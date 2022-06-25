@@ -11,11 +11,11 @@
  */
 import { DbIdentifiable } from "@/model/DbIdentifiable";
 
-export interface StoreAuthorization {
+export interface DbStoreAuthorization {
   userId: string;
   accessLevel: string;
 }
 export interface DbStore extends DbIdentifiable {
   name: string;
-  authorizations: Array<StoreAuthorization>;
+  authorizations: Array<DbStoreAuthorization>;
 }

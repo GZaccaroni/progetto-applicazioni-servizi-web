@@ -1,12 +1,12 @@
 import { DbUnitOfMeasure } from "@/model/DbUnitOfMeasure";
 import { DbIdentifiable } from "@/model/DbIdentifiable";
 
-export enum ItemGrade {
+export enum DbItemGrade {
   First = "first",
   Second = "second",
   Mixed = "mixed",
 }
-export interface ItemKind {
+export interface DbItemKind {
   id?: string;
   name: string;
   pricePerUnit?: number;
@@ -18,7 +18,7 @@ export interface DbItemKindIdentifier {
 export interface DbItem extends DbIdentifiable {
   name: string;
   pricePerUnit?: number;
-  grade?: ItemGrade;
-  kinds: ItemKind[];
+  grade?: DbItemGrade;
+  kinds: DbItemKind[];
   unitOfMeasure: DbUnitOfMeasure;
 }
