@@ -1,7 +1,8 @@
 import axios from "axios";
 
-const baseDomain = "https://jsonplaceholder.typicode.com";
-const baseURL = `${baseDomain}`; // Incase of /api/v1;
+const baseDomain =
+  "https://virtserver.swaggerhub.com/ZACCARONIGIULIO/ColtureCloud/1.0.0";
+const baseURL = `${baseDomain}`;
 
 export default axios.create({
   baseURL,
