@@ -1,4 +1,4 @@
-interface ChartDataItem {
+export interface DbChartDataItem {
   date: string;
   value: number;
   dataPerItem: Array<{
@@ -6,7 +6,11 @@ interface ChartDataItem {
     value: number;
   }>;
 }
+export enum DbChartDataType {
+  Quantity = "quantity",
+  Revenue = "price",
+}
 
 export interface DbChartData {
-  data: Array<ChartDataItem>;
+  data: Array<DbChartDataItem>;
 }

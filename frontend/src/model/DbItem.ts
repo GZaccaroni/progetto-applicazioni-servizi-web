@@ -11,6 +11,10 @@ export interface ItemKind {
   name: string;
   pricePerUnit?: number;
 }
+export interface DbItemKindIdentifier {
+  itemId: string;
+  variantId: string;
+}
 export interface DbItem extends DbIdentifiable {
   name: string;
   pricePerUnit?: number;
