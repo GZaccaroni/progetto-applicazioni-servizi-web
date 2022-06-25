@@ -1,7 +1,7 @@
 export interface SnackbarState {
-  message?: SnackbarMessage;
+  message?: SnackbarStateMessage;
 }
-export interface SnackbarMessage {
+export interface SnackbarStateMessage {
   text: string;
   color: string;
   timeout: number;

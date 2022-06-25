@@ -1,5 +1,5 @@
 import store from "@/store";
-import { SnackbarMessage } from "@/store/snackbar/types";
+import { SnackbarStateMessage } from "@/store/snackbar/types";
 
 interface SnackbarStatusMessage {
   type: "error" | "success";
@@ -11,7 +11,7 @@ const messageColor = {
   error: { color: "danger" },
 };
 const showMessage = (payload: SnackbarStatusMessage) => {
-  const fullPayload: SnackbarMessage = {
+  const fullPayload: SnackbarStateMessage = {
     text: payload.text,
     color: messageColor[payload.type].color,
     timeout: payload.timeout ?? 1000,
