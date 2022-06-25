@@ -1,4 +1,4 @@
-import { DbIdentifiable } from "@/model/DbIdentifiable";
+import { DbIdentifiable } from "./DbIdentifiable";
 
 export interface DbCustomer extends DbIdentifiable {
   name: string;

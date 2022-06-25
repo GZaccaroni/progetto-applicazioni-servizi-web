@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="2bfdce36-b65d-4f09-aeef-82ac971dc518" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/Launch_API.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/Serve_Frontend.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/backend/.idea/backend.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/backend/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/common/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/common/tsconfig.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tsconfig.build.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.eslintrc.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/backend/.eslintrc.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/packages/backend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/packages/backend/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.idea/backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/progetto.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/packages/backend/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/packages/backend/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/backend/src/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/backend/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.browserslistrc" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/.browserslistrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.eslintrc.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/.eslintrc.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/babel.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/babel.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/public/favicon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/assets/logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/assets/logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/assets/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/assets/logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/HelloWorld.vue" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/components/HelloWorld.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/AppSnackbar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/components/common/AppSnackbar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/helpers/snackbar.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/helpers/snackbar.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/model/DbChartData.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/model/db/DbChartData.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/model/DbCustomer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/model/db/DbCustomer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/model/DbIdentifiable.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/model/db/DbIdentifiable.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/model/DbItem.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/model/db/DbItem.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/model/DbOrder.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/model/db/DbOrder.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/model/DbStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/model/db/DbStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/model/DbUnitOfMeasure.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/model/db/DbUnitOfMeasure.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/model/DbUser.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/model/db/DbUser.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/vuetify.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/plugins/vuetify.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/repositories/AnalyticsRepository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/repositories/AnalyticsRepository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/repositories/CustomerRepository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/repositories/CustomerRepository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/repositories/ItemRepository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/repositories/ItemRepository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/repositories/OrdersRepository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/repositories/OrdersRepository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/repositories/StoreRepository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/repositories/StoreRepository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/repositories/UserRepository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/repositories/UserRepository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/repositories/common/AxiosClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/repositories/common/AxiosClient.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/repositories/common/PaginatedResult.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/repositories/common/PaginatedResult.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/shims-tsx.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/shims-tsx.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/shims-vue.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/shims-vue.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/shims-vuetify.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/shims-vuetify.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/store/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/store/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/store/rootState.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/store/rootState.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/store/snackbar/snackbar.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/store/snackbar/snackbar.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/store/snackbar/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/store/snackbar/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/store/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/store/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/AboutView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/views/AboutView.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/HomeView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/views/HomeView.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/vue.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/vue.config.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2B57GS9GovmC2XS5PdiM8L2KfA6" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/gzaccaroni/DocumentiLocali/Università/Applicazioni Web/progetto/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/packages/common/src/model/db" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.Launch Frontend">
+    <list>
+      <item itemvalue="npm.Launch Frontend" />
+      <item itemvalue="npm.Launch API" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2bfdce36-b65d-4f09-aeef-82ac971dc518" name="Changes" comment="" />
+      <created>1656183996819</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1656183996819</updated>
+      <workItem from="1656183999199" duration="1007000" />
+      <workItem from="1656185077289" duration="400000" />
+      <workItem from="1656188996847" duration="556000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

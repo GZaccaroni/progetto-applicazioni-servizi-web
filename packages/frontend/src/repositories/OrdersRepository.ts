@@ -1,7 +1,7 @@
 import Client from "@/repositories/common/AxiosClient";
 import { PaginatedResult } from "@/repositories/common/PaginatedResult";
 import { omit } from "lodash";
-import { DbOrder } from "@/model/DbOrder";
+import { DbOrder } from "@/model/db/DbOrder";
 
 const resource = "/order";
 

@@ -1,8 +1,7 @@
 import Client from "@/repositories/common/AxiosClient";
 import { PaginatedResult } from "@/repositories/common/PaginatedResult";
 import { omit } from "lodash";
-import { DbStore } from "@/model/DbStore";
-import { DbUser } from "@/model/DbUser";
+import { DbUser } from "@/model/db/DbUser";
 
 const resource = "/user";
 
@@ -15,8 +14,8 @@ export interface FindStoresInput {
 }
 export async function findUsers(
   input: FindStoresInput
-): Promise<PaginatedResult<DbStore[]>> {
-  const result = await Client.get<PaginatedResult<DbStore[]>>(
+): Promise<PaginatedResult<DbUser[]>> {
+  const result = await Client.get<PaginatedResult<DbUser[]>>(
     `${resource}/find`,
     {
       params: input,
@@ -24,8 +23,8 @@ export async function findUsers(
   );
   return result.data;
 }
-export async function findUser(id: string): Promise<DbStore> {
-  const result = await Client.get<DbStore>(`${resource}/${id}`);
+export async function findUser(id: string): Promise<DbUser> {
+  const result = await Client.get<DbUser>(`${resource}/${id}`);
   return result.data;
 }
 export type AddUserInput = DbUser & { password: string };

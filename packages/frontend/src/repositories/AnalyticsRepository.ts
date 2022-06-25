@@ -1,6 +1,6 @@
 import Client from "@/repositories/common/AxiosClient";
-import { DbChartData, DbChartDataType } from "@/model/DbChartData";
-import { DbItemKindIdentifier } from "@/model/DbItem";
+import { DbChartData, DbChartDataType} from "@/model/db/DbChartData";
+import { DbItemKindIdentifier } from "@/model/db/DbItem";
 
 const resource = "/analytics";
 

@@ -1,5 +1,5 @@
-import { DbUnitOfMeasure } from "@/model/DbUnitOfMeasure";
-import { DbIdentifiable } from "@/model/DbIdentifiable";
+import { DbUnitOfMeasure } from "./DbUnitOfMeasure";
+import { DbIdentifiable } from "./DbIdentifiable";
 
 export enum DbItemGrade {
   First = "first",

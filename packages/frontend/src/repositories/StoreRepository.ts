@@ -1,9 +1,7 @@
 import Client from "@/repositories/common/AxiosClient";
-import { DbItem } from "@/model/DbItem";
 import { PaginatedResult } from "@/repositories/common/PaginatedResult";
 import { omit } from "lodash";
-import { DbCustomer } from "@/model/DbCustomer";
-import { DbStore } from "@/model/DbStore";
+import {DbStore} from "@/model/db/DbStore";
 
 const resource = "/store";
 

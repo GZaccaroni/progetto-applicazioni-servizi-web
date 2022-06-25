@@ -1,5 +1,5 @@
 import { DbCustomer } from "./DbCustomer";
-import { DbIdentifiable } from "@/model/DbIdentifiable";
+import { DbIdentifiable } from "./DbIdentifiable";
 
 export interface DbOrderEntry {
   itemId: string;

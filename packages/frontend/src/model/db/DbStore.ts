@@ -9,7 +9,7 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { DbIdentifiable } from "@/model/DbIdentifiable";
+import { DbIdentifiable } from "./DbIdentifiable";
 
 export interface DbStoreAuthorization {
   userId: string;

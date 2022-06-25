@@ -1,21 +1,20 @@
 import Client from "@/repositories/common/AxiosClient";
-import { DbItem } from "@/model/DbItem";
 import { PaginatedResult } from "@/repositories/common/PaginatedResult";
 import { omit } from "lodash";
-import { DbCustomer } from "@/model/DbCustomer";
+import {DbItem} from "@/model/db/DbItem";
 
-const resource = "/customer";
+const resource = "/item";
 
-export interface FindCustomersInput {
+export interface FindItemsInput {
   pagingNext?: string;
   pagingPrevious?: string;
   searchName?: string;
   limit: number;
 }
-export async function findCustomers(
-  input: FindCustomersInput
-): Promise<PaginatedResult<DbCustomer[]>> {
-  const result = await Client.get<PaginatedResult<DbCustomer[]>>(
+export async function findItems(
+  input: FindItemsInput
+): Promise<PaginatedResult<DbItem[]>> {
+  const result = await Client.get<PaginatedResult<DbItem[]>>(
     `${resource}/find`,
     {
       params: input,
@@ -23,22 +22,22 @@ export async function findCustomers(
   );
   return result.data;
 }
-export async function findCustomer(id: string): Promise<DbCustomer> {
+export async function findItem(id: string): Promise<DbItem> {
   const result = await Client.get<DbItem>(`${resource}/${id}`);
   return result.data;
 }
-export async function addCustomer(data: Omit<DbCustomer, "id">): Promise<void> {
+export async function addItem(data: Omit<DbItem, "id">): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export async function updateCustomer(item: DbCustomer): Promise<void> {
+export async function updateItem(item: DbItem): Promise<void> {
   const result = await Client.post<void>(
     `${resource}/${item.id}`,
     omit(item, "id")
   );
   return result.data;
 }
-export async function deleteCustomer(id: string): Promise<void> {
+export async function deleteItem(id: string): Promise<void> {
   const result = await Client.delete<void>(`${resource}/${id}`);
   return result.data;
 }
