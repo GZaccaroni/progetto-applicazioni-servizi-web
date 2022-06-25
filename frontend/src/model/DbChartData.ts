@@ -1,5 +1,5 @@
 export interface DbChartDataItem {
-  date: string;
+  date: Date;
   value: number;
   dataPerItem: Array<{
     itemName: string;
