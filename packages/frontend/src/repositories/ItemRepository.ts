@@ -1,25 +1,38 @@
 import Client from "@/repositories/common/AxiosClient";
-import { PaginatedResult } from "@/repositories/common/PaginatedResult";
+import {
+  PaginatedFindInput,
+  PaginatedResult,
+} from "@/repositories/common/PaginatedResult";
 import { omit } from "lodash";
-import {DbItem} from "@/model/db/DbItem";
+import { DbItem } from "@/model/db/DbItem";
+import { Unsubscribe } from "@/repositories/common/Unsubscribe";
+import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 
 const resource = "/item";
 
-export interface FindItemsInput {
-  pagingNext?: string;
-  pagingPrevious?: string;
+export interface FindItemsInput extends PaginatedFindInput {
   searchName?: string;
   limit: number;
 }
+export function observeItems(
+  input: FindItemsInput,
+  onNext: (result: PaginatedResult<DbItem>) => void,
+  onError: (error: { code: string; message: string }) => void
+): Unsubscribe {
+  return observePaginatedResult(
+    input,
+    findItems,
+    "itemChanged",
+    onNext,
+    onError
+  );
+}
 export async function findItems(
   input: FindItemsInput
-): Promise<PaginatedResult<DbItem[]>> {
-  const result = await Client.get<PaginatedResult<DbItem[]>>(
-    `${resource}/find`,
-    {
-      params: input,
-    }
-  );
+): Promise<PaginatedResult<DbItem>> {
+  const result = await Client.get<PaginatedResult<DbItem>>(`${resource}/find`, {
+    params: input,
+  });
   return result.data;
 }
 export async function findItem(id: string): Promise<DbItem> {

@@ -1,26 +1,38 @@
 import Client from "@/repositories/common/AxiosClient";
-import { PaginatedResult } from "@/repositories/common/PaginatedResult";
+import {
+  PaginatedFindInput,
+  PaginatedResult,
+} from "@/repositories/common/PaginatedResult";
 import { omit } from "lodash";
 import { DbUser } from "@/model/db/DbUser";
+import { Unsubscribe } from "@/repositories/common/Unsubscribe";
+import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 
 const resource = "/user";
 
-export interface FindStoresInput {
-  authorized?: boolean;
-  pagingNext?: string;
-  pagingPrevious?: string;
+export function observeUsers(
+  input: FindUsersInput,
+  onNext: (result: PaginatedResult<DbUser>) => void,
+  onError: (error: { code: string; message: string }) => void
+): Unsubscribe {
+  return observePaginatedResult(
+    input,
+    findUsers,
+    "userChanged",
+    onNext,
+    onError
+  );
+}
+export interface FindUsersInput extends PaginatedFindInput {
   searchName?: string;
   limit: number;
 }
 export async function findUsers(
-  input: FindStoresInput
-): Promise<PaginatedResult<DbUser[]>> {
-  const result = await Client.get<PaginatedResult<DbUser[]>>(
-    `${resource}/find`,
-    {
-      params: input,
-    }
-  );
+  input: FindUsersInput
+): Promise<PaginatedResult<DbUser>> {
+  const result = await Client.get<PaginatedResult<DbUser>>(`${resource}/find`, {
+    params: input,
+  });
   return result.data;
 }
 export async function findUser(id: string): Promise<DbUser> {

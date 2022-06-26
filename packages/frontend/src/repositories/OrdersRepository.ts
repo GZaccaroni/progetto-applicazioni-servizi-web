@@ -1,22 +1,35 @@
 import Client from "@/repositories/common/AxiosClient";
-import { PaginatedResult } from "@/repositories/common/PaginatedResult";
+import {PaginatedFindInput, PaginatedResult} from "@/repositories/common/PaginatedResult";
 import { omit } from "lodash";
 import { DbOrder } from "@/model/db/DbOrder";
+import { Unsubscribe } from "@/repositories/common/Unsubscribe";
+import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 
 const resource = "/order";
 
-export interface FindOrdersInput {
+export interface FindOrdersInput extends PaginatedFindInput {
   storeId?: string;
-  pagingNext?: string;
-  pagingPrevious?: string;
   fromDate?: Date;
   toDate?: Date;
   limit: number;
 }
+export function observeOrders(
+  input: FindOrdersInput,
+  onNext: (result: PaginatedResult<DbOrder>) => void,
+  onError: (error: { code: string; message: string }) => void
+): Unsubscribe {
+  return observePaginatedResult(
+    input,
+    findOrders,
+    "orderChanged",
+    onNext,
+    onError
+  );
+}
 export async function findOrders(
   input: FindOrdersInput
-): Promise<PaginatedResult<DbOrder[]>> {
-  const result = await Client.get<PaginatedResult<DbOrder[]>>(
+): Promise<PaginatedResult<DbOrder>> {
+  const result = await Client.get<PaginatedResult<DbOrder>>(
     `${resource}/find`,
     {
       params: input,
