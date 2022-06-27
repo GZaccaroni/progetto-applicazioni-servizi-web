@@ -2,7 +2,7 @@ import { DbCustomer } from "./DbCustomer";
 import { DbIdentifiable } from "./DbIdentifiable";
 
 export interface DbOrderEntry {
-  itemId: string;
+  productId: string;
   variantId?: string;
   name: string;
   quantity: number;

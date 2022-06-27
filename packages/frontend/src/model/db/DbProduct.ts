@@ -6,19 +6,19 @@ export enum DbItemGrade {
   Second = "second",
   Mixed = "mixed",
 }
-export interface DbItemKind {
+export interface DbProductKind {
   id?: string;
   name: string;
   pricePerUnit?: number;
 }
-export interface DbItemKindIdentifier {
-  itemId: string;
+export interface DbProductKindIdentifier {
+  productId: string;
   variantId: string;
 }
-export interface DbItem extends DbIdentifiable {
+export interface DbProduct extends DbIdentifiable {
   name: string;
   pricePerUnit?: number;
   grade?: DbItemGrade;
-  kinds: DbItemKind[];
+  kinds: DbProductKind[];
   unitOfMeasure: DbUnitOfMeasure;
 }
