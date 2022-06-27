@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType, ref } from "@vue/composition-api";
-import { isEqual, pickBy } from "lodash";
+import { debounce, isEqual, pickBy } from "lodash";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { useCancellablesListener } from "@/components/common/UnsubscribeMixin";
 import { ObservePaginatedResultFunction } from "@/repositories/common/ObserveUtils";
@@ -90,6 +90,7 @@ export default defineComponent({
     const previousPageCursor = ref<string | undefined>(undefined);
     const nextPageCursor = ref<string | undefined>(undefined);
     const cancellables = useCancellablesListener();
+
     return {
       intLoading,
       items,
@@ -110,12 +111,15 @@ export default defineComponent({
     },
   },
   watch: {
-    filters(oldValue, newValue) {
+    observeFnInput(oldValue, newValue) {
       if (isEqual(oldValue, newValue)) {
         return;
       }
-      this.loadItems();
+      this.debouncedLoadItems();
     },
+  },
+  created() {
+    this.debouncedLoadItems = debounce(this.debouncedLoadItems, 500);
   },
   methods: {
     $_tableItemSlots() {
@@ -125,9 +129,12 @@ export default defineComponent({
         (_, key) => key.startsWith("item.") && !excludedItems.includes(key)
       );
     },
+    debouncedLoadItems(direction?: "previous" | "next") {
+      this.loadItems(direction);
+    },
     loadItems(direction?: "previous" | "next") {
-      // Unsubscribe previous
       this.intLoading = true;
+      // Unsubscribe previous
       this.cancelAll();
       const limit = this.numberOfItemsPerPage;
       let previousCursor: string | undefined;

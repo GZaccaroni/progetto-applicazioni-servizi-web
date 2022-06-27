@@ -3,6 +3,7 @@ import { AxiosError } from "axios";
 
 export function repositoryErrorHandler(reason: unknown) {
   let errorMessage: string;
+  console.error("Repository error", reason);
   if (reason instanceof AxiosError) {
     switch (reason.response?.status) {
       case 400:
@@ -24,8 +25,6 @@ export function repositoryErrorHandler(reason: unknown) {
   } else if (typeof reason == "string") {
     errorMessage = reason;
   } else {
-    console.error("Unknown error detected: ");
-    console.error(reason);
     errorMessage = "Unknown error";
   }
   showMessage({

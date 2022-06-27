@@ -3,21 +3,14 @@
     <paginated-table-builder
       :observe-items-fn="observeItemsFn"
       :observe-fn-input="observeFnInput"
-      @onDataEvent="clickAction"
+      @onRowEvent="onRowEvent"
       :columns="headers"
+      :actions="['edit', 'delete']"
       :loading="tableLoading"
     >
-      <!--
-      <template v-slot:header v-if="showFilters">
-       <form-builder-vuetify
-         @onChangeForm="filterItems"
-         :configForm="formConfig.form"
-         :validation="formConfig.validate"
-         :hide-buttons="true"
-       >
-       </form-builder-vuetify>
+      <template v-slot:header>
+        <list-users-filter @change="filterList" />
       </template>
-      -->
       <template v-slot:[`item.isAdmin`]="{ item }">
         <v-simple-checkbox
           :value="item.isPrivate"
@@ -25,7 +18,6 @@
         ></v-simple-checkbox>
       </template>
     </paginated-table-builder>
-    <confirm-dialog-vuetify ref="confirm" />
   </div>
 </template>
 
@@ -34,12 +26,13 @@ import { defineComponent, ref } from "@vue/composition-api";
 import { FindUsersInput, observeUsers } from "@/repositories/UserRepository";
 import { DataTableHeader } from "vuetify";
 import { DbUser } from "@/model/db/DbUser";
-import {
-  TableItemEvent,
-  TableItemEventType,
-} from "@/plugins/table-builder/TableItemEventType";
+import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
+import ListUsersFilter from "@/components/users/ListUsersFilter.vue";
 
 export default defineComponent({
+  components: {
+    ListUsersFilter,
+  },
   setup() {
     const observeItemsFn = observeUsers;
     const tableLoading = ref(false);
@@ -56,6 +49,7 @@ export default defineComponent({
         sortable: false,
         width: "130px",
       },
+      { text: "Actions", value: "actions", sortable: false, width: "130px" },
     ]);
     return {
       observeItemsFn,
@@ -65,19 +59,12 @@ export default defineComponent({
     };
   },
   methods: {
-    openUserView(item: DbUser) {
-      this.$router.push(`/users/${item.id}`);
+    filterList(input: FindUsersInput) {
+      this.observeFnInput = input;
     },
-
-    clickAction(event: TableItemEvent<DbUser>) {
-      switch (event.type) {
-        case TableItemEventType.rowClick:
-          this.openUserView(event.item);
-          break;
-        case TableItemEventType.rowSelection:
-          this.$emit("onDataEvent", event);
-          break;
-      }
+    onRowEvent(event: TableItemEvent<DbUser>) {
+      // Pass-through
+      this.$emit("onRowEvent", event);
     },
   },
 });

@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import { TableItemEventType } from "@/plugins/table-builder/TableItemEventType";
 
 type Action = {
   name: ItemAction;
@@ -24,20 +25,15 @@ const ACTIONS: Action[] = [
   {
     name: "edit",
     ico: "mdi-pencil",
-    event: "onActionEdit",
-  },
-  {
-    name: "remove",
-    ico: "mdi-close",
-    event: "onActionRemove",
+    event: TableItemEventType.rowEditAction,
   },
   {
     name: "delete",
     ico: "mdi-delete",
-    event: "onActionDelete",
+    event: TableItemEventType.rowDeleteAction,
   },
 ];
-export type ItemAction = "remove" | "edit" | "delete";
+export type ItemAction = "edit" | "delete";
 export default Vue.extend({
   name: "ActionTable",
   props: {

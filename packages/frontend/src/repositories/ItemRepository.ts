@@ -22,7 +22,7 @@ export function observeItems(
   return observePaginatedResult(
     input,
     findItems,
-    "itemChanged",
+    "productChanged",
     onNext,
     onError
   );

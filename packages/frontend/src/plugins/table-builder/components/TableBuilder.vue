@@ -121,7 +121,7 @@ export default defineComponent({
       );
     },
     clickAction(item: Item, eventType: TableItemEventType): void {
-      this.$emit("onDataEvent", { item, type: eventType });
+      this.$emit("onRowEvent", { item, type: eventType });
     },
   },
 });

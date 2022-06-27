@@ -1,8 +1,8 @@
 import { io, Socket } from "socket.io-client";
-const domain = "https://socketiodomain/";
+const domain = "https://localhost/";
 export interface ServerToClientEvents {
   orderChanged: (id: string) => void;
-  itemChanged: (id: string) => void;
+  productChanged: (id: string) => void;
   storeChanged: (id: string) => void;
   userChanged: (id: string) => void;
   customerChanged: (id: string) => void;
