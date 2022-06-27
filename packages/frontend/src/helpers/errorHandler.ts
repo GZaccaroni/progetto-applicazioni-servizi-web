@@ -5,6 +5,9 @@ export function repositoryErrorHandler(reason: unknown) {
   let errorMessage: string;
   if (reason instanceof AxiosError) {
     switch (reason.response?.status) {
+      case 400:
+        errorMessage = "Nome utente/ Password non validi.";
+        break;
       case 404:
         errorMessage = "Elemento non trovato.";
         break;

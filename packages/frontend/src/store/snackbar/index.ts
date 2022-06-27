@@ -1,6 +1,6 @@
 import { Module } from "vuex";
 import { SnackbarState } from "@/store/snackbar/types";
-import { RootState } from "@/store/rootState";
+import { RootState } from "@/store/types";
 
 const module: Module<SnackbarState, RootState> = {
   namespaced: true,

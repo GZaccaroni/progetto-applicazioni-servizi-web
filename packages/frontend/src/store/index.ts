@@ -1,7 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import snackbar from "@/store/snackbar/snackbar";
-import { RootState } from "@/store/rootState";
+import snackbar from "@/store/snackbar";
+import user from "@/store/user";
+import { RootState } from "@/store/types";
 
 Vue.use(Vuex);
 
@@ -14,5 +15,6 @@ export default new Vuex.Store<RootState>({
   actions: {},
   modules: {
     snackbar,
+    user,
   },
 });

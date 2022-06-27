@@ -1,5 +1,8 @@
 import Client from "@/repositories/common/AxiosClient";
-import {PaginatedFindInput, PaginatedResult} from "@/repositories/common/PaginatedResult";
+import {
+  PaginatedFindInput,
+  PaginatedResult,
+} from "@/repositories/common/PaginatedResult";
 import { omit } from "lodash";
 import { DbOrder } from "@/model/db/DbOrder";
 import { Unsubscribe } from "@/repositories/common/Unsubscribe";

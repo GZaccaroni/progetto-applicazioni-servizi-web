@@ -16,16 +16,11 @@
 import Vue, { PropType } from "vue";
 
 type Action = {
-  name: string;
+  name: ItemAction;
   ico: string;
   event: string;
 };
 const ACTIONS: Action[] = [
-  {
-    name: "list_parents",
-    ico: "mdi-format-list-bulleted",
-    event: "onActionListParents",
-  },
   {
     name: "edit",
     ico: "mdi-pencil",
@@ -42,7 +37,7 @@ const ACTIONS: Action[] = [
     event: "onActionDelete",
   },
 ];
-type ItemAction = "list_parents" | "remove" | "edit" | "delete";
+type ItemAction = "remove" | "edit" | "delete";
 export default Vue.extend({
   name: "ActionTable",
   props: {
@@ -65,9 +60,9 @@ export default Vue.extend({
   },
   computed: {
     actionsToShow(): Action[] {
-      return ACTIONS.filter(
-        (act) => this.item.actions && this.item.actions[act.name]
-      );
+      return ACTIONS.filter((act) => {
+        return this.item?.actions && this.item.actions[act.name];
+      });
     },
   },
 });
