@@ -11,6 +11,7 @@ Vue.config.productionTip = false;
 Vue.use(VueCompositionAPI);
 Vue.use(PaginatedTableBuilder);
 Vue.use(TableBuilder);
+
 new Vue({
   router,
   store,
