@@ -51,6 +51,7 @@ import ActionsTable from "./ActionsTable.vue";
 import { DataTableHeader } from "vuetify";
 import { defineComponent, PropType } from "@vue/composition-api";
 import { pickBy } from "lodash";
+import { TableItemEventType } from "@/plugins/table-builder/TableItemEventType";
 
 type Item = Partial<Record<string, string>>;
 
@@ -105,7 +106,7 @@ export default defineComponent({
 
   watch: {
     selected(newSelected, _) {
-      this.clickAction(newSelected, "onRowSelection");
+      this.clickAction(newSelected, TableItemEventType.rowSelection);
     },
   },
 
@@ -119,8 +120,8 @@ export default defineComponent({
         (_, key) => key.startsWith("item.") && !excludedItems.includes(key)
       );
     },
-    clickAction(item: Item, event: string): void {
-      this.$emit("onDataEvent", { item, event });
+    clickAction(item: Item, eventType: TableItemEventType): void {
+      this.$emit("onDataEvent", { item, type: eventType });
     },
   },
 });

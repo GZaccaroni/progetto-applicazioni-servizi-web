@@ -8,10 +8,10 @@ import socketIoClient, {
 } from "@/repositories/common/SocketIoClient";
 import { Cancellable } from "@/repositories/common/Cancellable";
 
-export type ObservePaginatedResultFunction = <
+export type ObservePaginatedResultFunction<
   Input extends PaginatedFindInput,
   Item extends DbIdentifiable
->(
+> = (
   input: Input,
   onNext: (result: PaginatedResult<Item>) => void,
   onError: (error: { code: string; message: string }) => void
@@ -26,9 +26,10 @@ export function observePaginatedResult<Input, Item extends DbIdentifiable>(
 ): Cancellable {
   let currentResult: PaginatedResult<Item> | undefined = undefined;
   let isLoading = false;
-  const listener = (id: string) => {
+  const listener = (id?: string) => {
     if (isLoading) return;
     if (
+      id == undefined ||
       currentResult == undefined ||
       currentResult.results.some((el) => el.id == id)
     ) {
@@ -42,6 +43,7 @@ export function observePaginatedResult<Input, Item extends DbIdentifiable>(
   };
   socketIoClient.on("customerChanged", listener);
   socketIoClient.removeListener();
+  listener();
   return () => {
     socketIoClient.removeListener("customerChanged", listener);
   };

@@ -50,7 +50,9 @@ export default defineComponent({
   components: {},
   props: {
     observeItemsFn: {
-      type: Function as PropType<ObservePaginatedResultFunction>,
+      type: Function as PropType<
+        ObservePaginatedResultFunction<any, any> // eslint-disable-line
+      >,
       required: true,
     },
     observeFnInput: {

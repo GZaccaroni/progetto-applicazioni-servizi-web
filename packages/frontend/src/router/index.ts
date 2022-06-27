@@ -20,6 +20,12 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(/* webpackChunkName: "login" */ "../views/AboutView.vue"),
   },
+  {
+    path: "/users",
+    name: "users",
+    component: () =>
+      import(/* webpackChunkName: "users" */ "../views/user/UsersView.vue"),
+  },
 ];
 
 const router = new VueRouter({
@@ -31,7 +37,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
   if (requiresAuth) {
-    if ((<any>store.state).user.isLoggedIn) {
+    if ((<any>store.state).user.isLoggedIn) {  // eslint-disable-line
       next();
       return;
     } else {
