@@ -1,5 +1,5 @@
 <template>
-  <table-builder-vuetify
+  <table-builder
     v-on="$listeners"
     :showCustomFooterPagination="true"
     :single-select="singleSelect"
@@ -7,7 +7,6 @@
     :columns="columns"
     :items="items"
     :numberOfItemsPerPage="numberOfItemsPerPage"
-    :sortable="sortable"
     :loading="loading || intLoading"
   >
     <template
@@ -33,31 +32,33 @@
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
     </template>
-  </table-builder-vuetify>
+  </table-builder>
 </template>
 
 <script lang="ts">
-import Vue, { PropType, VueConstructor } from "vue";
+import { defineComponent, PropType, ref } from "@vue/composition-api";
+import { isEqual, pickBy } from "lodash";
+import { repositoryErrorHandler } from "@/helpers/errorHandler";
+import { useCancellablesListener } from "@/components/common/UnsubscribeMixin";
+import { ObservePaginatedResultFunction } from "@/repositories/common/ObserveUtils";
+import { ItemAction } from "@/plugins/table-builder/components/ActionsTable.vue";
+import { PaginatedFindInput } from "@/repositories/common/PaginatedResult";
 import { DataTableHeader } from "vuetify";
-import { observeErrorHandler } from "@/components/utils/UIErrorHandler";
 
-export default (
-  Vue as VueConstructor<Vue & InstanceType<typeof unsubscribeMixin>>
-).extend({
+export default defineComponent({
   name: "PaginatedTable",
   components: {},
-  mixins: [unsubscribeMixin],
-
   props: {
-    collectionName: {
-      type: String,
+    observeItemsFn: {
+      type: Function as PropType<ObservePaginatedResultFunction>,
+      required: true,
+    },
+    observeFnInput: {
+      type: Object as PropType<PaginatedFindInput>,
+      required: true,
     },
     columns: {
       type: Array as PropType<DataTableHeader[]>,
-      default: () => [],
-    },
-    filters: {
-      type: Array as PropType<FindOptionsWhereFilter[]>,
       default: () => [],
     },
     showSelect: {
@@ -69,53 +70,46 @@ export default (
       default: false,
     },
     actions: {
-      type: Array as PropType<
-        ("list_parents" | "remove" | "edit" | "delete")[]
-      >,
+      type: Array as PropType<ItemAction[]>,
       default: () => [],
     },
     numberOfItemsPerPage: {
       type: Number,
       default: 10,
     },
-    sortable: {
-      type: Boolean,
-      default: false,
-    },
     loading: {
       type: Boolean,
       default: false,
     },
   },
-  data(): {
-    intLoading: boolean;
-    items: Partial<Record<string, string>>[];
-    previousPagesCursors: (string | undefined)[];
-    hasNextPage: boolean;
-    nonReactive: {
-      unsubscribeObserveAll?: Unsubscribe;
-    };
-  } {
+  setup() {
+    const intLoading = ref(false);
+    const items = ref(new Array<Partial<Record<string, unknown>>>());
+    const previousPageCursor = ref<string | undefined>(undefined);
+    const nextPageCursor = ref<string | undefined>(undefined);
+    const cancellables = useCancellablesListener();
     return {
-      intLoading: false,
-      items: [],
-      previousPagesCursors: [],
-      hasNextPage: false,
-      nonReactive: {},
+      intLoading,
+      items,
+      previousPageCursor,
+      nextPageCursor,
+      ...cancellables,
     };
   },
-
   beforeMount() {
     this.loadItems();
   },
   computed: {
     hasPreviousPage(): boolean {
-      return this.previousPagesCursors.length > 0;
+      return this.previousPageCursor != undefined;
+    },
+    hasNextPage(): boolean {
+      return this.nextPageCursor != undefined;
     },
   },
   watch: {
     filters(oldValue, newValue) {
-      if (_.isEqual(oldValue, newValue)) {
+      if (isEqual(oldValue, newValue)) {
         return;
       }
       this.loadItems();
@@ -124,7 +118,7 @@ export default (
   methods: {
     $_tableItemSlots() {
       const excludedItems = ["item.actions"];
-      return _.pickBy(
+      return pickBy(
         this.$scopedSlots,
         (_, key) => key.startsWith("item.") && !excludedItems.includes(key)
       );
@@ -132,78 +126,52 @@ export default (
     loadItems(direction?: "previous" | "next") {
       // Unsubscribe previous
       this.intLoading = true;
-      this.unsubscribeAll();
+      this.cancelAll();
       const limit = this.numberOfItemsPerPage;
-      let startAfter: string | undefined;
-      let startAt: string | undefined;
+      let previousCursor: string | undefined;
+      let nextCursor: string | undefined;
 
-      const orderByField = this.orderByFieldPath ?? "id";
       switch (direction) {
         case "previous":
-          startAt = this.previousPagesCursors.pop();
-          // If it is the first page don't use startAt
-          if (this.previousPagesCursors.length == 0) {
-            startAt = undefined;
-          }
-          startAfter = undefined;
+          previousCursor = this.previousPageCursor;
           break;
         case "next":
-          startAt = undefined;
-          startAfter = _.last(this.items)?.[orderByField];
-          if (startAfter == undefined) return;
+          nextCursor = this.nextPageCursor;
           break;
         default:
-          startAfter = undefined;
-          startAt = undefined;
+          previousCursor = undefined;
+          nextCursor = undefined;
           break;
       }
-      const previousPagesCursorsLength = this.previousPagesCursors.length;
-      const unsubscribe = firestoreRepository.observeAll(
-        this.collectionName,
+      const unsubscribe = this.observeItemsFn(
         {
-          whereFilters: this.filters,
-          startAfter: startAfter,
-          startAt: startAt,
-          limit: limit + 1,
-          orderBy: {
-            fieldPath: this.orderByFieldPath ?? undefined,
-            direction: this.orderByDirection ?? undefined,
-          },
+          ...this.observeFnInput,
+          pagingNext: nextCursor,
+          pagingPrevious: previousCursor,
+          limit: limit,
         },
-        (next) => {
-          if (next.length == limit + 1) {
-            next.pop();
-            this.hasNextPage = true;
-          } else {
-            this.hasNextPage = false;
-          }
-          if (direction == "next") {
-            const firstItemId = _.first(this.items)?.[orderByField];
-            Vue.set(
-              this.previousPagesCursors,
-              previousPagesCursorsLength,
-              firstItemId
-            );
-          }
-
+        (result) => {
+          this.previousPageCursor = result.previous;
+          this.nextPageCursor = result.next;
           // Add actions if needed
-          if (this.actions.length > 0) {
-            next.forEach((el) => {
-              el.actions = {};
-              for (const action of this.actions) {
-                el.actions[action] = true;
-              }
-            });
+          let actions: Partial<Record<ItemAction, boolean>> = {};
+          for (const action of this.actions) {
+            actions[action] = true;
           }
-          this.items = next;
+          this.items = result.results.map((item) => {
+            return {
+              ...item,
+              actions: actions,
+            };
+          });
           this.intLoading = false;
         },
         (error) => {
-          observeErrorHandler(error);
+          repositoryErrorHandler(error);
           this.intLoading = false;
         }
       );
-      this.unsubscribes.push(unsubscribe);
+      this.addToCancellables(unsubscribe);
     },
   },
 });

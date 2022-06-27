@@ -37,7 +37,7 @@ const ACTIONS: Action[] = [
     event: "onActionDelete",
   },
 ];
-type ItemAction = "remove" | "edit" | "delete";
+export type ItemAction = "remove" | "edit" | "delete";
 export default Vue.extend({
   name: "ActionTable",
   props: {

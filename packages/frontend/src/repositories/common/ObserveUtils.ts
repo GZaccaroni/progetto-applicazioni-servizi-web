@@ -1,24 +1,29 @@
 import { DbIdentifiable } from "@/model/db/DbIdentifiable";
-import { PaginatedResult } from "@/repositories/common/PaginatedResult";
+import {
+  PaginatedFindInput,
+  PaginatedResult,
+} from "@/repositories/common/PaginatedResult";
 import socketIoClient, {
   ServerToClientEvents,
 } from "@/repositories/common/SocketIoClient";
-import { Unsubscribe } from "@/repositories/common/Unsubscribe";
+import { Cancellable } from "@/repositories/common/Cancellable";
 
-type ObservePaginatedResult = <Input, Item extends DbIdentifiable>(
+export type ObservePaginatedResultFunction = <
+  Input extends PaginatedFindInput,
+  Item extends DbIdentifiable
+>(
   input: Input,
-  findItemsFn: (input: Input) => Promise<PaginatedResult<Item>>,
-  eventName: keyof ServerToClientEvents & (string | symbol),
   onNext: (result: PaginatedResult<Item>) => void,
   onError: (error: { code: string; message: string }) => void
-) => Unsubscribe;
+) => Cancellable;
+
 export function observePaginatedResult<Input, Item extends DbIdentifiable>(
   input: Input,
   findItemsFn: (input: Input) => Promise<PaginatedResult<Item>>,
   eventName: keyof ServerToClientEvents & (string | symbol),
   onNext: (result: PaginatedResult<Item>) => void,
   onError: (error: { code: string; message: string }) => void
-): Unsubscribe {
+): Cancellable {
   let currentResult: PaginatedResult<Item> | undefined = undefined;
   let isLoading = false;
   const listener = (id: string) => {

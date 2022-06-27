@@ -5,7 +5,7 @@ import {
 } from "@/repositories/common/PaginatedResult";
 import { omit } from "lodash";
 import { DbProduct } from "@/model/db/DbProduct";
-import { Unsubscribe } from "@/repositories/common/Unsubscribe";
+import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 
 const resource = "/item";
@@ -18,7 +18,7 @@ export function observeItems(
   input: FindItemsInput,
   onNext: (result: PaginatedResult<DbProduct>) => void,
   onError: (error: { code: string; message: string }) => void
-): Unsubscribe {
+): Cancellable {
   return observePaginatedResult(
     input,
     findItems,
