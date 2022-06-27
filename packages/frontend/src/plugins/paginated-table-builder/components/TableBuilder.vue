@@ -1,4 +1,4 @@
-<!--<template>
+<template>
   <table-builder-vuetify
     v-on="$listeners"
     :showCustomFooterPagination="true"
@@ -215,4 +215,3 @@ export default (
   border-top-right-radius: 0;
 }
 </style>
--->
