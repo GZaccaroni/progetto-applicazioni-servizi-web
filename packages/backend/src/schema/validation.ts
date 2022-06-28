@@ -16,6 +16,9 @@ import StoreAuthorization from "./json/StoreAuthorization.json";
 import Store from "./json/Store.json";
 import CreateStore from "./json/CreateStore.json";
 import UpdateStore from "./json/UpdateStore.json";
+import User from "./json/User.json";
+import CreateUser from "./json/CreateUser.json";
+import UpdateUser from "./json/UpdateUser.json";
 
 export const ajv=new Ajv();
 addFormats(ajv)
@@ -35,6 +38,9 @@ ajv.addSchema(StoreAuthorization, "StoreAuthorization");
 ajv.addSchema(Store,"Store");
 ajv.addSchema(CreateStore,"CreateStore");
 ajv.addSchema(UpdateStore,"UpdateStore");
+ajv.addSchema(User,"User");
+ajv.addSchema(CreateUser, "CreateUser");
+ajv.addSchema(UpdateUser,"UpdateUser");
 
 export function validateRequest<T>(key:string, reqBody:string):Promise<T> | boolean{
   const validate= ajv.getSchema<T>(key);
