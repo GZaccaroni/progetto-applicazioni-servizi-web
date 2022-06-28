@@ -1,10 +1,10 @@
 import {Request, Response} from "express";
 import {validateRequest} from "../schema/validation";
-import {Product} from "../schema/type/Product";
 import {UpdateProduct} from "../schema/type/UpdateProduct";
+import {CreateProduct} from "../schema/type/CreateProduct";
 
 export const addProduct=(req:Request,res: Response)=>{
-  if(validateRequest<Product>("Product",req.body)){
+  if(validateRequest<CreateProduct>("CreateProduct",req.body)){
     res.send("validated");
   } else {
     res.status(400).send("Invalid Input");
