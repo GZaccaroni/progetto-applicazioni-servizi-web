@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" class="pa-4" @submit.prevent>
+  <v-form class="pa-4" @submit.prevent>
     <v-text-field
       v-model="form.searchName"
       label="Cerca per nome"
