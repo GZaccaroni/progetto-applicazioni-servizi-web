@@ -1,0 +1,26 @@
+{
+  "required": [
+    "pricePerUnit",
+    "productId",
+    "quantity"
+  ],
+  "type": "object",
+  "properties": {
+    "productId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "variantId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "quantity": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "pricePerUnit": {
+      "minimum": 0,
+      "type": "number"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "required": [
+    "date",
+    "entries",
+    "price",
+    "storeId"
+  ],
+  "type": "object",
+  "properties": {
+    "customerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "storeId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "entries": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "CreateOrderEntry#"
+      }
+    },
+    "note": {
+      "type": "string"
+    }
+  }
+}
