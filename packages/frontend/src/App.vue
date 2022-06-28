@@ -34,17 +34,21 @@
     </v-app-bar>
 
     <v-main>
-      <router-view />
+      <v-container fluid>
+        <app-snackbar />
+        <router-view />
+      </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import AppSnackbar from "@/components/common/AppSnackbar.vue";
 
 export default Vue.extend({
   name: "App",
-
+  components: { AppSnackbar },
   data: () => ({
     //
   }),
