@@ -9,11 +9,12 @@
       </template>
     </header-view>
     <list-users @onRowEvent="onRowEvent" />
+    <user-form-dialog v-model="dialogModel" />
   </v-container>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/composition-api";
+import { defineComponent, ref } from "@vue/composition-api";
 import ListUsers from "@/components/users/ListUsers.vue";
 import {
   TableItemEvent,
@@ -21,23 +22,41 @@ import {
 } from "@/plugins/table-builder/TableItemEventType";
 import { DbUser } from "@/model/db/DbUser";
 import HeaderView from "@/components/common/HeaderView.vue";
+import UserFormDialog, {
+  UserFormDialogModel,
+} from "@/components/form/user/UserFormDialog.vue";
+import { deleteUser } from "@/repositories/UserRepository";
+import { repositoryErrorHandler } from "@/helpers/errorHandler";
 
 export default defineComponent({
   components: {
+    UserFormDialog,
     HeaderView,
     ListUsers,
   },
+  setup() {
+    const dialogModel = ref<UserFormDialogModel>({ isVisible: false });
+    return {
+      dialogModel,
+    };
+  },
   methods: {
     openNewItemDialog() {
-      console.log("New item!");
+      this.dialogModel = {
+        isVisible: true,
+        initialData: {},
+      };
     },
     onRowEvent(event: TableItemEvent<DbUser>) {
       switch (event.type) {
         case TableItemEventType.rowEditAction:
-          console.log("Edit row!");
+          this.dialogModel = {
+            isVisible: true,
+            initialData: event.item,
+          };
           break;
         case TableItemEventType.rowDeleteAction:
-          console.log("Delete row!");
+          deleteUser(event.item.id).catch(repositoryErrorHandler);
           break;
       }
     },
