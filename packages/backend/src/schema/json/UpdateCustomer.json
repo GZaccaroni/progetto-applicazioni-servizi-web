@@ -1,0 +1,10 @@
+{
+  "allOf": [
+    {
+      "$ref": "Customer#"
+    },
+    {
+      "$ref": "Identifiable#"
+    }
+  ]
+}
