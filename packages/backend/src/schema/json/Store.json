@@ -1,0 +1,19 @@
+{
+  "required": [
+    "authorizations",
+    "name"
+  ],
+  "type": "object",
+  "properties": {
+    "name": {
+      "maximum": 250,
+      "type": "string"
+    },
+    "authorizations": {
+      "type": "array",
+      "items": {
+        "$ref": "StoreAuthorization#"
+      }
+    }
+  }
+}
