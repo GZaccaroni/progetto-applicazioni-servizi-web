@@ -12,6 +12,10 @@ import UpdateOrder from "./json/UpdateOrder.json";
 import Customer from "./json/Customer.json";
 import CreateCustomer from "./json/CreateCustomer.json";
 import UpdateCustomer from "./json/UpdateCustomer.json";
+import StoreAuthorization from "./json/StoreAuthorization.json";
+import Store from "./json/Store.json";
+import CreateStore from "./json/CreateStore.json";
+import UpdateStore from "./json/UpdateStore.json";
 
 export const ajv=new Ajv();
 addFormats(ajv)
@@ -27,6 +31,10 @@ ajv.addSchema(UpdateOrder, "UpdateOrder");
 ajv.addSchema(Customer,"Customer");
 ajv.addSchema(CreateCustomer,"CreateCustomer");
 ajv.addSchema(UpdateCustomer,"UpdateCustomer");
+ajv.addSchema(StoreAuthorization, "StoreAuthorization");
+ajv.addSchema(Store,"Store");
+ajv.addSchema(CreateStore,"CreateStore");
+ajv.addSchema(UpdateStore,"UpdateStore");
 
 export function validateRequest<T>(key:string, reqBody:string):Promise<T> | boolean{
   const validate= ajv.getSchema<T>(key);

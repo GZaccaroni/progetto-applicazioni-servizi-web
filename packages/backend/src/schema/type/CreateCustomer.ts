@@ -1,3 +1,3 @@
 import {Customer} from "./Customer";
 
-export type CreateCustomer = Customer
+export type CreateCustomer = Customer;
