@@ -47,6 +47,12 @@
   "views": {
     "users": {
       "title": "Utenti"
+    },
+    "orders": {
+      "title": "Ordini"
+    },
+    "stores": {
+      "title": "Punti Vendita"
     }
   }
 }
