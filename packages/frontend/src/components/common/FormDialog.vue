@@ -54,12 +54,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  PropType,
-  reactive,
-  SetupContext,
-} from "@vue/composition-api";
+import { defineComponent, PropType } from "@vue/composition-api";
 import { passthroughVModel } from "@/helpers/passthroughVModel";
 
 export type GenericFormDialogModel<T> =
@@ -69,14 +64,6 @@ export type GenericFormDialogModel<T> =
 type FormDialogParams = {
   persistent: boolean;
 };
-export function useFormDialog(
-  props: GenericFormDialogModel<unknown>,
-  context: SetupContext
-) {
-  return reactive({
-    isVisible: passthroughVModel(props, context, "isVisible"),
-  });
-}
 export default defineComponent({
   props: {
     title: {
