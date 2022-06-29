@@ -45,12 +45,13 @@ export async function addUser(data: AddUserInput): Promise<void> {
   return result.data;
 }
 export type UpdateUserInput = {
+  username?: string;
   password?: string;
   isAdmin?: string;
 };
 export async function updateUser(item: UpdateUserInput): Promise<void> {
   const result = await Client.post<void>(
-    `${resource}/${item.password}`,
+    `${resource}/${item.username}`,
     omit(item, "username")
   );
   return result.data;
