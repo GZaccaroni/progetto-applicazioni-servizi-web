@@ -1,7 +1,7 @@
 {
   "required": [
     "username",
-    "required"
+    "password"
   ],
   "type": "object",
   "properties": {
