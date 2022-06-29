@@ -10,6 +10,7 @@
     </header-view>
     <list-users @onRowEvent="onRowEvent" />
     <user-form-dialog v-model="dialogModel" />
+    <confirm-dialog ref="confirmDialog" />
   </v-container>
 </template>
 
@@ -27,16 +28,20 @@ import UserFormDialog, {
 } from "@/components/form/user/UserFormDialog.vue";
 import { deleteUser } from "@/repositories/UserRepository";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
+import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
 
 export default defineComponent({
   components: {
     UserFormDialog,
     HeaderView,
     ListUsers,
+    ConfirmDialog,
   },
   setup() {
     const dialogModel = ref<UserFormDialogModel>({ isVisible: false });
+    const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
     return {
+      confirmDialog,
       dialogModel,
     };
   },
@@ -47,6 +52,18 @@ export default defineComponent({
         initialData: {},
       };
     },
+    deleteItem(item: DbUser) {
+      this.confirmDialog
+        ?.open(
+          "Elimina utente",
+          "Sei sicuro di volere eliminare " + item.username + "?"
+        )
+        .then((confirmed) => {
+          if (confirmed) {
+            deleteUser(item.username).catch(repositoryErrorHandler);
+          }
+        });
+    },
     onRowEvent(event: TableItemEvent<DbUser>) {
       switch (event.type) {
         case TableItemEventType.rowEditAction:
@@ -56,7 +73,7 @@ export default defineComponent({
           };
           break;
         case TableItemEventType.rowDeleteAction:
-          deleteUser(event.item.id).catch(repositoryErrorHandler);
+          this.deleteItem(event.item);
           break;
       }
     },

@@ -84,7 +84,7 @@ export default defineComponent({
   },
   methods: {
     closeForm() {
-      this.$emit("onClose");
+      this.$emit("input", { isVisible: false });
     },
     async saveForm() {
       this.submitButtonLoading = true;
