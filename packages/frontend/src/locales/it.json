@@ -25,10 +25,17 @@
       "edit": "Modifica utente",
       "added": "Utente aggiunto con successo",
       "edited": "Utente modificato con successo"
+    },
+    "store": {
+      "name": "Nome",
+      "authorizations": "Autorizzazioni"
     }
   },
   "components": {
     "ListUsersFilter": {
+      "searchPerName": "Cerca per nome"
+    },
+    "ListStoresFilter": {
       "searchPerName": "Cerca per nome"
     },
     "form": {
