@@ -20,15 +20,15 @@ import {
   TableItemEvent,
   TableItemEventType,
 } from "@/plugins/table-builder/TableItemEventType";
-import { DbUser } from "@/model/db/DbUser";
 import HeaderView from "@/components/common/HeaderView.vue";
 import UserFormDialog, {
   UserFormDialogModel,
 } from "@/components/form/user/UserFormDialog.vue";
-import { deleteUser } from "@/repositories/UserRepository";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
 import ListOrders from "@/components/orders/ListOrders.vue";
+import { DbOrder } from "@/model/db/DbOrder";
+import { deleteOrder } from "@/repositories/OrdersRepository";
 
 export default defineComponent({
   components: {
@@ -52,27 +52,25 @@ export default defineComponent({
         initialData: {},
       };
     },
-    deleteItem(item: DbUser) {
+    deleteItem(item: DbOrder) {
       this.confirmDialog
         ?.open(
-          this.$t("confirm.delete.user.title").toString(),
-          this.$t("confirm.delete.user.message", {
-            username: item.username,
-          }).toString()
+          this.$t("confirm.delete.order.title").toString(),
+          this.$t("confirm.delete.order.message").toString()
         )
         .then((confirmed) => {
           if (confirmed) {
-            deleteUser(item.id).catch(repositoryErrorHandler);
+            deleteOrder(item.id).catch(repositoryErrorHandler);
           }
         });
     },
-    onRowEvent(event: TableItemEvent<DbUser>) {
+    onRowEvent(event: TableItemEvent<DbOrder>) {
       switch (event.type) {
         case TableItemEventType.rowEditAction:
-          this.dialogModel = {
+          /*this.dialogModel = {
             isVisible: true,
             initialData: event.item,
-          };
+          };*/
           break;
         case TableItemEventType.rowDeleteAction:
           this.deleteItem(event.item);

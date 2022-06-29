@@ -1,6 +1,6 @@
 <template>
   <v-container class="my-1" fluid>
-    <header-view :title="$t('views.stores.title').toString()">
+    <header-view :title="$t('views.customers.title').toString()">
       <template v-slot:endItems>
         <v-btn elevation="0" class="me-4" @click="openNewItemDialog()">
           <v-icon left>mdi-plus</v-icon>
@@ -8,7 +8,7 @@
         </v-btn>
       </template>
     </header-view>
-    <list-stores @onRowEvent="onRowEvent" />
+    <list-customers @onRowEvent="onRowEvent" />
     <user-form-dialog v-model="dialogModel" />
     <confirm-dialog ref="confirmDialog" />
   </v-container>
@@ -26,15 +26,15 @@ import UserFormDialog, {
 } from "@/components/form/user/UserFormDialog.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
-import ListStores from "@/components/stores/ListStores.vue";
-import { DbStore } from "@/model/db/DbStore";
-import {deleteStore} from "@/repositories/StoreRepository";
+import { DbCustomer } from "@/model/db/DbCustomer";
+import { deleteCustomer } from "@/repositories/CustomerRepository";
+import ListCustomers from "@/components/customers/ListCustomers.vue";
 
 export default defineComponent({
   components: {
     UserFormDialog,
     HeaderView,
-    ListStores,
+    ListCustomers,
     ConfirmDialog,
   },
   setup() {
@@ -52,21 +52,21 @@ export default defineComponent({
         initialData: {},
       };
     },
-    deleteItem(item: DbStore) {
+    deleteItem(item: DbCustomer) {
       this.confirmDialog
         ?.open(
-          this.$t("confirm.delete.store.title").toString(),
-          this.$t("confirm.delete.store.message", {
+          this.$t("confirm.delete.customer.title").toString(),
+          this.$t("confirm.delete.customer.message", {
             name: item.name,
           }).toString()
         )
         .then((confirmed) => {
           if (confirmed) {
-            deleteStore(item.id).catch(repositoryErrorHandler);
+            deleteCustomer(item.id).catch(repositoryErrorHandler);
           }
         });
     },
-    onRowEvent(event: TableItemEvent<DbStore>) {
+    onRowEvent(event: TableItemEvent<DbCustomer>) {
       switch (event.type) {
         case TableItemEventType.rowEditAction:
           /*this.dialogModel = {

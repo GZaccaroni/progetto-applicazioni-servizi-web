@@ -4,8 +4,22 @@
     "delete": {
       "user": {
         "title": "Elimina utente",
+        "message": "Sei sicuro di voler davvero eliminare {username}?"
+      },
+      "store": {
+        "title": "Elimina punto vendita",
         "message":
-                "Sei sicuro di voler davvero eliminare {username}?"
+        "Sei sicuro di voler davvero eliminare il punto vendita {name}?"
+      },
+      "order": {
+        "title": "Elimina ordine",
+        "message":
+        "Sei sicuro di voler davvero eliminare l'ordine?"
+      },
+      "customer": {
+        "title": "Elimina cliente",
+        "message":
+        "Sei sicuro di voler davvero eliminare {name}?"
       }
     }
   },
@@ -59,6 +73,9 @@
     },
     "stores": {
       "title": "Punti Vendita"
+    },
+    "customers": {
+      "title": "Clienti"
     }
   }
 }
