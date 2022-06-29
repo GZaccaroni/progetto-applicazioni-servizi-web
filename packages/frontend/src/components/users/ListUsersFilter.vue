@@ -10,7 +10,7 @@
 <script lang="ts">
 import { defineComponent, reactive, watch } from "@vue/composition-api";
 import { FindUsersInput } from "@/repositories/UserRepository";
-import { removeBlanks } from "@/helpers/textUtils";
+import { removeBlanks } from "@/helpers/utils";
 
 export default defineComponent({
   setup(props, { emit }) {
