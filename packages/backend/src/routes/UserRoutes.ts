@@ -15,11 +15,12 @@ UserRoutes.route("/").post(createUser);
 
 UserRoutes.route("/find").get(getUsers);
 
-UserRoutes.route("/:id").get(getUserById)
-                              .put(updateUser)
-                              .delete(deleteUser);
-
 UserRoutes.route("/login").post(userLogin);
 UserRoutes.route("/logout").get(userLogout);
+
+
+UserRoutes.route("/:username").get(getUserById)
+                                    .put(updateUser)
+                                    .delete(deleteUser);
 
 export default UserRoutes;
