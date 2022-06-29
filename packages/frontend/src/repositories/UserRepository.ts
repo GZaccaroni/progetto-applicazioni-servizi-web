@@ -7,6 +7,7 @@ import { omit } from "lodash";
 import { DbUser } from "@/model/db/DbUser";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
+import { DbIdentifiable } from "@/model/db/DbIdentifiable";
 
 const resource = "/user";
 
@@ -39,20 +40,18 @@ export async function findUser(id: string): Promise<DbUser> {
   const result = await Client.get<DbUser>(`${resource}/${id}`);
   return result.data;
 }
-export type AddUserInput = DbUser & { password: string };
+export type AddUserInput = Omit<DbUser, keyof DbIdentifiable> & {
+  password: string;
+};
 export async function addUser(data: AddUserInput): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export type UpdateUserInput = {
-  username?: string;
-  password?: string;
-  isAdmin?: string;
-};
+export type UpdateUserInput = Partial<AddUserInput> & DbIdentifiable;
 export async function updateUser(item: UpdateUserInput): Promise<void> {
   const result = await Client.post<void>(
-    `${resource}/${item.username}`,
-    omit(item, "username")
+    `${resource}/${item.id}`,
+    omit(item, "id")
   );
   return result.data;
 }

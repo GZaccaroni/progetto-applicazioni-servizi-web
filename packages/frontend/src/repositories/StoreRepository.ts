@@ -7,6 +7,7 @@ import { omit } from "lodash";
 import { DbStore } from "@/model/db/DbStore";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
+import {DbIdentifiable} from "@/model/db/DbIdentifiable";
 
 const resource = "/store";
 
@@ -43,7 +44,9 @@ export async function findStore(id: string): Promise<DbStore> {
   const result = await Client.get<DbStore>(`${resource}/${id}`);
   return result.data;
 }
-export async function addStore(data: Omit<DbStore, "id">): Promise<void> {
+export async function addStore(
+  data: Omit<DbStore, keyof DbIdentifiable>
+): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }

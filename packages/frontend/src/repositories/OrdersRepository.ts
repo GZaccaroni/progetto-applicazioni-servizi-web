@@ -7,6 +7,7 @@ import { omit } from "lodash";
 import { DbOrder } from "@/model/db/DbOrder";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
+import {DbIdentifiable} from "@/model/db/DbIdentifiable";
 
 const resource = "/order";
 
@@ -45,7 +46,9 @@ export async function findOrder(id: string): Promise<DbOrder> {
   return result.data;
 }
 
-export async function addOrder(data: Omit<DbOrder, "id">): Promise<void> {
+export async function addOrder(
+  data: Omit<DbOrder, keyof DbIdentifiable>
+): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }

@@ -7,6 +7,7 @@ import { omit } from "lodash";
 import { DbProduct } from "@/model/db/DbProduct";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
+import { DbIdentifiable } from "@/model/db/DbIdentifiable";
 
 const resource = "/product";
 
@@ -42,7 +43,9 @@ export async function findProduct(id: string): Promise<DbProduct> {
   const result = await Client.get<DbProduct>(`${resource}/${id}`);
   return result.data;
 }
-export async function addProduct(data: Omit<DbProduct, "id">): Promise<void> {
+export async function addProduct(
+  data: Omit<DbProduct, keyof DbIdentifiable>
+): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }

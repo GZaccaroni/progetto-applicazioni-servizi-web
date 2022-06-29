@@ -62,7 +62,7 @@ export default defineComponent({
         )
         .then((confirmed) => {
           if (confirmed) {
-            deleteUser(item.username).catch(repositoryErrorHandler);
+            deleteUser(item.id).catch(repositoryErrorHandler);
           }
         });
     },
