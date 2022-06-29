@@ -34,7 +34,6 @@ export function observePaginatedResult<Input, Item extends DbIdentifiable>(
       currentResult.results.some((el) => el.id == id)
     ) {
       isLoading = true;
-      console.log("Reloading data: " + eventName);
       findItemsFn(input).then((result) => {
         isLoading = false;
         currentResult = result;
