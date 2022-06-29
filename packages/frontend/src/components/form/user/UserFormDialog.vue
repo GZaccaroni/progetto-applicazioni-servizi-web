@@ -10,12 +10,24 @@
       <v-text-field
         v-model="formData.username"
         label="Nome utente"
+        :disabled="!create"
       ></v-text-field>
-      <v-text-field v-model="formData.password" label="Password"></v-text-field>
       <v-checkbox
         v-model="formData.isAdmin"
         label="Amministratore"
       ></v-checkbox>
+      <v-switch
+        v-model="changePassword"
+        v-if="!create"
+        inset
+        label="Cambia password"
+      ></v-switch>
+      <v-text-field
+        type="password"
+        v-if="changePassword || create"
+        v-model="formData.password"
+        label="Password"
+      ></v-text-field>
     </v-form>
   </form-dialog>
 </template>
@@ -29,6 +41,7 @@ import FormDialog, {
 } from "@/components/common/FormDialog.vue";
 import { showMessage } from "@/helpers/snackbar";
 import { AddUserInput } from "@/repositories/UserRepository";
+import { removeBlanks } from "@/helpers/utils";
 export type UserFormDialogModel = GenericFormDialogModel<{
   initialData: Partial<AddUserInput>;
 }>;
@@ -47,13 +60,14 @@ export default defineComponent({
     const formData = ref<Partial<AddUserInput>>({});
     const create = ref(false);
     const isVisible = ref(false);
+    const changePassword = ref(false);
 
     watch(
       () => props.value,
       (el) => {
         console.log("Value: ", props.value);
         if (el.isVisible) {
-          create.value = el.initialData.id == undefined;
+          create.value = el.initialData.username == undefined;
           formData.value = el.initialData;
         }
         isVisible.value = el.isVisible;
@@ -64,6 +78,7 @@ export default defineComponent({
       formActionsDisabled,
       formData,
       create,
+      changePassword,
       isVisible,
     };
   },
@@ -74,8 +89,7 @@ export default defineComponent({
     async saveForm() {
       this.submitButtonLoading = true;
       this.formActionsDisabled = true;
-      let data = clone(this.formData);
-      console.log(data);
+      let data = clone(removeBlanks(this.formData));
       try {
         this.closeForm();
         const message = this.create
