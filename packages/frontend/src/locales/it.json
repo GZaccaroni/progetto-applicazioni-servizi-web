@@ -29,6 +29,12 @@
     "store": {
       "name": "Nome",
       "authorizations": "Autorizzazioni"
+    },
+    "customer": {
+      "name": "Nome",
+      "address": "Indirizzo",
+      "phoneNumber": "Numero di telefono",
+      "vatNumber": "Partita Iva"
     }
   },
   "components": {
