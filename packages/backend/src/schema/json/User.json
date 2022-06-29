@@ -1,11 +1,15 @@
 {
   "required": [
-    "username"
+    "username",
+    "required"
   ],
   "type": "object",
   "properties": {
     "username": {
       "maximum": 50,
+      "type": "string"
+    },
+    "password": {
       "type": "string"
     }
   }
