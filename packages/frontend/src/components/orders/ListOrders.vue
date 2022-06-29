@@ -1,0 +1,69 @@
+<template>
+  <div style="width: 100%">
+    <paginated-table-builder
+      :observe-items-fn="observeItemsFn"
+      :observe-fn-input="observeFnInput"
+      @onRowEvent="onRowEvent"
+      :columns="headers"
+      :actions="['edit', 'delete']"
+      :loading="tableLoading"
+    >
+      <template v-slot:header>
+        <list-orders-filter @change="filterList" />
+      </template>
+    </paginated-table-builder>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from "@vue/composition-api";
+import { DataTableHeader } from "vuetify";
+import { DbUser } from "@/model/db/DbUser";
+import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
+import i18n from "@/i18n";
+import {
+  FindOrdersInput,
+  observeOrders,
+} from "@/repositories/OrdersRepository";
+import { FindStoresInput } from "@/repositories/StoreRepository";
+import ListOrdersFilter from "@/components/orders/ListOrdersFilter.vue";
+
+export default defineComponent({
+  components: {
+    ListOrdersFilter,
+  },
+  setup() {
+    const observeItemsFn = observeOrders;
+    const tableLoading = ref(false);
+    const observeFnInput = ref<FindOrdersInput>({ limit: 10 });
+    const headers = ref<DataTableHeader[]>([
+      {
+        text: i18n.t("model.store.name").toString(),
+        value: "name",
+        sortable: false,
+      },
+      {
+        text: i18n.t("word.actions").toString(),
+        value: "actions",
+        sortable: false,
+        width: "130px",
+      },
+    ]);
+    return {
+      observeItemsFn,
+      observeFnInput,
+      tableLoading,
+      headers,
+    };
+  },
+  methods: {
+    filterList(input: FindStoresInput) {
+      this.observeFnInput = input;
+    },
+    onRowEvent(event: TableItemEvent<DbUser>) {
+      // Pass-through
+      this.$emit("onRowEvent", event);
+    },
+  },
+});
+</script>
