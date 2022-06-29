@@ -1,3 +1,45 @@
 {
-  "message": "hello i18n !!"
+  "message": "hello i18n !!",
+  "confirm": {
+    "delete": {
+      "user": {
+        "title": "Elimina utente",
+        "message":
+                "Sei sicuro di voler davvero eliminare {username}?"
+      }
+    }
+  },
+  "word": {
+    "create": "Aggiungi",
+    "actions": "Azioni",
+    "confirm": "Ok",
+    "cancel": "Annulla",
+    "close": "Chiudi"
+  },
+  "model": {
+    "user": {
+      "username": "Nome utente",
+      "isAdmin": "Amministratore",
+      "password": "Password",
+      "add": "Aggiungi utente",
+      "edit": "Modifica utente",
+      "added": "Utente aggiunto con successo",
+      "edited": "Utente modificato con successo"
+    }
+  },
+  "components": {
+    "ListUsersFilter": {
+      "searchPerName": "Cerca per nome"
+    },
+    "form": {
+      "user": {
+        "changePassword": "Cambia password"
+      }
+    }
+  },
+  "views": {
+    "users": {
+      "title": "Utenti"
+    }
+  }
 }

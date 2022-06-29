@@ -8,7 +8,9 @@
     >
       {{ message.text }}
       <template v-slot:action="{ attrs }">
-        <v-btn text v-bind="attrs" @click="hideSnackbar">Chiudi</v-btn>
+        <v-btn text v-bind="attrs" @click="hideSnackbar">
+          {{ $t("word.close") }}
+        </v-btn>
       </template>
     </v-snackbar>
   </div>

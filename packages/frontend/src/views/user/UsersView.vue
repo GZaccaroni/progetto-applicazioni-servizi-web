@@ -1,10 +1,10 @@
 <template>
   <v-container class="my-1" fluid>
-    <header-view title="Utenti">
+    <header-view :title="$t('views.users.title').toString()">
       <template v-slot:endItems>
         <v-btn elevation="0" class="me-4" @click="openNewItemDialog()">
           <v-icon left>mdi-plus</v-icon>
-          Aggiungi
+          {{ $t("word.create") }}
         </v-btn>
       </template>
     </header-view>
@@ -55,8 +55,10 @@ export default defineComponent({
     deleteItem(item: DbUser) {
       this.confirmDialog
         ?.open(
-          "Elimina utente",
-          "Sei sicuro di volere eliminare " + item.username + "?"
+          this.$t("confirm.delete.user.title").toString(),
+          this.$t("confirm.delete.user.message", {
+            username: item.username,
+          }).toString()
         )
         .then((confirmed) => {
           if (confirmed) {

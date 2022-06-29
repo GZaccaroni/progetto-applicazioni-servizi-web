@@ -25,9 +25,10 @@
           text
           class="body-2 font-weight-bold"
           @click.native="cancel"
-          >Annulla
+        >
+          {{ $t("word.cancel") }}
         </v-btn>
-        <v-btn text @click.native="agree">Ok</v-btn>
+        <v-btn text @click.native="agree">{{ $t("word.confirm") }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

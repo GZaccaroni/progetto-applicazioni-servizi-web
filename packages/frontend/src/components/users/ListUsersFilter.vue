@@ -2,7 +2,7 @@
   <v-form class="pa-4" @submit.prevent>
     <v-text-field
       v-model="form.searchName"
-      label="Cerca per nome"
+      :label="$t('components.ListUsersFilter.searchPerName')"
     ></v-text-field>
   </v-form>
 </template>
@@ -17,8 +17,6 @@ export default defineComponent({
     const form = reactive<FindUsersInput>({
       limit: 10,
     });
-    console.log("Setup called!");
-
     watch(form, (newValue) => {
       emit("change", removeBlanks(newValue));
     });

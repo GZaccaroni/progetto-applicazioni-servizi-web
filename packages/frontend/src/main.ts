@@ -7,7 +7,7 @@ import vuetify from "./plugins/vuetify";
 import PaginatedTableBuilder from "@/plugins/paginated-table-builder/main";
 import TableBuilder from "@/plugins/table-builder/main";
 import ConfirmDialog from "@/plugins/confirm-dialog/main";
-import i18n from './i18n'
+import i18n from "./i18n";
 
 Vue.config.productionTip = false;
 Vue.use(VueCompositionAPI);
@@ -20,5 +20,5 @@ new Vue({
   store,
   vuetify,
   i18n,
-  render: (h) => h(App)
+  render: (h) => h(App),
 }).$mount("#app");

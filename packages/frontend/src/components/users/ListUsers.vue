@@ -28,6 +28,7 @@ import { DataTableHeader } from "vuetify";
 import { DbUser } from "@/model/db/DbUser";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import ListUsersFilter from "@/components/users/ListUsersFilter.vue";
+import i18n from "@/i18n";
 
 export default defineComponent({
   components: {
@@ -39,17 +40,22 @@ export default defineComponent({
     const observeFnInput = ref<FindUsersInput>({ limit: 10 });
     const headers = ref<DataTableHeader[]>([
       {
-        text: "Nome utente",
+        text: i18n.t("model.user.username").toString(),
         value: `username`,
         sortable: false,
       },
       {
-        text: "Amministratore",
+        text: i18n.t("model.user.isAdmin").toString(),
         value: "isAdmin",
         sortable: false,
         width: "130px",
       },
-      { text: "Actions", value: "actions", sortable: false, width: "130px" },
+      {
+        text: i18n.t("word.actions").toString(),
+        value: "actions",
+        sortable: false,
+        width: "130px",
+      },
     ]);
     return {
       observeItemsFn,

@@ -3,30 +3,30 @@
     v-model="isVisible"
     submit-button-text="Salva"
     :submit-button-loading="submitButtonLoading"
-    :title="create ? 'Aggiungi utente' : 'Modifica utente'"
+    :title="$t(create ? 'model.user.add' : 'model.user.edit').toString()"
     @submit="saveForm"
   >
     <v-form ref="form" class="pa-4">
       <v-text-field
         v-model="formData.username"
-        label="Nome utente"
+        :label="$t('model.user.username')"
         :disabled="!create"
       ></v-text-field>
       <v-checkbox
         v-model="formData.isAdmin"
-        label="Amministratore"
+        :label="$t('model.user.isAdmin')"
       ></v-checkbox>
       <v-switch
         v-model="changePassword"
         v-if="!create"
         inset
-        label="Cambia password"
+        :label="$t('components.form.user.changePassword')"
       ></v-switch>
       <v-text-field
         type="password"
         v-if="changePassword || create"
         v-model="formData.password"
-        label="Password"
+        :label="$t('model.user.password')"
       ></v-text-field>
     </v-form>
   </form-dialog>
@@ -65,7 +65,6 @@ export default defineComponent({
     watch(
       () => props.value,
       (el) => {
-        console.log("Value: ", props.value);
         if (el.isVisible) {
           create.value = el.initialData.username == undefined;
           formData.value = el.initialData;
@@ -93,11 +92,11 @@ export default defineComponent({
       try {
         this.closeForm();
         const message = this.create
-          ? "Utente aggiunto con successo"
-          : "Utente salvato con successo";
+          ? this.$t("model.user.added")
+          : this.$t("model.user.edited");
         showMessage({
           type: "success",
-          text: message,
+          text: message.toString(),
         });
       } catch (e) {
         repositoryErrorHandler(e);
