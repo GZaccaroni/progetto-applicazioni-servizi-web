@@ -30,7 +30,10 @@
     "cancel": "Annulla",
     "close": "Chiudi",
     "login": "Accedi",
-    "save": "Salva"
+    "save": "Salva",
+    "fromDate": "Da",
+    "toDate": "a",
+    "store": "Punto vendita"
   },
   "model": {
     "user": {
@@ -96,6 +99,13 @@
     },
     "login": {
       "title": "Accesso a Colture in Cloud"
+    },
+    "welcome": {
+      "title": "Benvenuto in {appName}",
+      "subtitle": {
+        "loggedIn": "Che piacere averti qui, {username}",
+        "default": "Accedi per continuare"
+      }
     }
   },
   "error": {

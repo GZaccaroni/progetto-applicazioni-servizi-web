@@ -10,7 +10,6 @@ export async function getSelectStoreItems(
     searchName: query,
     limit: selectMaxItems,
   });
-  console.log("Results ", paginatedResult);
   return paginatedResult.results.map((el) => {
     return {
       id: el.id,

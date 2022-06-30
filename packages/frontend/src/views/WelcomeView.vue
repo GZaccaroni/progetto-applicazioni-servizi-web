@@ -12,7 +12,7 @@
 
       <v-col class="mb-4">
         <h1 class="display-2 font-weight-bold mb-3">
-          Benvenuto in Colture in Cloud
+          {{ $t("views.welcome.title", { appName: $t("name") }) }}
         </h1>
 
         <p class="subheading font-weight-regular">
@@ -35,9 +35,11 @@ export default defineComponent({
     }),
     welcomeText(): string {
       if (this.userProfile != undefined) {
-        return `Che piacere averti qui, ${this.userProfile.username}!`;
+        return this.$t("views.welcome.subtitle.loggedIn", {
+          username: this.userProfile.username,
+        }).toString();
       } else {
-        return "Accedi per continuare";
+        return this.$t("views.welcome.subtitle.default").toString();
       }
     },
   },

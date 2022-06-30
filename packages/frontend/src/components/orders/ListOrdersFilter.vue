@@ -5,7 +5,7 @@
         <v-col col="4">
           <async-select
             v-model="selectedStore"
-            label="Store"
+            :label="$t('word.store').toString()"
             :find-items-fn="findItemsFn"
             :clearable="true"
           />
@@ -15,14 +15,14 @@
           <text-field-date-picker
             v-model="form.fromDate"
             :max="form.toDate"
-            label="Da"
+            :label="$t('word.fromDate').toString()"
           />
         </v-col>
         <v-col col="4">
           <text-field-date-picker
             v-model="form.toDate"
             :min="form.fromDate"
-            label="a"
+            :label="$t('word.toDate').toString()"
           />
         </v-col>
       </v-row>
