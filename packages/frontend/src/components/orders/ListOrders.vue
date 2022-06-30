@@ -18,7 +18,6 @@
 <script lang="ts">
 import { defineComponent, ref } from "@vue/composition-api";
 import { DataTableHeader } from "vuetify";
-import { DbUser } from "@/model/db/DbUser";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
 import {
@@ -27,6 +26,7 @@ import {
 } from "@/repositories/OrdersRepository";
 import { FindStoresInput } from "@/repositories/StoreRepository";
 import ListOrdersFilter from "@/components/orders/ListOrdersFilter.vue";
+import { DbOrder } from "@/model/db/DbOrder";
 
 export default defineComponent({
   components: {
@@ -60,7 +60,7 @@ export default defineComponent({
     filterList(input: FindStoresInput) {
       this.observeFnInput = input;
     },
-    onRowEvent(event: TableItemEvent<DbUser>) {
+    onRowEvent(event: TableItemEvent<DbOrder>) {
       // Pass-through
       this.$emit("onRowEvent", event);
     },
