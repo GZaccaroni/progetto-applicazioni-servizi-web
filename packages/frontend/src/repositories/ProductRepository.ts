@@ -11,12 +11,12 @@ import { DbIdentifiable } from "@/model/db/DbIdentifiable";
 
 const resource = "/product";
 
-export interface FindItemsInput extends PaginatedFindInput {
+export interface FindProductsInput extends PaginatedFindInput {
   searchName?: string;
   limit: number;
 }
 export function observeProducts(
-  input: FindItemsInput,
+  input: FindProductsInput,
   onNext: (result: PaginatedResult<DbProduct>) => void,
   onError: (error: { code: string; message: string }) => void
 ): Cancellable {
@@ -29,7 +29,7 @@ export function observeProducts(
   );
 }
 export async function findProducts(
-  input: FindItemsInput
+  input: FindProductsInput
 ): Promise<PaginatedResult<DbProduct>> {
   const result = await Client.get<PaginatedResult<DbProduct>>(
     `${resource}/find`,

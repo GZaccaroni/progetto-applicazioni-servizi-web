@@ -49,6 +49,9 @@
       "address": "Indirizzo",
       "phoneNumber": "Numero di telefono",
       "vatNumber": "Partita Iva"
+    },
+    "product": {
+      "name": "Nome"
     }
   },
   "components": {
@@ -56,6 +59,9 @@
       "searchPerName": "Cerca per nome"
     },
     "ListStoresFilter": {
+      "searchPerName": "Cerca per nome"
+    },
+    "ListProductsFilter": {
       "searchPerName": "Cerca per nome"
     },
     "form": {
