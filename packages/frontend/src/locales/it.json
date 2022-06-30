@@ -1,5 +1,5 @@
 {
-  "message": "hello i18n !!",
+  "name": "Colture in Cloud",
   "confirm": {
     "delete": {
       "user": {
@@ -28,7 +28,9 @@
     "actions": "Azioni",
     "confirm": "Ok",
     "cancel": "Annulla",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "login": "Accedi",
+    "save": "Salva"
   },
   "model": {
     "user": {
@@ -67,6 +69,9 @@
     "form": {
       "user": {
         "changePassword": "Cambia password"
+      },
+      "userLogin": {
+        "title": "Accedi"
       }
     }
   },
@@ -77,6 +82,9 @@
     "orders": {
       "title": "Ordini"
     },
+    "stats": {
+      "title": "Statistiche"
+    },
     "stores": {
       "title": "Punti Vendita"
     },
@@ -85,6 +93,12 @@
     },
     "products": {
       "title": "Prodotti"
+    },
+    "login": {
+      "title": "Accesso a Colture in Cloud"
     }
+  },
+  "error": {
+    "formGeneric": "Compila correttamente tutti i campi"
   }
 }

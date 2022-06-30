@@ -1,7 +1,7 @@
 <template>
   <form-dialog
     v-model="isVisible"
-    submit-button-text="Salva"
+    :submit-button-text="$t('word.save').toString()"
     :submit-button-loading="submitButtonLoading"
     :title="$t(create ? 'model.user.add' : 'model.user.edit').toString()"
     @submit="saveForm"

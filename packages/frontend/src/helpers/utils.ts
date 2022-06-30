@@ -13,9 +13,8 @@ export function removeBlanks<T>(obj: T): Partial<T> {
       case "number":
         if (Number.isNaN(value)) continue;
         break;
-      default:
-        acc[key] = value;
     }
+    acc[key] = value;
   }
   return acc;
 }

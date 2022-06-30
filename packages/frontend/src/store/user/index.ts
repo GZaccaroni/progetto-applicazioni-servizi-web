@@ -10,25 +10,22 @@ const module: Module<UserState, RootState> = {
   namespaced: true,
   state: {
     userProfile: undefined,
-    isLoggedIn: false,
   },
   getters: {
     userProfile: ({ userProfile }) => userProfile,
-    isLoggedIn: ({ isLoggedIn }) => isLoggedIn,
+    isLoggedIn: ({ userProfile }) => userProfile != undefined,
   },
   mutations: {
     auth_success(state, userProfile: DbUser) {
-      state.isLoggedIn = true;
       state.userProfile = userProfile;
     },
     logout(state) {
-      state.isLoggedIn = false;
       state.userProfile = undefined;
     },
   },
   actions: {
     async login(context, userCredential: UserCredential): Promise<void> {
-      if (context.state.isLoggedIn) return;
+      if (context.getters.isLoggedIn) return;
       await login(userCredential.username, userCredential.password);
       const user = await findUser(userCredential.username);
       context.commit("auth_success", user);
