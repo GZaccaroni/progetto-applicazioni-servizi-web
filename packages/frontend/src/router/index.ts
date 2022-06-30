@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import store from "@/store";
 import WelcomeView from "@/views/WelcomeView.vue";
+import i18n from "@/i18n";
 
 Vue.use(VueRouter);
 
@@ -83,5 +84,11 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
-
+router.afterEach((to, from) => {
+  // Use next tick to handle router history correctly
+  // see: https://github.com/vuejs/vue-router/issues/914#issuecomment-384477609
+  Vue.nextTick(() => {
+    document.title = i18n.t(`views.${to.name}.title`).toString();
+  });
+});
 export default router;

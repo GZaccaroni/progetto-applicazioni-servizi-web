@@ -52,7 +52,6 @@
             :disabled="submitButtonLoading"
             :loading="submitButtonLoading"
             text
-            type="submit"
             @click="submitForm"
           >
             {{ submitButtonText }}
