@@ -7,7 +7,7 @@ import { omit } from "lodash";
 import { DbCustomer } from "@/model/db/DbCustomer";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import {DbIdentifiable} from "@/model/db/DbIdentifiable";
+import { DbIdentifiable } from "@/model/db/DbIdentifiable";
 
 const resource = "/customer";
 

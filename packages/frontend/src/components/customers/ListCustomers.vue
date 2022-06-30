@@ -43,17 +43,17 @@ export default defineComponent({
         sortable: false,
       },
       {
-        text: i18n.t("model.address.name").toString(),
+        text: i18n.t("model.customer.address").toString(),
         value: "address",
         sortable: false,
       },
       {
-        text: i18n.t("model.phoneNumber.name").toString(),
+        text: i18n.t("model.customer.phoneNumber").toString(),
         value: "phoneNumber",
         sortable: false,
       },
       {
-        text: i18n.t("model.vatNumber.name").toString(),
+        text: i18n.t("model.customer.vatNumber").toString(),
         value: "vatNumber",
         sortable: false,
       },
