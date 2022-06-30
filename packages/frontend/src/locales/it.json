@@ -82,6 +82,9 @@
     },
     "customers": {
       "title": "Clienti"
+    },
+    "products": {
+      "title": "Prodotti"
     }
   }
 }
