@@ -1,54 +1,64 @@
 <template>
   <v-dialog
     v-model="isVisibleState"
-    :persistent="customParams.persistent || submitButtonLoading"
+    :persistent="isPersistent"
     :fullscreen="$vuetify.breakpoint.xsOnly"
     max-width="700"
+    @click:outside="closeFormIfNotPersistent"
+    @keydown.esc="closeFormIfNotPersistent"
   >
     <v-card v-if="isVisibleState">
-      <v-toolbar v-if="$vuetify.breakpoint.xsOnly" dark color="primary">
-        <v-btn icon dark :disabled="submitButtonLoading" @click="closeForm">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title>{{ title }}</v-toolbar-title>
-        <v-spacer />
-        <v-btn
-          text
-          :disabled="submitButtonLoading"
-          @click="submitForm"
-          class="me-4 px-4"
-        >
-          {{ submitButtonText }}
-        </v-btn>
-      </v-toolbar>
+      <v-form
+        @submit.prevent="submitForm"
+        :disabled="submitButtonLoading"
+        class="pa-4"
+      >
+        <v-toolbar v-if="$vuetify.breakpoint.xsOnly" dark color="primary">
+          <v-btn icon dark :disabled="submitButtonLoading" @click="closeForm">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title>{{ title }}</v-toolbar-title>
+          <v-spacer />
+          <v-btn
+            text
+            :disabled="submitButtonLoading"
+            @click="submitForm"
+            class="me-4 px-4"
+          >
+            {{ submitButtonText }}
+          </v-btn>
+        </v-toolbar>
 
-      <v-card-title v-if="!$vuetify.breakpoint.xsOnly">
-        <span class="headline">{{ title }}</span>
-      </v-card-title>
-      <v-card-text>
-        <v-container>
-          <slot></slot>
-        </v-container>
-      </v-card-text>
-      <v-card-actions v-if="!$vuetify.breakpoint.xsOnly">
-        <v-spacer></v-spacer>
-        <v-btn
-          color="blue darken-1"
-          :disabled="submitButtonLoading"
-          text
-          @click="closeForm"
-          >Chiudi</v-btn
-        >
-        <v-btn
-          color="blue darken-1"
-          :disabled="submitButtonLoading"
-          :loading="submitButtonLoading"
-          text
-          @click="submitForm"
-        >
-          {{ submitButtonText }}
-        </v-btn>
-      </v-card-actions>
+        <v-card-title v-if="!$vuetify.breakpoint.xsOnly">
+          <span class="headline">{{ title }}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <slot></slot>
+          </v-container>
+        </v-card-text>
+        <v-card-actions v-if="!$vuetify.breakpoint.xsOnly">
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1"
+            :disabled="submitButtonLoading"
+            text
+            tabindex="-1"
+            @click="closeForm"
+            >Chiudi</v-btn
+          >
+          <v-btn
+            color="blue darken-1"
+            :disabled="submitButtonLoading"
+            :loading="submitButtonLoading"
+            text
+            type="submit"
+            @click="submitForm"
+          >
+            {{ submitButtonText }}
+          </v-btn>
+        </v-card-actions>
+      </v-form>
     </v-card>
   </v-dialog>
 </template>
@@ -92,16 +102,26 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    console.log("Value: ", props.value);
     const isVisibleState = passthroughVModel(props, context, "value");
     return { isVisibleState };
+  },
+  computed: {
+    isPersistent(): boolean {
+      return this.$props.customParams.persistent || this.submitButtonLoading;
+    },
   },
   methods: {
     submitForm() {
       this.$emit("submit");
     },
+    closeFormIfNotPersistent() {
+      if (!this.isPersistent) {
+        this.closeForm();
+      }
+    },
     closeForm() {
       this.isVisibleState = false;
+      this.$emit("close");
     },
   },
 });
