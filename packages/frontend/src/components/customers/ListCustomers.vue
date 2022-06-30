@@ -21,12 +21,12 @@ import { DataTableHeader } from "vuetify";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
 import { FindStoresInput } from "@/repositories/StoreRepository";
-import { DbStore } from "@/model/db/DbStore";
 import {
   FindCustomersInput,
   observeCustomers,
 } from "@/repositories/CustomerRepository";
 import ListCustomersFilter from "@/components/customers/ListCustomersFilter.vue";
+import { DbCustomer } from "@/model/db/DbCustomer";
 
 export default defineComponent({
   components: {
@@ -75,7 +75,7 @@ export default defineComponent({
     filterList(input: FindStoresInput) {
       this.observeFnInput = input;
     },
-    onRowEvent(event: TableItemEvent<DbStore>) {
+    onRowEvent(event: TableItemEvent<DbCustomer>) {
       // Pass-through
       this.$emit("onRowEvent", event);
     },
