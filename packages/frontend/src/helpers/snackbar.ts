@@ -16,7 +16,6 @@ const showMessage = (payload: SnackbarStatusMessage) => {
     color: messageColor[payload.type].color,
     timeout: payload.timeout ?? 1000,
   };
-  console.log("Committing error message", fullPayload);
   store.commit("snackbar/SHOW_MESSAGE", fullPayload);
 };
 

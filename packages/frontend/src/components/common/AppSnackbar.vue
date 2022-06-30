@@ -3,7 +3,7 @@
     <v-snackbar
       top
       v-if="message !== undefined"
-      v-model="message"
+      :value="message !== undefined"
       :color="message.color"
     >
       {{ message.text }}
