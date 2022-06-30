@@ -11,6 +11,7 @@
     :loading="isLoading"
     :multiple="multiple"
     :small-chips="multiple"
+    :clearable="clearable"
     return-object
   >
   </v-autocomplete>
@@ -26,7 +27,7 @@ export interface AsyncSelectItem extends DbIdentifiable {
   id: string;
   text: string;
 }
-export type FindSelectItemsFn = (query: string) => Promise<AsyncSelectItem[]>;
+export type FindSelectItemsFn = (query?: string) => Promise<AsyncSelectItem[]>;
 
 export default defineComponent({
   props: {
@@ -36,11 +37,14 @@ export default defineComponent({
     },
     value: {
       type: [Object, Array] as PropType<AsyncSelectItem | AsyncSelectItem[]>,
-      required: true,
     },
     multiple: {
       type: Boolean,
-      required: true,
+      default: false,
+    },
+    clearable: {
+      type: Boolean,
+      default: false,
     },
     label: {
       type: String,
@@ -52,10 +56,12 @@ export default defineComponent({
     const items = ref<AsyncSelectItem[]>();
     const valueState = passthroughVModel(props, context, "value");
     const searchQuery = ref<string>();
-    if (Array.isArray(props.value)) {
-      items.value = props.value;
-    } else {
-      items.value = [props.value];
+    if (props.value != undefined) {
+      if (Array.isArray(props.value)) {
+        items.value = props.value;
+      } else {
+        items.value = [props.value];
+      }
     }
     return {
       isLoading,
@@ -65,11 +71,11 @@ export default defineComponent({
     };
   },
   created() {
+    this.updateItems();
     this.updateItems = debounce(this.updateItems, 500);
   },
   methods: {
     updateItems() {
-      if (this.searchQuery == undefined) return;
       this.isLoading = true;
       this.findItemsFn(this.searchQuery)
         .then((el) => {
