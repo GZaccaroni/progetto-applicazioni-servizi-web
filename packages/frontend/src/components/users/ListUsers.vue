@@ -13,7 +13,7 @@
       </template>
       <template v-slot:[`item.isAdmin`]="{ item }">
         <v-simple-checkbox
-          :value="item.isPrivate"
+          :value="item.isAdmin"
           :disabled="true"
         ></v-simple-checkbox>
       </template>
