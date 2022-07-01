@@ -2,10 +2,7 @@
   <v-container>
     <user-login-dialog v-model="loginDialogVisible" />
     <v-app-bar app color="white" elevate-on-scroll>
-      <v-app-bar-nav-icon
-        v-if="isLoggedIn && !$vuetify.breakpoint.lgAndUp"
-        @click.stop="drawer = !drawer"
-      />
+      <v-app-bar-nav-icon v-if="isLoggedIn" @click.stop="drawer = !drawer" />
       <div class="d-flex align-center">
         <v-img
           alt="Colture in Cloud Logo"
@@ -38,13 +35,7 @@
         <v-icon>mdi-login</v-icon>
       </v-btn>
     </v-app-bar>
-    <v-navigation-drawer
-      v-if="isLoggedIn"
-      app
-      v-model="drawer"
-      :temporary="!$vuetify.breakpoint.lgAndUp"
-      :permanent="$vuetify.breakpoint.lgAndUp"
-    >
+    <v-navigation-drawer v-if="isLoggedIn" app v-model="drawer" temporary>
       <app-navigation-drawer />
     </v-navigation-drawer>
   </v-container>
