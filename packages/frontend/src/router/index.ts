@@ -30,6 +30,7 @@ const routes: Array<RouteConfig> = [
       import(/* webpackChunkName: "users" */ "../views/user/UsersView.vue"),
     meta: {
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
@@ -50,6 +51,7 @@ const routes: Array<RouteConfig> = [
       ),
     meta: {
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
   {
@@ -61,6 +63,7 @@ const routes: Array<RouteConfig> = [
       ),
     meta: {
       requiresAuth: true,
+      requiresAdmin: true,
     },
   },
 ];
@@ -73,16 +76,20 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
   if (requiresAuth) {
-    if (store.getters["user/isLoggedIn"]) {  // eslint-disable-line
-      next();
+    if (!store.getters["user/isLoggedIn"]) {
+      next("/");
       return;
-    } else {
-      next("/welcome");
     }
-  } else {
-    next();
   }
+  if (requiresAdmin) {
+    if (store.getters["user/userProfile"]?.isAdmin != true) {
+      next("/");
+      return;
+    }
+  }
+  next();
 });
 router.afterEach((to, from) => {
   // Use next tick to handle router history correctly

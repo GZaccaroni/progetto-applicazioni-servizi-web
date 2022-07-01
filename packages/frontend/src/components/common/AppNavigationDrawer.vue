@@ -40,9 +40,26 @@
 import { mapGetters } from "vuex";
 import { defineComponent } from "@vue/composition-api";
 
-const menuItems = [
+interface MenuGroup {
+  title?: string;
+  meta: {
+    requiresAuth: boolean;
+    requiresAdmin: boolean;
+  };
+  items: MenuItem[];
+}
+interface MenuItem {
+  title: string;
+  icon: string;
+  route: string;
+}
+const menuItems: MenuGroup[] = [
   {
     title: undefined,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+    },
     items: [
       {
         title: "views.orders.title",
@@ -63,6 +80,10 @@ const menuItems = [
   },
   {
     title: "Amministrazione",
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
     items: [
       {
         title: "views.products.title",
@@ -83,16 +104,23 @@ const menuItems = [
   },
 ];
 export default defineComponent({
-  data() {
-    return {
-      menuItems: menuItems,
-    };
-  },
-
   computed: {
     ...mapGetters("user", {
       userProfile: "userProfile",
     }),
+    menuItems() {
+      const userHasAccess = (group: MenuGroup) => {
+        console.log("User profile", this.userProfile);
+        if (group.meta.requiresAuth) {
+          if (this.userProfile == undefined) return false;
+        }
+        if (group.meta.requiresAdmin) {
+          if (this.userProfile?.isAdmin != true) return false;
+        }
+        return true;
+      };
+      return menuItems.filter((group) => userHasAccess(group));
+    },
   },
 });
 </script>
