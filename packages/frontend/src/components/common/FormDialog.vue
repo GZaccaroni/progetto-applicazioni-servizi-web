@@ -21,7 +21,7 @@
           <v-spacer />
           <v-btn
             text
-            :disabled="submitButtonLoading"
+            :disabled="submitButtonLoading || !submitButtonEnabled"
             @click="submitForm"
             class="me-4 px-4"
           >
@@ -49,7 +49,7 @@
           >
           <v-btn
             color="blue darken-1"
-            :disabled="submitButtonLoading"
+            :disabled="submitButtonLoading || !submitButtonEnabled"
             :loading="submitButtonLoading"
             text
             @click="submitForm"
@@ -82,6 +82,10 @@ export default defineComponent({
     submitButtonText: {
       type: String,
       required: true,
+    },
+    submitButtonEnabled: {
+      type: Boolean,
+      default: true,
     },
     submitButtonLoading: {
       type: Boolean,
