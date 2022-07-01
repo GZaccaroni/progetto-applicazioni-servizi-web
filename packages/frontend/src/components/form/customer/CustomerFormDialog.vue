@@ -3,6 +3,7 @@
     v-model="isVisible"
     :submit-button-text="$t('word.save').toString()"
     :submit-button-loading="submitButtonLoading"
+    :submit-button-enabled="validateForm(formData)"
     :title="
       $t(create ? 'model.customer.add' : 'model.customer.edit').toString()
     "
@@ -39,7 +40,7 @@ import FormDialog, {
 import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
 import { DbCustomer } from "@/model/db/DbCustomer";
-import { updateCustomer } from "@/repositories/CustomerRepository";
+import { addCustomer, updateCustomer } from "@/repositories/CustomerRepository";
 export type CustomerFormDialogModel = GenericFormDialogModel<{
   initialData: Partial<DbCustomer>;
 }>;
@@ -54,7 +55,6 @@ export default defineComponent({
 
   setup(props) {
     const submitButtonLoading = ref(false);
-    const formActionsDisabled = ref(false);
     const formData = ref<Partial<DbCustomer>>({});
     const create = ref(false);
     const isVisible = ref(false);
@@ -71,7 +71,6 @@ export default defineComponent({
     );
     return {
       submitButtonLoading,
-      formActionsDisabled,
       formData,
       create,
       isVisible,
@@ -83,11 +82,20 @@ export default defineComponent({
     },
     async saveForm() {
       this.submitButtonLoading = true;
-      this.formActionsDisabled = true;
       let data = clone(removeBlanks(this.formData));
       try {
-        if (data.name == undefined) {
+        if (!this.validateForm(data)) {
+          showMessage({
+            text: this.$t("error.formGeneric").toString(),
+            type: "error",
+          });
+          this.submitButtonLoading = false;
           return;
+        }
+        if (this.create) {
+          await addCustomer(data);
+        } else {
+          await updateCustomer(data);
         }
         const message = this.create
           ? this.$t("model.customer.added")
@@ -99,8 +107,11 @@ export default defineComponent({
       } catch (e) {
         repositoryErrorHandler(e);
       }
-      this.formActionsDisabled = false;
       this.submitButtonLoading = false;
+    },
+    validateForm(form: Partial<DbCustomer>): form is DbCustomer {
+      let data = clone(removeBlanks(this.formData));
+      return data.name != undefined;
     },
   },
 });
