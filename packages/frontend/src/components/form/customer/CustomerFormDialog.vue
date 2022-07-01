@@ -3,30 +3,27 @@
     v-model="isVisible"
     :submit-button-text="$t('word.save').toString()"
     :submit-button-loading="submitButtonLoading"
-    :title="$t(create ? 'model.user.add' : 'model.user.edit').toString()"
+    :title="
+      $t(create ? 'model.customer.add' : 'model.customer.edit').toString()
+    "
     @submit="saveForm"
   >
     <v-form ref="form" class="pa-4">
       <v-text-field
-        v-model="formData.username"
-        :label="$t('model.user.username')"
-        :disabled="!create"
+        v-model="formData.name"
+        :label="$t('model.customer.name')"
       ></v-text-field>
-      <v-checkbox
-        v-model="formData.isAdmin"
-        :label="$t('model.user.isAdmin')"
-      ></v-checkbox>
-      <v-switch
-        v-model="changePassword"
-        v-if="!create"
-        inset
-        :label="$t('components.form.user.changePassword')"
-      ></v-switch>
       <v-text-field
-        type="password"
-        v-if="changePassword || create"
-        v-model="formData.password"
-        :label="$t('model.user.password')"
+        v-model="formData.address"
+        :label="$t('model.customer.address')"
+      ></v-text-field>
+      <v-text-field
+        v-model="formData.phoneNumber"
+        :label="$t('model.customer.phoneNumber')"
+      ></v-text-field>
+      <v-text-field
+        v-model="formData.vatNumber"
+        :label="$t('model.customer.vatNumber')"
       ></v-text-field>
     </v-form>
   </form-dialog>
@@ -40,16 +37,17 @@ import FormDialog, {
   GenericFormDialogModel,
 } from "@/components/common/FormDialog.vue";
 import { showMessage } from "@/helpers/snackbar";
-import { UpdateUserInput } from "@/repositories/UserRepository";
 import { removeBlanks } from "@/helpers/utils";
-export type UserFormDialogModel = GenericFormDialogModel<{
-  initialData: Partial<UpdateUserInput>;
+import { DbCustomer } from "@/model/db/DbCustomer";
+import { updateCustomer } from "@/repositories/CustomerRepository";
+export type CustomerFormDialogModel = GenericFormDialogModel<{
+  initialData: Partial<DbCustomer>;
 }>;
 export default defineComponent({
   components: { FormDialog },
   props: {
     value: {
-      type: Object as PropType<UserFormDialogModel>,
+      type: Object as PropType<CustomerFormDialogModel>,
       required: true,
     },
   },
@@ -57,10 +55,9 @@ export default defineComponent({
   setup(props) {
     const submitButtonLoading = ref(false);
     const formActionsDisabled = ref(false);
-    const formData = ref<Partial<UpdateUserInput>>({});
+    const formData = ref<Partial<DbCustomer>>({});
     const create = ref(false);
     const isVisible = ref(false);
-    const changePassword = ref(false);
 
     watch(
       () => props.value,
@@ -77,7 +74,6 @@ export default defineComponent({
       formActionsDisabled,
       formData,
       create,
-      changePassword,
       isVisible,
     };
   },
@@ -90,10 +86,12 @@ export default defineComponent({
       this.formActionsDisabled = true;
       let data = clone(removeBlanks(this.formData));
       try {
-        this.closeForm();
+        if (data.name == undefined) {
+          return;
+        }
         const message = this.create
-          ? this.$t("model.user.added")
-          : this.$t("model.user.edited");
+          ? this.$t("model.customer.added")
+          : this.$t("model.customer.edited");
         showMessage({
           type: "success",
           text: message.toString(),

@@ -9,7 +9,7 @@
       </template>
     </header-view>
     <list-customers @onRowEvent="onRowEvent" />
-    <user-form-dialog v-model="dialogModel" />
+    <customer-form-dialog v-model="dialogModel" />
     <confirm-dialog ref="confirmDialog" />
   </v-container>
 </template>
@@ -21,24 +21,24 @@ import {
   TableItemEventType,
 } from "@/plugins/table-builder/TableItemEventType";
 import HeaderView from "@/components/common/HeaderView.vue";
-import UserFormDialog, {
-  UserFormDialogModel,
-} from "@/components/form/user/UserFormDialog.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
 import { DbCustomer } from "@/model/db/DbCustomer";
 import { deleteCustomer } from "@/repositories/CustomerRepository";
 import ListCustomers from "@/components/customers/ListCustomers.vue";
+import CustomerFormDialog, {
+  CustomerFormDialogModel,
+} from "@/components/form/customer/CustomerFormDialog.vue";
 
 export default defineComponent({
   components: {
-    UserFormDialog,
+    CustomerFormDialog,
     HeaderView,
     ListCustomers,
     ConfirmDialog,
   },
   setup() {
-    const dialogModel = ref<UserFormDialogModel>({ isVisible: false });
+    const dialogModel = ref<CustomerFormDialogModel>({ isVisible: false });
     const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
     return {
       confirmDialog,
@@ -69,10 +69,10 @@ export default defineComponent({
     onRowEvent(event: TableItemEvent<DbCustomer>) {
       switch (event.type) {
         case TableItemEventType.rowEditAction:
-          /*this.dialogModel = {
+          this.dialogModel = {
             isVisible: true,
             initialData: event.item,
-          };*/
+          };
           break;
         case TableItemEventType.rowDeleteAction:
           this.deleteItem(event.item);

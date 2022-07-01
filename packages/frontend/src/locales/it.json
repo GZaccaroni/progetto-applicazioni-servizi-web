@@ -53,7 +53,11 @@
       "name": "Nome",
       "address": "Indirizzo",
       "phoneNumber": "Numero di telefono",
-      "vatNumber": "Partita Iva"
+      "vatNumber": "Partita Iva",
+      "add": "Aggiungi cliente",
+      "edit": "Modifica cliente",
+      "added": "Cliente aggiunto con successo",
+      "edited": "Cliente modificato con successo"
     },
     "product": {
       "name": "Nome"
