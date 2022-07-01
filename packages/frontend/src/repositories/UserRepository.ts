@@ -47,7 +47,9 @@ export async function addUser(data: AddUserInput): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export type UpdateUserInput = Partial<AddUserInput> & DbIdentifiable;
+export type UpdateUserInput = Omit<AddUserInput, "password"> & {
+  password?: string;
+} & DbIdentifiable;
 export async function updateUser(item: UpdateUserInput): Promise<void> {
   const result = await Client.post<void>(
     `${resource}/${item.id}`,
