@@ -4,18 +4,40 @@ import {CreateUser} from "../model/request/type/CreateUser";
 import {UpdateUser} from "../model/request/type/UpdateUser";
 import {User} from "../model/request/type/User";
 import passport from "passport";
-import UserDb from "../user";
+import UserDb from "../model/db_model/User";
+import Log from "../model/db_model/Log";
 
-export const createUser=(req:Request,res: Response)=>{
+export const createUser=(req,res: Response)=>{
   if(!validateRequest<CreateUser>("CreateUser",req.body)){
     res.status(400).send("Invalid Input");
     return;
   }
-  UserDb.register(req.body,req.body.password);
+  if(!req.user.isAdmin){
+    res.status(403).send("User not authorized");
+  }
+  UserDb.register(req.body,req.body.password, (err,user)=>{
+    if(err){
+      res.status(400).send("registration error");
+      return;
+    }
+    Log.create({username: req.user.username, action: "Create", objectId: user._id});
+  });
   res.send("Add User valid");
 }
-export const getUsers=(req:Request,res: Response)=>{
-  res.send("Get Users")
+export const getUsers=(req,res: Response)=>{
+/*  if(!req.user.isAdmin){
+    res.status(403).send("User not authorized");
+  }*/
+  if(!req.query.limit){
+    res.status(400).send("Bad request");
+  }
+  let usernamePattern = "";
+  if (req.query.searchName) {
+    usernamePattern = req.query.searchName;
+  }
+  UserDb.paginate();
+  const result=UserDb.find({ username: {$regex: "/"+usernamePattern+"/"}}).limit(req.query.limit)
+  res.send(result)
 }
 
 export const getUserById=(req:Request,res: Response)=>{
