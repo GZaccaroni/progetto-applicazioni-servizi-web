@@ -83,6 +83,7 @@ export const updateUser = (req, res: Response) => {
             res.json(err);
           } else {
             user.save();
+            Log.create({username: req.user.username, action: "Update", objectId: user._id});
             res.json({message: "User password updated"});
           }
         });
@@ -99,11 +100,11 @@ export const deleteUser = (req, res: Response) => {
     res.status(403).json({message: "User not authorized"});
     return;
   }
-  UserDb.deleteOne({username: req.params.username}, (err, result) => {
+  UserDb.findOneAndDelete({username: req.params.username},{},(err, user) => {
     if (err)
       res.json(err);
     else {
-      if (result.deletedCount == 0) {
+      if (user==null) {
         res.status(404).json({message: "User not found"});
       } else {
         req.user.logout(function (err) {
@@ -111,6 +112,7 @@ export const deleteUser = (req, res: Response) => {
             console.log("Errore " + err);
             res.json(err);
           } else {
+            Log.create({username: req.user.username, action: "Delete", objectId: user._id});
             res.json({message: "User deleted"});
           }
         });
