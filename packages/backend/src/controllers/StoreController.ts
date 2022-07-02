@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
-import {validateRequest} from "../schema/validation";
-import {CreateStore} from "../schema/type/CreateStore";
-import {UpdateStore} from "../schema/type/UpdateStore";
+import {validateRequest} from "../model/request/validation";
+import {CreateStore} from "../model/request/type/CreateStore";
+import {UpdateStore} from "../model/request/type/UpdateStore";
 
 export const addStore=(req:Request,res: Response)=>{
   if(!validateRequest<CreateStore>("CreateStore",req.body)){
