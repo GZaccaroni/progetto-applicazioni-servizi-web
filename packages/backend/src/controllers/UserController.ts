@@ -35,24 +35,67 @@ export const getUsers=(req,res: Response)=>{
   if (req.query.searchName) {
     usernamePattern = req.query.searchName;
   }
-  UserDb.paginate();
-  const result=UserDb.find({ username: {$regex: "/"+usernamePattern+"/"}}).limit(req.query.limit)
-  res.send(result)
+  //UserDb.paginate();
+  UserDb.find({ username: {$regex: "/"+usernamePattern+"/"}}).limit(req.query.limit);
+  res.send("User");
 }
 
-export const getUserById=(req:Request,res: Response)=>{
-  console.log(req.params.username);
-  res.send("GetId User")
+export const getUserByName=(req:Request, res: Response)=>{
+  //TODO Not authorized
+  if(!req.params.username){
+    res.status(400).send("Invalid Username supplied");
+    return;
+  }
+  UserDb.findOne({username: req.params.username},["username", "isAdmin"],(err, user)=>{
+    if(err){
+      res.send(err);
+    }
+    else {
+      if(user==null){
+        res.status(404).send('User not found');
+      } else {
+        res.json(user);
+      }
+    }
+  });
 }
 export const updateUser=(req:Request,res: Response)=>{
-  if(!validateRequest<UpdateUser>("UpdateUser",req.body)){
-    res.status(400).send("Invalid Input");
+  if(!validateRequest<UpdateUser>("UpdateUser",req.body) || !req.params.username){
+    res.status(400).send("Invalid user supplied");
+    return;
+  }
+  if(!req.params.username){
+    res.status(400).send("Invalid Username supplied");
     return;
   }
   res.send("Update User valid")
 }
-export const deleteUser=(req:Request,res: Response)=>{
-  res.send("delete User")
+export const deleteUser=(req,res: Response)=>{
+  if(!req.params.username){
+    res.status(400).send("Invalid Username supplied");
+    return;
+  }
+  if(req.user.username!=req.params.username){
+    res.status(403).send("User not authorized");
+    return;
+  }
+  UserDb.deleteOne({username:req.params.username},(err, result)=> {
+    if (err)
+      res.send(err);
+    else{
+      if(result.deletedCount==0){
+        res.status(404).send("User not found");
+      }
+      else{
+        req.user.logout(function(err) {
+          if(err){
+            console.log("Errore "+err);
+          }
+        });
+        res.json("User deleted");
+      }
+    }
+  });
 }
 export const userLogin=(req,res: Response)=>{
   if(!validateRequest<User>("User",req.body)){
