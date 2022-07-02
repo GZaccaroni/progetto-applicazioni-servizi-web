@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
-import {validateRequest} from "../schema/validation";
-import {CreateOrder} from "../schema/type/CreateOrder";
-import {UpdateOrder} from "../schema/type/UpdateOrder";
+import {validateRequest} from "../model/request/validation";
+import {CreateOrder} from "../model/request/type/CreateOrder";
+import {UpdateOrder} from "../model/request/type/UpdateOrder";
 
 export const addOrder=(req:Request,res: Response)=>{
   if(!validateRequest<CreateOrder>("CreateOrder",req.body)){

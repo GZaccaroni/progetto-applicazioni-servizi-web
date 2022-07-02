@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
-import {validateRequest} from "../schema/validation";
-import {CreateCustomer} from "../schema/type/CreateCustomer";
-import {UpdateCustomer} from "../schema/type/UpdateCustomer";
+import {validateRequest} from "../model/request/validation";
+import {CreateCustomer} from "../model/request/type/CreateCustomer";
+import {UpdateCustomer} from "../model/request/type/UpdateCustomer";
 
 export const addCustomer=(req:Request,res: Response)=>{
   if(!validateRequest<CreateCustomer>("CreateOrder",req.body)){

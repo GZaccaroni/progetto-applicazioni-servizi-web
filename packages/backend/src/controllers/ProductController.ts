@@ -1,7 +1,7 @@
 import {Request, Response} from "express";
-import {validateRequest} from "../schema/validation";
-import {UpdateProduct} from "../schema/type/UpdateProduct";
-import {CreateProduct} from "../schema/type/CreateProduct";
+import {validateRequest} from "../model/request/validation";
+import {UpdateProduct} from "../model/request/type/UpdateProduct";
+import {CreateProduct} from "../model/request/type/CreateProduct";
 
 export const addProduct=(req:Request,res: Response)=>{
   if(!validateRequest<CreateProduct>("CreateProduct",req.body)){
