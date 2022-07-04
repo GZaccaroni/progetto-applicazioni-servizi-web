@@ -7,12 +7,12 @@ type UserDocument = mongoose.Document & {
   isAdmin: boolean
 };
 
-const User = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   username: String,
   isAdmin: Boolean
 });
 
-User.plugin(passportLocalMongoose);
-User.plugin(mongoosePagination);
+UserSchema.plugin(passportLocalMongoose);
+UserSchema.plugin(mongoosePagination);
 
-export default mongoose.model<UserDocument, Pagination<UserDocument> & PassportLocalModel<UserDocument>>('user', User);
+export default mongoose.model<UserDocument, Pagination<UserDocument> & PassportLocalModel<UserDocument>>('user', UserSchema, 'users');
