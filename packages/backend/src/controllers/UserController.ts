@@ -17,6 +17,7 @@ export const createUser = (req, res: Response) => {
   }
   UserDb.register(req.body, req.body.password, (err, user) => {
     if (err) {
+      console.log(err);
       res.status(400).json({message: "registration error"});
       return;
     }
@@ -25,19 +26,40 @@ export const createUser = (req, res: Response) => {
   });
 }
 export const getUsers = (req, res: Response) => {
-  /*  if(!req.user.isAdmin){
+  if(!req.user.isAdmin){
       res.status(403).json({message:"User not authorized"});
-    }*/
+  }
   if (!req.query.limit) {
     res.status(400).json({message: "Bad request"});
+    return;
   }
-  let usernamePattern = "";
+  const options = {
+    limit: req.query.limit,
+    select: ["username", "isAdmin", "_id"]
+  };
   if (req.query.searchName) {
-    usernamePattern = req.query.searchName;
+    options["query"] = {username: {$regex: req.query.searchName}};
   }
-  //UserDb.paginate();
-  UserDb.find({username: {$regex: "/" + usernamePattern + "/"}}).limit(req.query.limit);
-  res.send("User");
+  if (req.query.pagingNext) {
+    options["startingAfter"]=req.query.pagingNext;
+  } else {
+    if(req.query.pagingPrevious){
+      options["endingBefore"]=req.query.pagingPrevious;
+    }
+  }
+  UserDb.paginate(options,err=> res.json(err)).then((result)=>{
+    const responseBody={
+      results:result.docs,
+      hasNext:result.hasNextPage
+    };
+    if(result.hasNextPage){
+      responseBody["next"]=result.docs.at(-1)._id;
+    }
+    if(result.docs.length>0){
+      responseBody["previous"]=result.docs.at(0)._id;
+    }
+    res.json(responseBody);
+  });
 }
 
 export const getUserByName = (req: Request, res: Response) => {
@@ -67,10 +89,10 @@ export const updateUser = (req, res: Response) => {
     res.status(400).json("Invalid Username supplied");
     return;
   }
-  /*if(req.user.username!=req.params.username){
+  if(req.user.username!=req.params.username){
     res.status(403).json({ message:"User not authorized"});
     return;
-  }*/
+  }
   UserDb.findOne({username: req.params.username}, (err, user) => {
     if (err) {
       res.json(err);
@@ -147,7 +169,6 @@ export const userLogin = (req, res: Response) => {
 export const userLogout = (req, res: Response) => {
   req.logout(function (err) {
     if (err) {
-      console.log("Errore " + err);
       res.json(err);
     }
   });

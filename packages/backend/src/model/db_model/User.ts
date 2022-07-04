@@ -1,6 +1,11 @@
-import mongoose, {InferSchemaType, IPaginateModel} from "mongoose";
+import mongoose, {InferSchemaType, PassportLocalModel, PassportLocalSchema} from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
-import MongoPaging from "mongo-cursor-pagination";
+import {mongoosePagination, Pagination} from "mongoose-paginate-ts";
+
+type UserD = mongoose.Document & {
+  username: string,
+  isAdmin: boolean
+};
 
 const User = new mongoose.Schema({
   username: String,
@@ -8,8 +13,8 @@ const User = new mongoose.Schema({
 });
 
 User.plugin(passportLocalMongoose);
-User.plugin(MongoPaging.mongoosePlugin);
+User.plugin(mongoosePagination);
 
-type UserSchema= InferSchemaType<typeof User>;
+type UserSchema= InferSchemaType<typeof User>
 
-export default mongoose.model<UserSchema>('user', User);
+export default mongoose.model<UserD, Pagination<UserD> & PassportLocalModel<UserD>>('user', User);
