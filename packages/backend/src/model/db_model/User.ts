@@ -2,7 +2,7 @@ import mongoose, {InferSchemaType, PassportLocalModel, PassportLocalSchema} from
 import passportLocalMongoose from "passport-local-mongoose";
 import {mongoosePagination, Pagination} from "mongoose-paginate-ts";
 
-type UserD = mongoose.Document & {
+type UserDocument = mongoose.Document & {
   username: string,
   isAdmin: boolean
 };
@@ -15,6 +15,4 @@ const User = new mongoose.Schema({
 User.plugin(passportLocalMongoose);
 User.plugin(mongoosePagination);
 
-type UserSchema= InferSchemaType<typeof User>
-
-export default mongoose.model<UserD, Pagination<UserD> & PassportLocalModel<UserD>>('user', User);
+export default mongoose.model<UserDocument, Pagination<UserDocument> & PassportLocalModel<UserDocument>>('user', User);
