@@ -1,14 +1,8 @@
 import mongoose from "mongoose";
 import {mongoosePagination, Pagination} from "mongoose-paginate-ts";
+import {Store} from "../request/type/Store";
 
-type StoreDocument = mongoose.Document & {
-  name: string,
-  authorizations: [{
-    userId: string,
-    accessLevel: string
-  }]
-};
-
+type StoreDocument = mongoose.Document & Store;
 const StoreSchema = new mongoose.Schema({
   name: String,
   authorizations: [{
