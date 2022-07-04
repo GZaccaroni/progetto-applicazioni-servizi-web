@@ -51,7 +51,7 @@ export const getUsers = (req, res: Response) => {
 
 export const getUserByName = (req, res: Response) => {
   if (!req.params.username) {
-    res.status(400).send({message: "Invalid Username supplied"});
+    res.status(400).json({message: "Invalid Username supplied"});
     return;
   }
   if(!req.user.isAdmin && req.params.username!=req.user.username){

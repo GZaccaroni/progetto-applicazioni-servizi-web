@@ -36,8 +36,7 @@ export const getStores=(req,res: Response)=>{
   if (req.query.searchName) {
     query["name"] = {$regex: req.query.searchName};
   }
-  const options = paginateOptions(query,
-                                  ["name", "authorizations", "_id"],
+  const options = paginateOptions(query,{},
                                     req.query.limit,
                                     req.query.pagingNext,
                                     req.query.paginatePrevious);
@@ -48,11 +47,11 @@ export const getStores=(req,res: Response)=>{
 export const getStoreById=(req:Request,res: Response)=>{
 
   if (!req.params.storeId) {
-    res.status(400).send({message: "Invalid ID supplied"});
+    res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  Store.findById(req.params.storeId, ["name", "authorizations", "_id"], (err, store) => {
+  Store.findById(req.params.storeId, {}, (err, store) => {
     if (err) {
       res.json(err);
     } else {
@@ -78,7 +77,7 @@ export const updateStore = (req, res: Response) => {
     else {
       if (store == null) {
         res.status(404).send({
-          message: 'Store not found'
+          message: "Store not found"
         });
       } else {
         Log.create({

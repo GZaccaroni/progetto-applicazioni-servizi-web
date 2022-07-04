@@ -29,8 +29,7 @@ export const getCustomers=(req:Request,res: Response)=>{
   if (req.query.searchName) {
     query["name"] = {$regex: req.query.searchName};
   }
-  const options = paginateOptions(query,
-    ["name", "phoneNumber", "address", "vatNumber","_id"],
+  const options = paginateOptions(query,{},
     req.query.limit,
     req.query.pagingNext,
     req.query.paginatePrevious);
@@ -40,7 +39,7 @@ export const getCustomers=(req:Request,res: Response)=>{
 }
 export const getCustomerById=(req:Request,res: Response)=>{
   if (!req.params.customerId) {
-    res.status(400).send({message: "Invalid ID supplied"});
+    res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
@@ -95,7 +94,7 @@ export const deleteCustomer=(req,res: Response)=>{
           username: req.user.username,
           action: "Delete",
           objectId: customer._id
-        }).then(() => res.json({message: "User deleted"}), err => res.json(err));
+        }).then(() => res.json({message: "Customer deleted"}), err => res.json(err));
       }
     }
   });
