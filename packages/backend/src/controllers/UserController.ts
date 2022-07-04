@@ -59,7 +59,7 @@ export const getUserByName = (req, res: Response) => {
   }
   UserDb.findOne({username: req.params.username}, ["username", "isAdmin"], (err, user) => {
     if (err) {
-      res.send(err);
+      res.json(err);
     } else {
       if (user == null) {
         res.status(404).json({message: "User not found"});
