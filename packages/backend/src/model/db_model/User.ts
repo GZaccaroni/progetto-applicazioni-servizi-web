@@ -1,4 +1,4 @@
-import mongoose, {InferSchemaType, PassportLocalModel, PassportLocalSchema} from "mongoose";
+import mongoose, {PassportLocalModel} from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
 import {mongoosePagination, Pagination} from "mongoose-paginate-ts";
 
