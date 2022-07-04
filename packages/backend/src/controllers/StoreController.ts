@@ -52,7 +52,7 @@ export const getStoreById=(req:Request,res: Response)=>{
     return;
   }
   //TODO Not authorized
-  Store.findOne({storeId: req.params.storeId}, ["name", "authorizations", "_id"], (err, store) => {
+  Store.findById(req.params.storeId, ["name", "authorizations", "_id"], (err, store) => {
     if (err) {
       res.json(err);
     } else {
