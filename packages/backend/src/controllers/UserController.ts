@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {Response} from "express";
 import {validateRequest} from "../model/request/validation";
 import {CreateUser} from "../model/request/type/CreateUser";
 import {UpdateUser} from "../model/request/type/UpdateUser";
@@ -6,6 +6,7 @@ import {User} from "../model/request/type/User";
 import passport from "passport";
 import UserDb from "../model/db_model/User";
 import Log from "../model/db_model/Log";
+import {paginateOptions, paginateResponse} from "../paginationUtils";
 
 export const createUser = (req, res: Response) => {
   if (!validateRequest<CreateUser>("CreateUser", req.body)) {
@@ -21,8 +22,11 @@ export const createUser = (req, res: Response) => {
       res.status(400).json({message: "registration error"});
       return;
     }
-    Log.create({username: req.user.username, action: "Create", objectId: user._id});
-    res.json({message: "User added"});
+    Log.create({
+      username: req.user.username,
+      action: "Create",
+      objectId: user._id
+    }).then(() => res.json({message: "User added"}), err => res.json(err));
   });
 }
 export const getUsers = (req, res: Response) => {
@@ -33,40 +37,25 @@ export const getUsers = (req, res: Response) => {
     res.status(400).json({message: "Bad request"});
     return;
   }
-  const options = {
-    limit: req.query.limit,
-    select: ["username", "isAdmin", "_id"]
-  };
+
+  const query={};
   if (req.query.searchName) {
-    options["query"] = {username: {$regex: req.query.searchName}};
+    query["username"]= {$regex: req.query.searchName};
   }
-  if (req.query.pagingNext) {
-    options["startingAfter"]=req.query.pagingNext;
-  } else {
-    if(req.query.pagingPrevious){
-      options["endingBefore"]=req.query.pagingPrevious;
-    }
-  }
+  const options= paginateOptions(query,["username", "isAdmin", "_id"],req.query.limit,req.query.pagingNext,req.query.pagingPrevious)
+
   UserDb.paginate(options,err=> res.json(err)).then((result)=>{
-    const responseBody={
-      results:result.docs,
-      hasNext:result.hasNextPage
-    };
-    if(result.hasNextPage){
-      responseBody["next"]=result.docs.at(-1)._id;
-    }
-    if(result.docs.length>0){
-      responseBody["previous"]=result.docs.at(0)._id;
-    }
-    res.json(responseBody);
+    res.json(paginateResponse(result));
   });
 }
 
-export const getUserByName = (req: Request, res: Response) => {
-  //TODO Not authorized
+export const getUserByName = (req, res: Response) => {
   if (!req.params.username) {
     res.status(400).send({message: "Invalid Username supplied"});
     return;
+  }
+  if(!req.user.isAdmin && req.params.username!=req.user.username){
+    res.status(403).json({message:"User not authorized"});
   }
   UserDb.findOne({username: req.params.username}, ["username", "isAdmin"], (err, user) => {
     if (err) {
@@ -105,8 +94,11 @@ export const updateUser = (req, res: Response) => {
             res.json(err);
           } else {
             user.save();
-            Log.create({username: req.user.username, action: "Update", objectId: user._id});
-            res.json({message: "User password updated"});
+            Log.create({
+              username: req.user.username,
+              action: "Update",
+              objectId: user._id
+            }).then(() => res.json({message: "User password updated"}), err => res.json(err));
           }
         });
       }
@@ -134,8 +126,11 @@ export const deleteUser = (req, res: Response) => {
             console.log("Errore " + err);
             res.json(err);
           } else {
-            Log.create({username: req.user.username, action: "Delete", objectId: user._id});
-            res.json({message: "User deleted"});
+            Log.create({
+              username: req.user.username,
+              action: "Delete",
+              objectId: user._id
+            }).then(() => res.json({message: "User deleted"}), err => res.json(err));
           }
         });
       }
