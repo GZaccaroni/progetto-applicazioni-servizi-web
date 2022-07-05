@@ -6,10 +6,9 @@ type CustomerDocument = mongoose.Document & Customer;
 
 const CustomerSchema = new mongoose.Schema({
   name: String,
-  authorizations: [{
-    userId: String,
-    accessLevel: String
-  }]
+  phoneNumber: String,
+  address: String,
+  vatNumber: String
 });
 
 CustomerSchema.plugin(mongoosePagination);
