@@ -16,7 +16,10 @@ export const addCustomer=(req,res: Response)=>{
       Log.create({
         username: req.user.username,
         action: "Create",
-        objectId: customer._id
+        object: {
+          id: customer._id,
+          type: "Customer"
+        }
       }).then(() => res.json("Add Customer"));
     });
 }
@@ -72,7 +75,10 @@ export const updateCustomer=(req,res: Response)=>{
         Log.create({
           username: req.user.username,
           action: "Update",
-          objectId: customer._id
+          object: {
+            id: customer._id,
+            type: "Customer"
+          }
         }).then(() => res.json(customer), (err) => res.json(err));
       }
     }
@@ -93,7 +99,10 @@ export const deleteCustomer=(req,res: Response)=>{
         Log.create({
           username: req.user.username,
           action: "Delete",
-          objectId: customer._id
+          object: {
+            id: customer._id,
+            type: "Customer"
+          }
         }).then(() => res.json({message: "Customer deleted"}), err => res.json(err));
       }
     }

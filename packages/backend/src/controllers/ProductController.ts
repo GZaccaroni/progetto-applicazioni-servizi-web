@@ -18,7 +18,10 @@ export const addProduct=(req,res: Response)=>{
     Log.create({
       username: req.user.username,
       action: "Create",
-      objectId: product._id
+      object: {
+        id: product._id,
+        type: "Product"
+      }
     }).then(() => res.json("Add Product"));
   });
 
@@ -79,7 +82,10 @@ export const updateProduct=(req,res: Response)=>{
         Log.create({
           username: req.user.username,
           action: "Update",
-          objectId: product._id
+          object: {
+            id: product._id,
+            type: "Product"
+          }
         }).then(() => res.json(product), (err) => res.json(err));
       }
     }
@@ -100,7 +106,10 @@ export const deleteProduct=(req,res: Response)=>{
         Log.create({
           username: req.user.username,
           action: "Delete",
-          objectId: product._id
+          object: {
+            id: product._id,
+            type: "Product"
+          }
         }).then(() => res.json({message: "Product deleted"}), err => res.json(err));
       }
     }

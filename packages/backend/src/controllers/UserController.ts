@@ -25,7 +25,10 @@ export const createUser = (req, res: Response) => {
     Log.create({
       username: req.user.username,
       action: "Create",
-      objectId: user._id
+      object: {
+        id: user._id,
+        type: "User"
+      }
     }).then(() => res.json({message: "User added"}), err => res.json(err));
   });
 }
@@ -97,7 +100,10 @@ export const updateUser = (req, res: Response) => {
             Log.create({
               username: req.user.username,
               action: "Update",
-              objectId: user._id
+              object: {
+                id: user._id,
+                type: "User"
+              }
             }).then(() => res.json({message: "User password updated"}), err => res.json(err));
           }
         });
@@ -129,7 +135,10 @@ export const deleteUser = (req, res: Response) => {
             Log.create({
               username: req.user.username,
               action: "Delete",
-              objectId: user._id
+              object: {
+                id: user._id,
+                type: "User"
+              }
             }).then(() => res.json({message: "User deleted"}), err => res.json(err));
           }
         });

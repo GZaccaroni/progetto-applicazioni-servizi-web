@@ -15,11 +15,14 @@ export const addStore=(req,res: Response)=>{
     return;
   }
   Store.create(req.body).then(
-    store=>{
+    store => {
       Log.create({
         username: req.user.username,
         action: "Create",
-        objectId: store._id
+        object: {
+          id: store._id,
+          type: "Store"
+        }
       }).then(() => res.json("Add Store"));
     });
 
@@ -83,7 +86,10 @@ export const updateStore = (req, res: Response) => {
         Log.create({
           username: req.user.username,
           action: "Update",
-          objectId: store._id
+          object: {
+            id: store._id,
+            type: "Store"
+          }
         }).then(() => res.json(store), (err) => res.json(err));
       }
     }

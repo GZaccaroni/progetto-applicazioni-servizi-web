@@ -6,7 +6,13 @@ const Log= new mongoose.Schema({
     type: String,
     enum: ["Create","Update","Delete"]
   },
-  objectID: String
+  object:{
+    id: String,
+    type: {
+      type:String,
+      enum: ["User","Product","Customer","Order","Store"]
+    }
+  }
 },{timestamps:true});
 
 export default mongoose.model("log",Log);
