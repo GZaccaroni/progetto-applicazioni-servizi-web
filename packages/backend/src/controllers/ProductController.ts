@@ -7,16 +7,16 @@ import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 
 export const addProduct=(req,res: Response)=>{
-  if (!req.user.isAdmin) {
+/*  if (!req.user.isAdmin) {
     res.status(403).json({message: "User not authorized"});
-  }
+  }*/
   if (!validateRequest<CreateProduct>("CreateProduct",req.body)){
     res.status(400).send("Invalid Input");
     return;
   }
   Product.create(req.body).then(product=>{
     Log.create({
-      username: req.user.username,
+      username: "pippo", //TODO req.user.username,
       action: "Create",
       object: {
         id: product._id,
@@ -45,23 +45,13 @@ export const getProducts = (req, res: Response) => {
   });
 }
 
-export const findProductById = async (productId: string) => {
-  return Product.findById(productId, {}, (err, product) => {
-    if (err) {
-      throw err;
-    } else {
-      return product;
-    }
-  });
-}
-
 export const getProductById = (req: Request, res: Response) => {
   if (!req.params.productId) {
     res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  findProductById(req.params.productId).then(product => {
+  Product.findById(req.params.productId).then(product => {
     if (product == null) {
       res.status(404).json({message: "Product not found"});
     } else {

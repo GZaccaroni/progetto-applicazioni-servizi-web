@@ -2,12 +2,12 @@ import {Request, Response} from "express";
 import {validateRequest} from "../model/request/validation";
 import {CreateOrder} from "../model/request/type/CreateOrder";
 import {UpdateOrder} from "../model/request/type/UpdateOrder";
-import {findCustomerById} from "./CustomerController";
-import {findStoreById} from "./StoreController";
-import {findProductById} from "./ProductController";
 import Order from "../model/db_model/Order";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
+import Store from "../model/db_model/Store";
+import Product from "../model/db_model/Product";
+import Customer from "../model/db_model/Customer";
 
 const enrichOrder = async (order)=>{
   const enrichedOrder={
@@ -20,7 +20,7 @@ const enrichOrder = async (order)=>{
   }
   const promises=[]
   //get Store data
-  promises.push(findStoreById(order.storeId).then(
+  promises.push(Store.findById(order.storeId).then(
     store => {
       if (store != null) {
         enrichedOrder["storeName"] = store.name;
@@ -32,7 +32,7 @@ const enrichOrder = async (order)=>{
   const entryPromises=[];
   order.entries.forEach(entry => {
     entry["price"] = entry.pricePerUnit * entry.quantity;
-    entryPromises.push(findProductById(entry.productId).then(product => {
+    entryPromises.push(Product.findById(entry.productId).then(product => {
       entry["name"] = product.name + entry.variantId ? " " + product.kinds.find(x => x.id == entry.variantId).name : "";
     }).then(() => enrichedOrder["entries"].push(entry)));
   })
@@ -40,7 +40,7 @@ const enrichOrder = async (order)=>{
   promises.push(Promise.all(entryPromises).then(() => enrichedOrder["price"] = enrichedOrder.entries.reduce((sum, entry) => sum + entry.price, 0)))
   //get Customer data
   if (order.customerId) {
-    promises.push(findCustomerById(order.customerId).then(customer=>{
+    promises.push(Customer.findById(order.customerId).then(customer=>{
       if(customer!=null){
         enrichedOrder["customer"]=customer;
       } else {

@@ -41,23 +41,13 @@ export const getCustomers=(req:Request,res: Response)=>{
   });
 }
 
-export const findCustomerById = async (customerId: string) => {
-  return Customer.findById(customerId, {}, (err, customer) => {
-    if (err) {
-      throw err;
-    } else {
-      return customer;
-    }
-  });
-}
-
 export const getCustomerById=(req:Request,res: Response)=>{
   if (!req.params.customerId) {
     res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  findCustomerById(req.params.customerId).then(customer=>{
+  Customer.findById(req.params.customerId).then(customer=>{
     if (customer == null) {
       res.status(404).json({message: "Product not found"});
     } else {

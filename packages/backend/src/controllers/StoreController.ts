@@ -49,23 +49,13 @@ export const getStores = (req, res: Response) => {
   });
 }
 
-export const findStoreById = (storeId: string) => {
-  return Store.findById(storeId, {}, (err, store) => {
-    if (err) {
-      throw err;
-    } else {
-      return store;
-    }
-  });
-}
-
 export const getStoreById=(req:Request,res: Response)=>{
   if (!req.params.storeId) {
     res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  findStoreById(req.params.storeId).then(
+  Store.findById(req.params.storeId).then(
     store=>{
       if (store == null) {
         res.status(404).json({message: "Store not found"});
