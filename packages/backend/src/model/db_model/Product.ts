@@ -6,13 +6,19 @@ type ProductDocument = mongoose.Document & Product;
 const ProductSchema = new mongoose.Schema({
   name: String,
   pricePerUnit: Number,
-  grade: GradeEnum,
+  grade:{
+    type:String,
+    enum: [GradeEnum.First,GradeEnum.Second,GradeEnum.Mixed]
+  },
   kinds: [{
     id: String,
     name: String,
     pricePerUnit: Number
   }],
-  unitOfMeasure: UnitOfMeasureEnum
+  unitOfMeasure: {
+    type:String,
+    enum: [UnitOfMeasureEnum.Kilogram,UnitOfMeasureEnum.Piece]
+  }
 });
 
 ProductSchema.plugin(mongoosePagination);
