@@ -9,50 +9,55 @@ import Order from "../model/db_model/Order";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 
-export const addOrder=(req,res: Response)=>{
-  if(!validateRequest<CreateOrder>("CreateOrder",req.body)){
-    res.status(400).json({message:"Invalid Input"});
-    return;
-  }
-  const newOrder={
-    storeId:req.body.storeId,
-    date: req.body.date,
+const enrichOrder = async (order)=>{
+  const enrichedOrder={
+    storeId:order.storeId,
+    date: order.date,
     entries:[]
   }
-  if(req.body.note){
-    newOrder["note"]=req.body.note;
+  if(order.note){
+    enrichedOrder["note"]=order.note;
   }
   const promises=[]
   //get Store data
-  promises.push(findStoreById(req.body.storeId).then(
+  promises.push(findStoreById(order.storeId).then(
     store => {
       if (store != null) {
-        newOrder["storeName"] = store.name;
+        enrichedOrder["storeName"] = store.name;
       } else {
         throw {code: 400, message:"Invalid Input"};
       }
     }))
   //generate product name
   const entryPromises=[];
-  req.body.entries.forEach(entry => {
+  order.entries.forEach(entry => {
     entry["price"] = entry.pricePerUnit * entry.quantity;
     entryPromises.push(findProductById(entry.productId).then(product => {
       entry["name"] = product.name + entry.variantId ? " " + product.kinds.find(x => x.id == entry.variantId).name : "";
-    }).then(() => newOrder["entries"].push(entry)));
+    }).then(() => enrichedOrder["entries"].push(entry)));
   })
   //compute tot
-  promises.push(Promise.all(entryPromises).then(()=>newOrder["price"]=newOrder.entries.reduce((sum,entry)=>sum+entry.price,0)))
+  promises.push(Promise.all(entryPromises).then(() => enrichedOrder["price"] = enrichedOrder.entries.reduce((sum, entry) => sum + entry.price, 0)))
   //get Customer data
-  if(req.body.customerId){
-   promises.push(findCustomerById(req.body.customerId).then(customer=>{
+  if (order.customerId) {
+    promises.push(findCustomerById(order.customerId).then(customer=>{
       if(customer!=null){
-        newOrder["customer"]=customer;
+        enrichedOrder["customer"]=customer;
       } else {
         throw {code: 400, message: "Invalid Input"};
       }
-   }));
+    }));
   }
-  Promise.all(promises).then(() => {
+  await Promise.all(promises);
+  return enrichedOrder;
+}
+
+export const addOrder=(req,res: Response)=>{
+  if(!validateRequest<CreateOrder>("CreateOrder",req.body)){
+    res.status(400).json({message:"Invalid Input"});
+    return;
+  }
+  enrichOrder(req.body).then(newOrder => {
     Order.create(newOrder).then(order => {
       Log.create({
         username: req.user.username,
@@ -117,45 +122,8 @@ export const updateOrder=(req,res: Response)=>{
     res.status(400).send("Invalid Input");
     return;
   }
-  const newOrder={
-    storeId:req.body.storeId,
-    date: req.body.date,
-    entries:[]
-  }
-  if(req.body.note){
-    newOrder["note"]=req.body.note;
-  }
-  const promises=[]
-  //get Store data
-  promises.push(findStoreById(req.body.storeId).then(
-    store => {
-      if (store != null) {
-        newOrder["storeName"] = store.name;
-      } else {
-        throw {code: 400, message:"Invalid Input"};
-      }
-    }))
-  //generate product name
-  const entryPromises=[];
-  req.body.entries.forEach( entry=>{
-    entry["price"]=entry.pricePerUnit*entry.quantity;
-    entryPromises.push(findProductById(entry.productId).then(product=>{
-      entry["name"] = product.name + entry.variantId ? " " + product.kinds.find(x => x.id == entry.variantId).name : "";
-    }).then(()=>newOrder["entries"].push(entry)));
-  })
-  //compute tot
-  promises.push(Promise.all(entryPromises).then(()=>newOrder["price"]=newOrder.entries.reduce((sum,entry)=>sum+entry.price,0)))
-  //get Customer data
-  if(req.body.customerId){
-    promises.push(findCustomerById(req.body.customerId).then(customer=>{
-      if(customer!=null){
-        newOrder["customer"]=customer;
-      } else {
-        throw {code: 400, message: "Invalid Input"};
-      }
-    }));
-  }
-  Promise.all(promises).then(() => {
+
+  enrichOrder(req.body).then( newOrder => {
     Order.findByIdAndUpdate(req.body.id,newOrder).then(order => {
       Log.create({
         username: req.user.username,
