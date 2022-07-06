@@ -47,24 +47,32 @@ export const getStores=(req,res: Response)=>{
     res.json(paginateResponse(result));
   });
 }
-export const getStoreById=(req:Request,res: Response)=>{
 
+export const findStoreById = (storeId: string) => {
+  return Store.findById(storeId, {}, (err, store) => {
+    if (err) {
+      throw err;
+    } else {
+      return store;
+    }
+  });
+}
+
+export const getStoreById=(req:Request,res: Response)=>{
   if (!req.params.storeId) {
     res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  Store.findById(req.params.storeId, {}, (err, store) => {
-    if (err) {
-      res.json(err);
-    } else {
+  findStoreById(req.params.storeId).then(
+    store=>{
       if (store == null) {
         res.status(404).json({message: "Store not found"});
       } else {
         res.json(store);
       }
     }
-  });
+  );
 }
 export const updateStore = (req, res: Response) => {
   /*  if(!req.user.isAdmin){

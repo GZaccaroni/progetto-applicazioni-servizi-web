@@ -44,21 +44,28 @@ export const getProducts = (req, res: Response) => {
     res.json(paginateResponse(result));
   });
 }
+
+export const findProductById = async (productId: string) => {
+  return Product.findById(productId, {}, (err, product) => {
+    if (err) {
+      throw err;
+    } else {
+      return product;
+    }
+  });
+}
+
 export const getProductById = (req: Request, res: Response) => {
   if (!req.params.productId) {
     res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  Product.findById(req.params.productId, {}, (err, product) => {
-    if (err) {
-      res.json(err);
+  findProductById(req.params.productId).then(product => {
+    if (product == null) {
+      res.status(404).json({message: "Product not found"});
     } else {
-      if (product == null) {
-        res.status(404).json({message: "Store not found"});
-      } else {
-        res.json(product);
-      }
+      res.json(product);
     }
   });
 }

@@ -40,24 +40,32 @@ export const getCustomers=(req:Request,res: Response)=>{
     res.json(paginateResponse(result));
   });
 }
+
+export const findCustomerById = async (customerId: string) => {
+  return Customer.findById(customerId, {}, (err, customer) => {
+    if (err) {
+      throw err;
+    } else {
+      return customer;
+    }
+  });
+}
+
 export const getCustomerById=(req:Request,res: Response)=>{
   if (!req.params.customerId) {
     res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  Customer.findById( req.params.storeId, ["name", "authorizations", "_id"], (err, customer) => {
-    if (err) {
-      res.json(err);
+  findCustomerById(req.params.customerId).then(customer=>{
+    if (customer == null) {
+      res.status(404).json({message: "Product not found"});
     } else {
-      if (customer == null) {
-        res.status(404).json({message: "Store not found"});
-      } else {
-        res.json(customer);
-      }
+      res.json(customer);
     }
   });
 }
+
 export const updateCustomer=(req,res: Response)=>{
   if(!validateRequest<UpdateCustomer>("UpdateCustomer",req.body) || !req.params.customerId){
     res.status(400).json({message:"Invalid Input"});
@@ -89,7 +97,7 @@ export const deleteCustomer=(req,res: Response)=>{
     res.status(400).send({message: "Invalid ID supplied"});
     return;
   }
-  Customer.findByIdAndDelete(req.params.customerId,{},(err,customer)=>{
+  Customer.findByIdAndDelete(req.params.customerId,(err,customer)=>{
     if (err)
       res.json(err);
     else {
