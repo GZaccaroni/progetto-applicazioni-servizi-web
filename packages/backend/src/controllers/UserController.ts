@@ -18,7 +18,6 @@ export const createUser = (req, res: Response) => {
   }
   UserDb.register(req.body, req.body.password, (err, user) => {
     if (err) {
-      console.log(err);
       res.status(400).json({message: "registration error"});
       return;
     }
@@ -33,21 +32,24 @@ export const createUser = (req, res: Response) => {
   });
 }
 export const getUsers = (req, res: Response) => {
-  if(!req.user.isAdmin){
-      res.status(403).json({message:"User not authorized"});
+  if (!req.user.isAdmin) {
+    res.status(403).json({message: "User not authorized"});
   }
   if (!req.query.limit) {
     res.status(400).json({message: "Bad request"});
     return;
   }
 
-  const query={};
+  const query = {};
   if (req.query.searchName) {
-    query["username"]= {$regex: req.query.searchName};
+    query["username"] = {$regex: req.query.searchName};
   }
-  const options= paginateOptions(query,["username", "isAdmin", "_id"],req.query.limit,req.query.pagingNext,req.query.pagingPrevious)
-
-  UserDb.paginate(options,err=> res.json(err)).then((result)=>{
+  const options = paginateOptions(query,
+                            ["username", "isAdmin", "_id"],
+                                  req.query.limit,
+                                  req.query.pagingNext,
+                                  req.query.pagingPrevious)
+  UserDb.paginate(options, err => res.json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
 }
@@ -57,14 +59,14 @@ export const getUserByName = (req, res: Response) => {
     res.status(400).json({message: "Invalid Username supplied"});
     return;
   }
-  if(!req.user.isAdmin && req.params.username!=req.user.username){
-    res.status(403).json({message:"User not authorized"});
+  if (!req.user.isAdmin && req.params.username != req.user.username) {
+    res.status(403).json({message: "User not authorized"});
   }
   UserDb.findOne({username: req.params.username}, ["username", "isAdmin"], (err, user) => {
     if (err) {
       res.json(err);
     } else {
-      if (user == null) {
+      if (!user) {
         res.status(404).json({message: "User not found"});
       } else {
         res.json(user);
@@ -81,15 +83,15 @@ export const updateUser = (req, res: Response) => {
     res.status(400).json("Invalid Username supplied");
     return;
   }
-  if(req.user.username!=req.params.username){
-    res.status(403).json({ message:"User not authorized"});
+  if (req.user.username != req.params.username) {
+    res.status(403).json({message: "User not authorized"});
     return;
   }
   UserDb.findOne({username: req.params.username}, (err, user) => {
     if (err) {
       res.json(err);
     } else {
-      if (user == null) {
+      if (!user) {
         res.status(404).json({message: "User not found"});
       } else {
         user.setPassword(req.body.password, (err, user) => {
@@ -120,11 +122,11 @@ export const deleteUser = (req, res: Response) => {
     res.status(403).json({message: "User not authorized"});
     return;
   }
-  UserDb.findOneAndDelete({username: req.params.username},{},(err, user) => {
+  UserDb.findOneAndDelete({username: req.params.username}, (err, user) => {
     if (err)
       res.json(err);
     else {
-      if (user==null) {
+      if (user == null) {
         res.status(404).json({message: "User not found"});
       } else {
         req.user.logout(function (err) {
@@ -153,13 +155,11 @@ export const userLogin = (req, res: Response) => {
   }
   passport.authenticate('local', function (err, user) {
     if (err) {
-      console.log(err);
       return res.status(401).json(err);
     }
     if (user) {
       req.login(user, function (err) {
         if (err) {
-          console.log("Errore " + err);
           res.json(err);
         } else {
           res.json({message: "Logged In"});

@@ -7,9 +7,10 @@ import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 
 export const addStore=(req,res: Response)=>{
-/*  if(!req.user.isAdmin){
+  if(!req.user.isAdmin){
     res.status(403).json({message:"User not authorized"});
-  }*/
+    return;
+  }
   if(!validateRequest<CreateStore>("CreateStore",req.body)){
     res.status(400).json({ message:"Invalid Input"});
     return;
@@ -27,7 +28,7 @@ export const addStore=(req,res: Response)=>{
     });
 
 }
-export const getStores=(req,res: Response)=>{
+export const getStores = (req, res: Response) => {
   if (!req.query.limit) {
     res.status(400).json({message: "Bad request"});
     return;
@@ -75,9 +76,9 @@ export const getStoreById=(req:Request,res: Response)=>{
   );
 }
 export const updateStore = (req, res: Response) => {
-  /*  if(!req.user.isAdmin){
-    res.status(403).json({message:"User not authorized"});
-  }*/
+  if(!req.user.isAdmin) {
+    res.status(403).json({message: "User not authorized"});
+  }
   if (!validateRequest<UpdateStore>("UpdateStore", req.body) || !req.params.storeId) {
     res.status(400).json({message: "Invalid Input"});
     return;

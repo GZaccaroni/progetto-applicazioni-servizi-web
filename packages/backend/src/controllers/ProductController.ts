@@ -7,10 +7,10 @@ import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 
 export const addProduct=(req,res: Response)=>{
-  /*  if(!req.user.isAdmin){
-  res.status(403).json({message:"User not authorized"});
-}*/
-  if(!validateRequest<CreateProduct>("CreateProduct",req.body)){
+  if (!req.user.isAdmin) {
+    res.status(403).json({message: "User not authorized"});
+  }
+  if (!validateRequest<CreateProduct>("CreateProduct",req.body)){
     res.status(400).send("Invalid Input");
     return;
   }
@@ -70,10 +70,10 @@ export const getProductById = (req: Request, res: Response) => {
   });
 }
 export const updateProduct=(req,res: Response)=>{
-  /*  if(!req.user.isAdmin){
+  if(!req.user.isAdmin){
     res.status(403).json({message:"User not authorized"});
-  }*/
-  if(!validateRequest<UpdateProduct>("UpdateProduct",req.body) || !req.params.productId){
+  }
+  if (!validateRequest<UpdateProduct>("UpdateProduct", req.body) || !req.params.productId) {
     res.status(400).send("Invalid Input");
     return;
   }
@@ -103,7 +103,7 @@ export const deleteProduct=(req,res: Response)=>{
     res.status(400).send({message: "Invalid ID supplied"});
     return;
   }
-  Product.findByIdAndDelete(req.params.productId,{},(err,product)=>{
+  Product.findByIdAndDelete(req.params.productId, (err, product) => {
     if (err)
       res.json(err);
     else {
