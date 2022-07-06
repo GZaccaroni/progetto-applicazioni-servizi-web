@@ -7,7 +7,7 @@ StoreRoutes.route("/").post(addStore);
 
 StoreRoutes.route("/find").get(getStores);
 
-StoreRoutes.route("/:id").get(getStoreById)
+StoreRoutes.route("/:storeId").get(getStoreById)
   .post(updateStore);
 
 export default StoreRoutes;

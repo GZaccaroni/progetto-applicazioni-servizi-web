@@ -7,7 +7,7 @@ CustomerRoutes.route("/").post(addCustomer);
 
 CustomerRoutes.route("/find").get(getCustomers);
 
-CustomerRoutes.route("/:id").get(getCustomerById)
+CustomerRoutes.route("/:customerId").get(getCustomerById)
                                     .post(updateCustomer)
                                     .delete(deleteCustomer);
 

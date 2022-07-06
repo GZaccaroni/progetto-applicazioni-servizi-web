@@ -7,7 +7,7 @@ OrderRoutes.route("/").post(addOrder);
 
 OrderRoutes.route("/find").get(getOrders);
 
-OrderRoutes.route("/:id").get(getOrderById)
+OrderRoutes.route("/:orderId").get(getOrderById)
                                 .post(updateOrder)
                                 .delete(deleteOrder);
 
