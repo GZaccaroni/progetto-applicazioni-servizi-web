@@ -23,7 +23,7 @@ import UpdateUser from "./json_schema/UpdateUser.json";
 export const ajv=new Ajv();
 addFormats(ajv)
 
-ajv.addSchema(Identifiable, "Id");
+ajv.addSchema(Identifiable, "Identifiable");
 ajv.addSchema(ProductKind,"ProductKind");
 ajv.addSchema(Product, "Product");
 ajv.addSchema(CreateProduct,"CreateProduct")
