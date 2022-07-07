@@ -2,7 +2,7 @@
   <v-form class="pa-4" @submit.prevent>
     <v-container fluid>
       <v-row no-gutters>
-        <v-col col="4">
+        <v-col cols="4">
           <async-select
             v-model="selectedStore"
             :label="$t('word.store').toString()"
@@ -11,14 +11,14 @@
           />
         </v-col>
         <v-spacer />
-        <v-col col="4">
+        <v-col cols="4">
           <text-field-date-picker
             v-model="form.fromDate"
             :max="form.toDate"
             :label="$t('word.fromDate').toString()"
           />
         </v-col>
-        <v-col col="4">
+        <v-col cols="4">
           <text-field-date-picker
             v-model="form.toDate"
             :min="form.fromDate"
@@ -38,7 +38,7 @@ import TextFieldDatePicker from "@/components/common/TextFieldDatePicker.vue";
 import AsyncSelect, {
   AsyncSelectItem,
 } from "@/components/common/AsyncSelect.vue";
-import { getSelectStoreItems } from "@/helpers/asyncSelectUtils";
+import { getSelectStores } from "@/helpers/asyncSelectUtils";
 import { observableRef } from "@/components/common/VueComposition";
 import Vue from "vue";
 
@@ -48,7 +48,7 @@ export default defineComponent({
     TextFieldDatePicker,
   },
   setup(props, { emit }) {
-    const findItemsFn = getSelectStoreItems;
+    const findItemsFn = getSelectStores;
     const form = reactive<FindOrdersInput>({
       limit: 10,
       storeId: undefined,

@@ -33,7 +33,8 @@
     "save": "Salva",
     "fromDate": "Da",
     "toDate": "a",
-    "store": "Punto vendita"
+    "store": "Punto vendita",
+    "user": "Utente"
   },
   "model": {
     "user": {
@@ -47,7 +48,12 @@
     },
     "store": {
       "name": "Nome",
-      "authorizations": "Autorizzazioni"
+      "authorizations": "Autorizzazioni",
+      "accessLevel": {
+        "name": "Autorizzazione",
+        "salesman": "Commesso",
+        "manager": "Gestore"
+      }
     },
     "customer": {
       "name": "Nome",

@@ -17,11 +17,17 @@
   </v-autocomplete>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, ref } from "@vue/composition-api";
+import {
+  defineComponent,
+  PropType,
+  ref,
+  WritableComputedRef,
+} from "@vue/composition-api";
 import { DbIdentifiable } from "@/model/db/DbIdentifiable";
-import { passthroughVModel } from "@/helpers/passthroughVModel";
+import { mappedVModel, passthroughVModel } from "@/helpers/passthroughVModel";
 import { debounce } from "lodash";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
+import { Mapper } from "@/helpers/types";
 
 export interface AsyncSelectItem extends DbIdentifiable {
   id: string;
@@ -36,7 +42,7 @@ export default defineComponent({
       required: true,
     },
     value: {
-      type: [Object, Array] as PropType<AsyncSelectItem | AsyncSelectItem[]>,
+      type: [Object, Array] as PropType<unknown>,
     },
     multiple: {
       type: Boolean,
@@ -50,17 +56,28 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    mapper: {
+      type: Object as PropType<
+        // any is AsyncSelectItem | AsyncSelectItem[]
+        Mapper<unknown, any> // eslint-disable-line
+      >,
+    },
   },
   setup(props, context) {
     const isLoading = ref(false);
     const items = ref<AsyncSelectItem[]>();
-    const valueState = passthroughVModel(props, context, "value");
+    let valueState: WritableComputedRef<unknown>;
+    if (props.mapper != undefined) {
+      valueState = mappedVModel(props, context, "value", props.mapper);
+    } else {
+      valueState = passthroughVModel(props, context, "value");
+    }
     const searchQuery = ref<string>();
     if (props.value != undefined) {
       if (Array.isArray(props.value)) {
-        items.value = props.value;
+        items.value = (props.mapper?.from(props.value) ?? props.value) as any; // eslint-disable-line
       } else {
-        items.value = [props.value];
+        items.value = [ (props.mapper?.from(props.value) ?? props.value) as any ] ; // eslint-disable-line
       }
     }
     return {
