@@ -21,6 +21,15 @@ const ProductSchema = new mongoose.Schema({
   }
 });
 
+export const ProductProjection= { _id: 0,
+  id: '$_id',
+  name: 1,
+  pricePerUnit: 1,
+  grade: 1,
+  kinds: {id: 1, name: 1, pricePerUnit: 1},
+  unitOfMeasure: 1
+}
+
 ProductSchema.plugin(mongoosePagination);
 
 export default mongoose.model<ProductDocument, Pagination<ProductDocument>>('product', ProductSchema, 'products');
