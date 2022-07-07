@@ -2,21 +2,22 @@ import {Request, Response} from "express";
 import {validateRequest} from "../model/request/validation";
 import {UpdateProduct} from "../model/request/type/UpdateProduct";
 import {CreateProduct} from "../model/request/type/CreateProduct";
-import Product from "../model/db_model/Product";
+import Product, {ProductProjection} from "../model/db_model/Product";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
+import mongoose from "mongoose";
 
 export const addProduct=(req,res: Response)=>{
-/*  if (!req.user.isAdmin) {
+  if (!req.user.isAdmin) {
     res.status(403).json({message: "User not authorized"});
-  }*/
+  }
   if (!validateRequest<CreateProduct>("CreateProduct",req.body)){
     res.status(400).send("Invalid Input");
     return;
   }
   Product.create(req.body).then(product=>{
     Log.create({
-      username: "pippo", //TODO req.user.username,
+      username: req.user.username,
       action: "Create",
       object: {
         id: product._id,
@@ -36,8 +37,7 @@ export const getProducts = (req, res: Response) => {
   if (req.query.searchName) {
     query["name"] = {$regex: req.query.searchName};
   }
-  const options = paginateOptions(query, {},
-    req.query.limit,
+  const options = paginateOptions(query, ProductProjection,req.query.limit,
     req.query.pagingNext,
     req.query.paginatePrevious);
   Product.paginate(options, err => res.json(err)).then((result) => {
@@ -46,24 +46,25 @@ export const getProducts = (req, res: Response) => {
 }
 
 export const getProductById = (req: Request, res: Response) => {
-  if (!req.params.productId) {
+  if (!mongoose.isValidObjectId(req.params.productId)) {
     res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  Product.findById(req.params.productId).then(product => {
+  Product.findById(req.params.productId,ProductProjection).then(product => {
+
     if (product == null) {
       res.status(404).json({message: "Product not found"});
     } else {
       res.json(product);
     }
-  });
+  }).catch(err=>res.json(err));
 }
 export const updateProduct=(req,res: Response)=>{
   if(!req.user.isAdmin){
     res.status(403).json({message:"User not authorized"});
   }
-  if (!validateRequest<UpdateProduct>("UpdateProduct", req.body) || !req.params.productId) {
+  if (!validateRequest<UpdateProduct>("UpdateProduct", req.body) || !mongoose.isValidObjectId(req.params.productId)) {
     res.status(400).send("Invalid Input");
     return;
   }
@@ -83,13 +84,13 @@ export const updateProduct=(req,res: Response)=>{
             id: product._id,
             type: "Product"
           }
-        }).then(() => res.json(product), (err) => res.json(err));
+        }).then(() => res.json({message: "Product updated"}), (err) => res.json(err));
       }
     }
   });
 }
 export const deleteProduct=(req,res: Response)=>{
-  if (!req.params.productId) {
+  if (!mongoose.isValidObjectId(req.params.productId)) {
     res.status(400).send({message: "Invalid ID supplied"});
     return;
   }
