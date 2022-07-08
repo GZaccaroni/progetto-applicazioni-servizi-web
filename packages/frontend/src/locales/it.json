@@ -69,6 +69,12 @@
       "added": "Cliente aggiunto con successo",
       "edited": "Cliente modificato con successo"
     },
+    "order": {
+      "date": "Data",
+      "store": "Punto Vendita",
+      "customer": "Cliente",
+      "price": "Importo"
+    },
     "product": {
       "name": "Nome"
     }
