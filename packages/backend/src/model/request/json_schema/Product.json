@@ -14,14 +14,6 @@
       "exclusiveMinimum": 0,
       "type": "number"
     },
-    "grade": {
-      "type": "string",
-      "enum": [
-        "first",
-        "second",
-        "mixed"
-      ]
-    },
     "kinds": {
       "type": "array",
       "items": {

@@ -8,16 +8,14 @@
   "type": "object",
   "properties": {
     "customerId": {
-      "type": "string",
-      "format": "uuid"
+      "type": "string"
     },
     "storeId": {
-      "type": "string",
-      "format": "uuid"
+      "type": "string"
     },
     "date": {
       "type": "string",
-      "format": "date-time"
+      "format": "date"
     },
     "entries": {
       "minItems": 1,

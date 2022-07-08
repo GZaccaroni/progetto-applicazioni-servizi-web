@@ -14,7 +14,6 @@ import { ProductKind } from './ProductKind';
 export interface Product { 
     name: string;
     pricePerUnit?: number;
-    grade?: GradeEnum;
     kinds: Array<ProductKind>;
     /**
      * Order Status
@@ -22,12 +21,6 @@ export interface Product {
     unitOfMeasure: UnitOfMeasureEnum;
 }
 
-export type GradeEnum = 'first' | 'second' | 'mixed';
-export const GradeEnum = {
-    First: 'first' as GradeEnum,
-    Second: 'second' as GradeEnum,
-    Mixed: 'mixed' as GradeEnum
-};
 export type UnitOfMeasureEnum = 'kilogram' | 'piece';
 export const UnitOfMeasureEnum = {
     Kilogram: 'kilogram' as UnitOfMeasureEnum,

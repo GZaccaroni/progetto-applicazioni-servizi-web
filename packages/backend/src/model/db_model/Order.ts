@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import {mongoosePagination, Pagination} from "mongoose-paginate-ts";
 import {Customer} from "../request/type/Customer";
 import {Identifiable} from "../request/type/Identifiable";
+import {GradeEnum} from "../request/type/CreateOrderEntry";
 
 type OrderDocument = mongoose.Document & {
   customer?: Customer & Identifiable;
@@ -34,6 +35,10 @@ const OrderSchema = new mongoose.Schema({
   entries: [{
     productId: String,
     variantId: String,
+    grade:{
+      type:String,
+      enum: [GradeEnum.First,GradeEnum.Second,GradeEnum.Mixed]
+    },
     name: String,
     quantity: Number,
     pricePerUnit: Number,
