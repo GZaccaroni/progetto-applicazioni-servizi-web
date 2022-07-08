@@ -14,3 +14,12 @@ const CustomerSchema = new mongoose.Schema({
 CustomerSchema.plugin(mongoosePagination);
 
 export default mongoose.model<CustomerDocument, Pagination<CustomerDocument>>('customer', CustomerSchema, 'customers');
+
+export const CustomerProjection= { _id: 0,
+  id: '$_id',
+  name: 1,
+  phoneNumber: 1,
+  address: 1,
+  vatNumber: 1
+
+}
