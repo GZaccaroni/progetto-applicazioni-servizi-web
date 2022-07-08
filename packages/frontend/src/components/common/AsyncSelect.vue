@@ -12,7 +12,7 @@
     :multiple="multiple"
     :small-chips="multiple"
     :clearable="clearable"
-    return-object
+    :return-object="returnObject"
   >
   </v-autocomplete>
 </template>
@@ -21,6 +21,7 @@ import {
   defineComponent,
   PropType,
   ref,
+  toRefs,
   WritableComputedRef,
 } from "@vue/composition-api";
 import { DbIdentifiable } from "@/model/db/DbIdentifiable";
@@ -42,7 +43,9 @@ export default defineComponent({
       required: true,
     },
     value: {
-      type: [Object, Array] as PropType<unknown>,
+      type: [Object, Array, String] as PropType<
+        AsyncSelectItem | AsyncSelectItem[]
+      >,
     },
     multiple: {
       type: Boolean,
@@ -56,28 +59,22 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    mapper: {
-      type: Object as PropType<
-        // any is AsyncSelectItem | AsyncSelectItem[]
-        Mapper<unknown, any> // eslint-disable-line
-      >,
+    returnObject: {
+      type: Boolean,
+      default: true,
     },
   },
   setup(props, context) {
     const isLoading = ref(false);
     const items = ref<AsyncSelectItem[]>();
-    let valueState: WritableComputedRef<unknown>;
-    if (props.mapper != undefined) {
-      valueState = mappedVModel(props, context, "value", props.mapper);
-    } else {
-      valueState = passthroughVModel(props, context, "value");
-    }
+    const valueState = passthroughVModel(props, context, "value");
     const searchQuery = ref<string>();
-    if (props.value != undefined) {
-      if (Array.isArray(props.value)) {
-        items.value = (props.mapper?.from(props.value) ?? props.value) as any; // eslint-disable-line
-      } else {
-        items.value = [ (props.mapper?.from(props.value) ?? props.value) as any ] ; // eslint-disable-line
+    const propsRef = toRefs(props).value?.value;
+    if (propsRef != undefined) {
+      if (Array.isArray(propsRef)) {
+        items.value = propsRef;
+      } else if (typeof propsRef == "object") {
+        items.value = [propsRef];
       }
     }
     return {

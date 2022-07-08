@@ -72,7 +72,7 @@ export type StoreFormDialogModel = GenericFormDialogModel<{
 }>;
 interface AuthorizationViewData {
   user?: Partial<AsyncSelectItem>;
-  accessLevel?: Partial<AsyncSelectItem>;
+  accessLevel?: DbStoreAccessLevel;
 }
 export default defineComponent({
   components: { AsyncSelect, FormDialog },
@@ -101,7 +101,7 @@ export default defineComponent({
               id: value.user?.id,
               username: value.user?.text,
             },
-            accessLevel: value.accessLevel?.id as DbStoreAccessLevel,
+            accessLevel: value.accessLevel,
           };
         });
       }
@@ -117,12 +117,7 @@ export default defineComponent({
           authorizedUsers.value =
             formData.value.authorizations?.map((el) => {
               return {
-                accessLevel: {
-                  id: el.accessLevel as DbStoreAccessLevel,
-                  text: i18n
-                    .t("model.store.accessLevel." + el.accessLevel)
-                    .toString(),
-                },
+                accessLevel: el.accessLevel,
                 user: {
                   id: el.user?.id,
                   text: el.user?.username,

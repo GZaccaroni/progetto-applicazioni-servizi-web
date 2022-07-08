@@ -4,7 +4,7 @@
     :submit-button-text="$t('word.save').toString()"
     :submit-button-loading="submitButtonLoading"
     :submit-button-enabled="validateForm(formData)"
-    :title="$t(create ? 'model.store.add' : 'model.store.edit').toString()"
+    :title="$t(create ? 'model.product.add' : 'model.product.edit').toString()"
     @submit="saveForm"
     @close="closeForm"
   >
@@ -16,18 +16,23 @@
         ></v-text-field>
       </v-row>
       <v-row>
-        <v-col cols="6" class="pa-0">
+        <v-col cols="5" class="pa-0">
           <v-text-field
             type="number"
             v-model.number="formData.pricePerUnit"
+            :suffix="priceSuffix"
             :label="$t('model.product.pricePerUnit')"
+            :min="0"
           ></v-text-field>
         </v-col>
-        <v-col cols="6" class="pa-0">
-          <v-text-field
+        <v-spacer />
+        <v-col cols="5" class="pa-0">
+          <async-select
             v-model="formData.unitOfMeasure"
-            :label="$t('model.product.unitOfMeasure')"
-          ></v-text-field>
+            :label="$t('model.product.unitOfMeasure').toString()"
+            :find-items-fn="findUnitOfMeasureFn"
+            :return-object="false"
+          />
         </v-col>
       </v-row>
       <v-row class="pt-6 pb-4">
@@ -53,6 +58,8 @@
             type="number"
             v-model.number="formData.kinds[index].pricePerUnit"
             :label="$t('model.product.pricePerUnit')"
+            :suffix="priceSuffix"
+            :min="0"
           ></v-text-field>
         </v-col>
         <v-spacer />
@@ -75,18 +82,16 @@ import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
 import { DbStore } from "@/model/db/DbStore";
 import { RecursivePartial } from "@/helpers/types";
-import {
-  getSelectStoreAccessLevel,
-  getSelectStores,
-} from "@/helpers/asyncSelectUtils";
+import { getSelectUnitOfMeasure } from "@/helpers/asyncSelectUtils";
 import { addStore, updateStore } from "@/repositories/StoreRepository";
 import { DbProduct } from "@/model/db/DbProduct";
+import AsyncSelect from "@/components/common/AsyncSelect.vue";
 
 export type ProductFormDialogModel = GenericFormDialogModel<{
   initialData: RecursivePartial<DbProduct>;
 }>;
 export default defineComponent({
-  components: { FormDialog },
+  components: { AsyncSelect, FormDialog },
   props: {
     value: {
       type: Object as PropType<ProductFormDialogModel>,
@@ -99,9 +104,7 @@ export default defineComponent({
     const formData = ref<RecursivePartial<DbProduct>>({});
     const create = ref(false);
     const isVisible = ref(false);
-    const findStoresSelectFn = getSelectStores;
-    const findStoreAccessLevelSelectFn = getSelectStoreAccessLevel;
-
+    const findUnitOfMeasureFn = getSelectUnitOfMeasure;
     console.log("Initial data ", props.value);
     watch(
       () => props.value,
@@ -120,9 +123,20 @@ export default defineComponent({
       formData,
       create,
       isVisible,
-      findStoresSelectFn,
-      findStoreAccessLevelSelectFn,
+      findUnitOfMeasureFn,
+      findStoreAccessLevelSelectFn: findUnitOfMeasureFn,
     };
+  },
+  computed: {
+    priceSuffix() {
+      let suffix = "€";
+      if (this.formData.unitOfMeasure == undefined) return suffix;
+      suffix += "/";
+      suffix += this.$t(
+        "model.unitOfMeasure." + this.formData.unitOfMeasure
+      ).toString();
+      return suffix;
+    },
   },
   methods: {
     closeForm() {
@@ -153,8 +167,8 @@ export default defineComponent({
           await updateStore(data);
         }
         const message = this.create
-          ? this.$t("model.store.added")
-          : this.$t("model.store.edited");
+          ? this.$t("model.product.added")
+          : this.$t("model.product.edited");
         showMessage({
           type: "success",
           text: message.toString(),

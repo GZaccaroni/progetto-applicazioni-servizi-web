@@ -3,6 +3,7 @@ import { AsyncSelectItem } from "@/components/common/AsyncSelect.vue";
 import { findUsers } from "@/repositories/UserRepository";
 import i18n from "@/i18n";
 import { DbStoreAccessLevel } from "@/model/db/DbStore";
+import { DbUnitOfMeasure } from "@/model/db/DbUnitOfMeasure";
 
 const selectMaxItems = 10;
 export async function getSelectStores(
@@ -39,6 +40,14 @@ export async function getSelectStoreAccessLevel(): Promise<AsyncSelectItem[]> {
     return {
       id: elKey,
       text: i18n.t("model.store.accessLevel." + elKey).toString(),
+    };
+  });
+}
+export async function getSelectUnitOfMeasure(): Promise<AsyncSelectItem[]> {
+  return Object.keys(DbUnitOfMeasure).map((elKey) => {
+    return {
+      id: elKey,
+      text: i18n.t("model.unitOfMeasure." + elKey).toString(),
     };
   });
 }

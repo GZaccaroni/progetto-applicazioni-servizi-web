@@ -78,7 +78,15 @@
     "product": {
       "name": "Nome",
       "pricePerUnit": "Prezzo unitario",
-      "unitOfMeasure": "Unità di misura"
+      "unitOfMeasure": "Unità di misura",
+      "add": "Aggiungi prodotto",
+      "edit": "Modifica prodotto",
+      "added": "Prodotto aggiunto con successo",
+      "edited": "Prodotto modificato con successo"
+    },
+    "unitOfMeasure": {
+      "kilogram": "Kg",
+      "piece": "Pezzo"
     }
   },
   "components": {
