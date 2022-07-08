@@ -2,7 +2,6 @@
   "required": [
     "date",
     "entries",
-    "price",
     "storeId"
   ],
   "type": "object",
