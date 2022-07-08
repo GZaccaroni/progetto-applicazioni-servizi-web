@@ -13,7 +13,7 @@ export interface DbProductKind {
 }
 export interface DbProductKindIdentifier {
   productId: string;
-  variantId: string;
+  variantId?: string;
 }
 export interface DbProduct extends DbIdentifiable {
   name: string;
