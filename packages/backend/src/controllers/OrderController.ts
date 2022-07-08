@@ -2,12 +2,13 @@ import {Request, Response} from "express";
 import {validateRequest} from "../model/request/validation";
 import {CreateOrder} from "../model/request/type/CreateOrder";
 import {UpdateOrder} from "../model/request/type/UpdateOrder";
-import Order from "../model/db_model/Order";
+import Order, {OrderProjection} from "../model/db_model/Order";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import Store from "../model/db_model/Store";
 import Product from "../model/db_model/Product";
-import Customer from "../model/db_model/Customer";
+import Customer, {CustomerProjection} from "../model/db_model/Customer";
+import mongoose from "mongoose";
 
 const enrichOrder = async (order)=>{
   const enrichedOrder={
@@ -40,7 +41,7 @@ const enrichOrder = async (order)=>{
   promises.push(Promise.all(entryPromises).then(() => enrichedOrder["price"] = enrichedOrder.entries.reduce((sum, entry) => sum + entry.price, 0)))
   //get Customer data
   if (order.customerId) {
-    promises.push(Customer.findById(order.customerId).then(customer=>{
+    promises.push(Customer.findById(order.customerId,CustomerProjection).then(customer=>{
       if(customer!=null){
         enrichedOrder["customer"]=customer;
       } else {
@@ -77,7 +78,7 @@ export const addOrder=(req,res: Response)=>{
   });
 }
 export const getOrders=(req,res: Response)=>{
-  if (!req.query.limit) {
+  if (!mongoose.isValidObjectId(req.query.limit)) {
     res.status(400).json({message: "Bad request"});
     return;
   }
@@ -91,7 +92,7 @@ export const getOrders=(req,res: Response)=>{
   if (req.query.toDate) {
     query["date"]["$lte"]= req.query.toDate;
   }
-  const options = paginateOptions(query,{},
+  const options = paginateOptions(query,OrderProjection,
     req.query.limit,
     req.query.pagingNext,
     req.query.paginatePrevious);
@@ -100,12 +101,12 @@ export const getOrders=(req,res: Response)=>{
   });
 }
 export const getOrderById=(req:Request,res: Response)=>{
-  if (!req.params.orderId) {
+  if (!mongoose.isValidObjectId(req.params.orderId)) {
     res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  Order.findById(req.params.orderId,(err,order)=>{
+  Order.findById(req.params.orderId,OrderProjection,(err,order)=>{
     if (err) {
       res.json(err);
     } else {
@@ -118,13 +119,15 @@ export const getOrderById=(req:Request,res: Response)=>{
   });
 }
 export const updateOrder=(req,res: Response)=>{
-  if(!validateRequest<UpdateOrder>("UpdateOrder",req.body)){
+  if(!validateRequest<UpdateOrder>("UpdateOrder",req.body)
+    || !mongoose.isValidObjectId(req.params.orderId)
+    || req.params.orderId!=req.body.id){
     res.status(400).send("Invalid Input");
     return;
   }
 
   enrichOrder(req.body).then( newOrder => {
-    Order.findByIdAndUpdate(req.body.id,newOrder).then(order => {
+    Order.findByIdAndUpdate(req.params.orderId,newOrder).then(order => {
       Log.create({
         username: req.user.username,
         action: "Update",

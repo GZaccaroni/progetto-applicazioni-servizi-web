@@ -70,7 +70,9 @@ export const updateStore = (req, res: Response) => {
   if(!req.user.isAdmin) {
     res.status(403).json({message: "User not authorized"});
   }
-  if (!validateRequest<UpdateStore>("UpdateStore", req.body) || !req.params.storeId) {
+  if (!validateRequest<UpdateStore>("UpdateStore", req.body)
+    || !mongoose.isValidObjectId(req.params.storeId)
+    || req.params.storeId!=req.body.id) {
     res.status(400).json({message: "Invalid Input"});
     return;
   }
