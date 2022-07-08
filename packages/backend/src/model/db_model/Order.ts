@@ -12,6 +12,7 @@ type OrderDocument = mongoose.Document & {
   entries: [{
     productId: string;
     variantId?: string;
+    grade?:string;
     name: string;
     quantity: number;
     pricePerUnit: number;
@@ -69,6 +70,7 @@ export const OrderProjection= { _id: 0,
     variantId: 1,
     name: 1,
     quantity: 1,
+    grade: 1,
     pricePerUnit: 1,
     price: 1
   }],
