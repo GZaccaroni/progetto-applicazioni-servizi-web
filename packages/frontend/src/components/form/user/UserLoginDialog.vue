@@ -39,7 +39,7 @@ export default defineComponent({
     },
   },
 
-  setup(props, { emit }) {
+  setup(props) {
     const submitButtonLoading = ref(false);
     const formData = ref<Partial<UserCredential>>({});
     const create = ref(false);

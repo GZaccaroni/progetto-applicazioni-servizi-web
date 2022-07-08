@@ -69,7 +69,7 @@ export default defineComponent({
       this.title = title;
       this.message = message;
       this.options = Object.assign(this.options, options);
-      return new Promise((resolve, _) => {
+      return new Promise((resolve) => {
         this.resolve = resolve;
       });
     },

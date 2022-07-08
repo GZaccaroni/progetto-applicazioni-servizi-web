@@ -105,7 +105,7 @@ export default defineComponent({
   },
 
   watch: {
-    selected(newSelected, _) {
+    selected(newSelected) {
       this.clickAction(newSelected, TableItemEventType.rowSelection);
     },
   },

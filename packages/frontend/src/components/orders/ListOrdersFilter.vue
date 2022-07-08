@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, watch } from "@vue/composition-api";
+import { defineComponent, reactive, watch } from "@vue/composition-api";
 import { removeBlanks } from "@/helpers/utils";
 import { FindOrdersInput } from "@/repositories/OrdersRepository";
 import TextFieldDatePicker from "@/components/common/TextFieldDatePicker.vue";
@@ -40,7 +40,6 @@ import AsyncSelect, {
 } from "@/components/common/AsyncSelect.vue";
 import { getSelectStores } from "@/helpers/asyncSelectUtils";
 import { observableRef } from "@/components/common/VueComposition";
-import Vue from "vue";
 
 export default defineComponent({
   components: {
