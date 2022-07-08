@@ -23,4 +23,12 @@ function loadLocaleMessages(): LocaleMessages {
 export default new VueI18n({
   locale: "it",
   messages: loadLocaleMessages(),
+  numberFormats: {
+    it: {
+      currency: {
+        style: "currency",
+        currency: "EUR",
+      },
+    },
+  },
 });
