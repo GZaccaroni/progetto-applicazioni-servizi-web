@@ -46,3 +46,27 @@ const OrderSchema = new mongoose.Schema({
 OrderSchema.plugin(mongoosePagination);
 
 export default mongoose.model<OrderDocument, Pagination<OrderDocument>>('order', OrderSchema, 'orders');
+
+export const OrderProjection= { _id: 0,
+  id: '$_id',
+  customer:{
+    id: 1,
+    name: 1,
+    phoneNumber: 1,
+    address: 1,
+    vatNumber: 1
+  },
+  storeId: 1,
+  storeName: 1,
+  date: 1,
+  entries: [{
+    productId: 1,
+    variantId: 1,
+    name: 1,
+    quantity: 1,
+    pricePerUnit: 1,
+    price: 1
+  }],
+  price: 1,
+  note: 1
+}
