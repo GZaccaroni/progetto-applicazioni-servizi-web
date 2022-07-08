@@ -4,9 +4,7 @@
     :submit-button-text="$t('word.save').toString()"
     :submit-button-loading="submitButtonLoading"
     :submit-button-enabled="validateForm(formData)"
-    :title="
-      $t(create ? 'model.customer.add' : 'model.customer.edit').toString()
-    "
+    :title="$t(create ? 'model.store.add' : 'model.store.edit').toString()"
     @submit="saveForm"
     @close="closeForm"
   >
@@ -57,8 +55,6 @@ import FormDialog, {
 } from "@/components/common/FormDialog.vue";
 import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
-import { DbCustomer } from "@/model/db/DbCustomer";
-import { addCustomer, updateCustomer } from "@/repositories/CustomerRepository";
 import { DbStore, DbStoreAccessLevel } from "@/model/db/DbStore";
 import { RecursivePartial } from "@/helpers/types";
 import AsyncSelect, {
@@ -70,6 +66,7 @@ import {
 } from "@/helpers/asyncSelectUtils";
 import { observableRef } from "@/components/common/VueComposition";
 import i18n from "@/i18n";
+import { addStore, updateStore } from "@/repositories/StoreRepository";
 export type StoreFormDialogModel = GenericFormDialogModel<{
   initialData: RecursivePartial<DbStore>;
 }>;
@@ -100,8 +97,10 @@ export default defineComponent({
       (newValue) => {
         formData.value.authorizations = newValue.map((value) => {
           return {
-            userId: value.user?.id,
-            username: value.user?.text,
+            user: {
+              id: value.user?.id,
+              username: value.user?.text,
+            },
             accessLevel: value.accessLevel?.id as DbStoreAccessLevel,
           };
         });
@@ -117,7 +116,6 @@ export default defineComponent({
           formData.value = initialData;
           authorizedUsers.value =
             formData.value.authorizations?.map((el) => {
-              console.log("Username ", el.userId);
               return {
                 accessLevel: {
                   id: el.accessLevel as DbStoreAccessLevel,
@@ -126,8 +124,8 @@ export default defineComponent({
                     .toString(),
                 },
                 user: {
-                  id: el.userId,
-                  text: el.username,
+                  id: el.user?.id,
+                  text: el.user?.username,
                 },
               };
             }) ?? [];
@@ -169,14 +167,15 @@ export default defineComponent({
           this.submitButtonLoading = false;
           return;
         }
+        console.log("Final data", data);
         if (this.create) {
-          await addCustomer(data);
+          await addStore(data);
         } else {
-          await updateCustomer(data);
+          await updateStore(data);
         }
         const message = this.create
-          ? this.$t("model.customer.added")
-          : this.$t("model.customer.edited");
+          ? this.$t("model.store.added")
+          : this.$t("model.store.edited");
         showMessage({
           type: "success",
           text: message.toString(),
@@ -186,7 +185,7 @@ export default defineComponent({
       }
       this.submitButtonLoading = false;
     },
-    validateForm(form: Partial<DbCustomer>): form is DbCustomer {
+    validateForm(form: RecursivePartial<DbStore>): form is DbStore {
       let data = clone(removeBlanks(this.formData));
       return data.name != undefined;
     },

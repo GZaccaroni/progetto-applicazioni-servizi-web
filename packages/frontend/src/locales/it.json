@@ -48,6 +48,10 @@
     },
     "store": {
       "name": "Nome",
+      "add": "Aggiungi punto vendita",
+      "edit": "Modifica punto vendita",
+      "added": "Punto vendita aggiunto con successo",
+      "edited": "Punto vendita modificato con successo",
       "authorizations": "Autorizzazioni",
       "accessLevel": {
         "name": "Autorizzazione",
@@ -111,7 +115,7 @@
       "title": "Accesso a Colture in Cloud"
     },
     "welcome": {
-      "title": "Benvenuto in {appName}",
+      "title": "Benvenuto in Colture in Cloud",
       "subtitle": {
         "loggedIn": "Che piacere averti qui, {username}",
         "default": "Accedi per continuare"

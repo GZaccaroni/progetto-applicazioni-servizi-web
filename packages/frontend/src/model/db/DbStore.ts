@@ -5,8 +5,10 @@ export enum DbStoreAccessLevel {
   manager = "manager",
 }
 export interface DbStoreAuthorization {
-  userId: string;
-  username: string;
+  user: {
+    id: string;
+    username: string;
+  };
   accessLevel: DbStoreAccessLevel;
 }
 export interface DbStore extends DbIdentifiable {

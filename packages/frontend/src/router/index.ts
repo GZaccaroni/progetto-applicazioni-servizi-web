@@ -66,6 +66,10 @@ const routes: Array<RouteConfig> = [
       requiresAdmin: true,
     },
   },
+  {
+    path: "*",
+    redirect: "/",
+  },
 ];
 
 const router = new VueRouter({
