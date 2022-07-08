@@ -8,6 +8,7 @@
     :items="items"
     :numberOfItemsPerPage="numberOfItemsPerPage"
     :loading="loading || intLoading"
+    :show-expand="showExpand"
   >
     <template
       v-for="(_, name) in $_tableItemSlots()"
@@ -31,6 +32,9 @@
       <v-btn :disabled="!hasNextPage" @click="loadItems('next')" text normal>
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
+    </template>
+    <template v-slot:expanded-item="slotData">
+      <slot name="expanded-item" v-bind="slotData" />
     </template>
   </table-builder>
 </template>
@@ -80,6 +84,10 @@ export default defineComponent({
       default: 10,
     },
     loading: {
+      type: Boolean,
+      default: false,
+    },
+    showExpand: {
       type: Boolean,
       default: false,
     },

@@ -20,6 +20,7 @@
             class="elevation-0"
             style="border-bottom-left-radius: 0; border-bottom-right-radius: 0"
             :loading="loading"
+            :show-expand="showExpand"
           >
             <template
               v-for="(_, name) in $_tableItemSlots()"
@@ -31,6 +32,9 @@
 
             <template v-slot:[`item.actions`]="{ item }">
               <actions-table @onClickAction="clickAction" :item="item" />
+            </template>
+            <template v-slot:expanded-item="slotData">
+              <slot name="expanded-item" v-bind="slotData" />
             </template>
           </v-data-table>
           <v-card-actions
@@ -94,6 +98,10 @@ export default defineComponent({
       default: 10,
     },
     loading: {
+      type: Boolean,
+      default: false,
+    },
+    showExpand: {
       type: Boolean,
       default: false,
     },
