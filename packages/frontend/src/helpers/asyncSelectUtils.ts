@@ -34,9 +34,7 @@ export async function getSelectUsers(
     };
   });
 }
-export async function getSelectStoreAccessLevel(
-  query: string
-): Promise<AsyncSelectItem[]> {
+export async function getSelectStoreAccessLevel(): Promise<AsyncSelectItem[]> {
   return Object.keys(DbStoreAccessLevel).map((elKey) => {
     return {
       id: elKey,

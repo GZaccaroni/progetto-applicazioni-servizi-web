@@ -76,7 +76,9 @@
       "price": "Importo"
     },
     "product": {
-      "name": "Nome"
+      "name": "Nome",
+      "pricePerUnit": "Prezzo unitario",
+      "unitOfMeasure": "Unità di misura"
     }
   },
   "components": {
