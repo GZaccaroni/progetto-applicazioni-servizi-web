@@ -163,7 +163,7 @@ export default defineComponent({
           this.previousPageCursor = result.previous;
           this.nextPageCursor = result.next;
           // Add actions if needed
-          let actions: Partial<Record<ItemAction, boolean>> = {};
+          const actions: Partial<Record<ItemAction, boolean>> = {};
           for (const action of this.actions) {
             actions[action] = true;
           }

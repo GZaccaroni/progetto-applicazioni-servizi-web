@@ -66,7 +66,7 @@ export default defineComponent({
     },
     async saveForm() {
       this.submitButtonLoading = true;
-      let data = clone(removeBlanks(this.formData));
+      const data = clone(removeBlanks(this.formData));
       if (!data.username || !data.password) {
         showMessage({
           text: this.$t("error.formGeneric").toString(),

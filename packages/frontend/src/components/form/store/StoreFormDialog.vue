@@ -111,7 +111,7 @@ export default defineComponent({
       (el) => {
         if (el.isVisible) {
           create.value = el.initialData.id == undefined;
-          let initialData = clone(el.initialData);
+          const initialData = clone(el.initialData);
           initialData.authorizations = initialData.authorizations ?? [];
           formData.value = initialData;
           authorizedUsers.value =
@@ -157,7 +157,7 @@ export default defineComponent({
     },
     async saveForm() {
       this.submitButtonLoading = true;
-      let data = clone(removeBlanks(this.formData));
+      const data = clone(removeBlanks(this.formData));
       try {
         if (!this.validateForm(data)) {
           showMessage({
@@ -186,7 +186,7 @@ export default defineComponent({
       this.submitButtonLoading = false;
     },
     validateForm(form: RecursivePartial<DbStore>): form is DbStore {
-      let data = clone(removeBlanks(this.formData));
+      const data = clone(removeBlanks(this.formData));
       return data.name != undefined;
     },
   },

@@ -82,7 +82,7 @@ export default defineComponent({
     },
     async saveForm() {
       this.submitButtonLoading = true;
-      let data = clone(removeBlanks(this.formData));
+      const data = clone(removeBlanks(this.formData));
       try {
         if (!this.validateForm(data)) {
           showMessage({
@@ -110,7 +110,7 @@ export default defineComponent({
       this.submitButtonLoading = false;
     },
     validateForm(form: Partial<DbCustomer>): form is DbCustomer {
-      let data = clone(removeBlanks(this.formData));
+      const data = clone(removeBlanks(this.formData));
       return data.name != undefined;
     },
   },
