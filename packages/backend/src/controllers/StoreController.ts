@@ -2,9 +2,10 @@ import {Request, Response} from "express";
 import {validateRequest} from "../model/request/validation";
 import {CreateStore} from "../model/request/type/CreateStore";
 import {UpdateStore} from "../model/request/type/UpdateStore";
-import Store from "../model/db_model/Store";
+import Store, {StoreProjection} from "../model/db_model/Store";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
+import mongoose from "mongoose";
 
 export const addStore=(req,res: Response)=>{
   if(!req.user.isAdmin){
@@ -34,13 +35,13 @@ export const getStores = (req, res: Response) => {
     return;
   }
   const query={};
-  if(req.query.authorized){
-    query["authorizations"]={ userId: req.user.id}
+  if(req.query.authorized=="true"){
+    query["authorizations.userId"]=req.user.id;
   }
   if (req.query.searchName) {
     query["name"] = {$regex: req.query.searchName};
   }
-  const options = paginateOptions(query,{},
+  const options = paginateOptions(query,StoreProjection,
                                     req.query.limit,
                                     req.query.pagingNext,
                                     req.query.paginatePrevious);
@@ -50,12 +51,12 @@ export const getStores = (req, res: Response) => {
 }
 
 export const getStoreById=(req:Request,res: Response)=>{
-  if (!req.params.storeId) {
+  if (!mongoose.isValidObjectId(req.params.storeId)) {
     res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  Store.findById(req.params.storeId).then(
+  Store.findById(req.params.storeId,StoreProjection).then(
     store=>{
       if (store == null) {
         res.status(404).json({message: "Store not found"});
@@ -89,7 +90,7 @@ export const updateStore = (req, res: Response) => {
             id: store._id,
             type: "Store"
           }
-        }).then(() => res.json(store), (err) => res.json(err));
+        }).then(() => res.json({message: "Store Updated"}), (err) => res.json(err));
       }
     }
   });
