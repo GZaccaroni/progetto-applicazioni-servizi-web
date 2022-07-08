@@ -2,9 +2,10 @@ import {Request, Response} from "express";
 import {validateRequest} from "../model/request/validation";
 import {CreateCustomer} from "../model/request/type/CreateCustomer";
 import {UpdateCustomer} from "../model/request/type/UpdateCustomer";
-import Customer from "../model/db_model/Customer";
+import Customer, {CustomerProjection} from "../model/db_model/Customer";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
+import mongoose from "mongoose";
 
 export const addCustomer=(req,res: Response)=>{
   if(!validateRequest<CreateCustomer>("CreateCustomer",req.body)){
@@ -32,7 +33,7 @@ export const getCustomers=(req:Request,res: Response)=>{
   if (req.query.searchName) {
     query["name"] = {$regex: req.query.searchName};
   }
-  const options = paginateOptions(query,{},
+  const options = paginateOptions(query,CustomerProjection,
     req.query.limit,
     req.query.pagingNext,
     req.query.paginatePrevious);
@@ -42,12 +43,12 @@ export const getCustomers=(req:Request,res: Response)=>{
 }
 
 export const getCustomerById=(req:Request,res: Response)=>{
-  if (!req.params.customerId) {
+  if (!mongoose.isValidObjectId(req.params.customerId)) {
     res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
-  Customer.findById(req.params.customerId).then(customer=>{
+  Customer.findById(req.params.customerId,CustomerProjection).then(customer=>{
     if (customer == null) {
       res.status(404).json({message: "Product not found"});
     } else {
@@ -57,7 +58,7 @@ export const getCustomerById=(req:Request,res: Response)=>{
 }
 
 export const updateCustomer=(req,res: Response)=>{
-  if(!validateRequest<UpdateCustomer>("UpdateCustomer",req.body) || !req.params.customerId){
+  if(!validateRequest<UpdateCustomer>("UpdateCustomer",req.body) || !mongoose.isValidObjectId(req.params.customerId)){
     res.status(400).json({message:"Invalid Input"});
     return;
   }
@@ -77,13 +78,13 @@ export const updateCustomer=(req,res: Response)=>{
             id: customer._id,
             type: "Customer"
           }
-        }).then(() => res.json(customer), (err) => res.json(err));
+        }).then(() => res.json({message: "Customer updated"}), (err) => res.json(err));
       }
     }
   });
 }
 export const deleteCustomer=(req,res: Response)=>{
-  if (!req.params.customerId) {
+  if (!mongoose.isValidObjectId(req.params.customerId)) {
     res.status(400).send({message: "Invalid ID supplied"});
     return;
   }
