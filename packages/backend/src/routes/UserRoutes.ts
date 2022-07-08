@@ -14,7 +14,7 @@ const UserRoutes = Router();
 
 
 UserRoutes.route("/login").post(userLogin);
-UserRoutes.route("/logout").get(userLogout);
+UserRoutes.route("/logout").post(userLogout);
 UserRoutes.use(isUserLoggedIn);
 UserRoutes.route("/").post(createUser);
 UserRoutes.route("/find").get(getUsers);
