@@ -73,7 +73,7 @@
       "date": "Data",
       "store": "Punto Vendita",
       "customer": "Cliente",
-      "price": "Importo"
+      "price": "Importo totale"
     },
     "product": {
       "name": "Nome",
