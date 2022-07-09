@@ -83,9 +83,9 @@ import { removeBlanks } from "@/helpers/utils";
 import { DbStore } from "@/model/db/DbStore";
 import { RecursivePartial } from "@/helpers/types";
 import { getSelectUnitOfMeasure } from "@/helpers/asyncSelectUtils";
-import { addStore, updateStore } from "@/repositories/StoreRepository";
 import { DbProduct } from "@/model/db/DbProduct";
 import AsyncSelect from "@/components/common/AsyncSelect.vue";
+import { addProduct, updateProduct } from "@/repositories/ProductRepository";
 
 export type ProductFormDialogModel = GenericFormDialogModel<{
   initialData: RecursivePartial<DbProduct>;
@@ -162,9 +162,9 @@ export default defineComponent({
         }
         console.log("Final data", data);
         if (this.create) {
-          await addStore(data);
+          await addProduct(data);
         } else {
-          await updateStore(data);
+          await updateProduct(data);
         }
         const message = this.create
           ? this.$t("model.product.added")
@@ -178,7 +178,7 @@ export default defineComponent({
       }
       this.submitButtonLoading = false;
     },
-    validateForm(form: RecursivePartial<DbStore>): form is DbStore {
+    validateForm(form: RecursivePartial<DbStore>): form is DbProduct {
       const data = clone(removeBlanks(this.formData));
       return data.name != undefined;
     },
