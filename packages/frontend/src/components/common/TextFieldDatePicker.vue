@@ -10,11 +10,11 @@
       <v-text-field
         v-model="formattedDate"
         :label="label"
-        prepend-icon="mdi-calendar"
+        :prepend-icon="showIcon ? 'mdi-calendar' : undefined"
         readonly
         v-bind="attrs"
         v-on="on"
-        clearable
+        :clearable="clearable"
       ></v-text-field>
     </template>
     <v-date-picker
@@ -42,6 +42,14 @@ export default defineComponent({
     },
     max: {
       type: Date as PropType<Date>,
+    },
+    clearable: {
+      type: Boolean,
+      default: false,
+    },
+    showIcon: {
+      type: Boolean,
+      default: true,
     },
   },
   setup(props, { emit }) {
