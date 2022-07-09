@@ -7,7 +7,8 @@ import { omit } from "lodash";
 import { DbOrder } from "@/model/db/DbOrder";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { DbIdentifiable } from "@/model/db/DbIdentifiable";
+import { UpdateOrderInput } from "@/model/UpdateOrderInput";
+import { CreateOrderInput } from "@/model/CreateOrderInput";
 
 const resource = "/order";
 
@@ -46,16 +47,14 @@ export async function findOrder(id: string): Promise<DbOrder> {
   return result.data;
 }
 
-export async function addOrder(
-  data: Omit<DbOrder, keyof DbIdentifiable>
-): Promise<void> {
+export async function addOrder(data: CreateOrderInput): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export async function updateOrder(item: DbOrder): Promise<void> {
+export async function updateOrder(input: UpdateOrderInput): Promise<void> {
   const result = await Client.post<void>(
-    `${resource}/${item.id}`,
-    omit(item, "id")
+    `${resource}/${input.id}`,
+    omit(input, "id")
   );
   return result.data;
 }
