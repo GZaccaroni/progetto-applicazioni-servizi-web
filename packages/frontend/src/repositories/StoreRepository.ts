@@ -8,6 +8,8 @@ import { DbStore } from "@/model/db/DbStore";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 import { DbIdentifiable } from "@/model/db/DbIdentifiable";
+import { CreateStoreInput } from "@/model/CreateStoreInput";
+import { UpdateStoreInput } from "@/model/UpdateStoreInput";
 
 const resource = "/store";
 
@@ -44,16 +46,14 @@ export async function findStore(id: string): Promise<DbStore> {
   const result = await Client.get<DbStore>(`${resource}/${id}`);
   return result.data;
 }
-export async function addStore(
-  data: Omit<DbStore, keyof DbIdentifiable>
-): Promise<void> {
+export async function addStore(data: CreateStoreInput): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export async function updateStore(item: DbStore): Promise<void> {
+export async function updateStore(input: UpdateStoreInput): Promise<void> {
   const result = await Client.post<void>(
-    `${resource}/${item.id}`,
-    omit(item, "id")
+    `${resource}/${input.id}`,
+    omit(input, "id")
   );
   return result.data;
 }

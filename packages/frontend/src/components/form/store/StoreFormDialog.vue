@@ -161,7 +161,7 @@ export default defineComponent({
       }
       this.submitButtonLoading = false;
     },
-    validateForm(form: RecursivePartial<DbStore>): form is DbStore {
+    validateForm(form: RecursivePartial<DbStore>): form is UpdateStoreInput {
       const data = clone(removeBlanks(this.formData));
       return data.name != undefined;
     },
