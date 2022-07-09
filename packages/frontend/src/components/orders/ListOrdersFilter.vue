@@ -16,6 +16,7 @@
             v-model="form.fromDate"
             :max="form.toDate"
             :label="$t('word.fromDate').toString()"
+            :clearable="true"
           />
         </v-col>
         <v-col cols="4">
@@ -23,6 +24,7 @@
             v-model="form.toDate"
             :min="form.fromDate"
             :label="$t('word.toDate').toString()"
+            :clearable="true"
           />
         </v-col>
       </v-row>

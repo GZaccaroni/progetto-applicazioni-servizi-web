@@ -11,6 +11,5 @@ export interface CreateOrderInput {
   storeId: string;
   date: Date;
   entries: CreateOrderEntry[];
-  price: number;
   note?: string;
 }

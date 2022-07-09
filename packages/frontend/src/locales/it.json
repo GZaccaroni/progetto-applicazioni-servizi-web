@@ -73,7 +73,11 @@
       "date": "Data",
       "store": "Punto Vendita",
       "customer": "Cliente",
-      "price": "Importo totale"
+      "price": "Importo totale",
+      "add": "Aggiungi ordine",
+      "edit": "Modifica ordine",
+      "added": "Ordine aggiunto con successo",
+      "edited": "Ordine modificato con successo"
     },
     "product": {
       "name": "Nome",

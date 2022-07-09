@@ -9,7 +9,7 @@
       </template>
     </header-view>
     <list-orders @onRowEvent="onRowEvent" />
-    <user-form-dialog v-model="dialogModel" />
+    <order-form-dialog v-model="dialogModel" />
     <confirm-dialog ref="confirmDialog" />
   </v-container>
 </template>
@@ -21,24 +21,24 @@ import {
   TableItemEventType,
 } from "@/plugins/table-builder/TableItemEventType";
 import HeaderView from "@/components/common/HeaderView.vue";
-import UserFormDialog, {
-  UserFormDialogModel,
-} from "@/components/form/user/UserFormDialog.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
 import ListOrders from "@/components/orders/ListOrders.vue";
 import { DbOrder } from "@/model/db/DbOrder";
 import { deleteOrder } from "@/repositories/OrderRepository";
+import OrderFormDialog, {
+  OrderFormDialogModel,
+} from "@/components/form/order/OrderFormDialog.vue";
 
 export default defineComponent({
   components: {
-    UserFormDialog,
+    OrderFormDialog,
     HeaderView,
     ListOrders,
     ConfirmDialog,
   },
   setup() {
-    const dialogModel = ref<UserFormDialogModel>({ isVisible: false });
+    const dialogModel = ref<OrderFormDialogModel>({ isVisible: false });
     const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
     return {
       confirmDialog,
@@ -49,7 +49,6 @@ export default defineComponent({
     openNewItemDialog() {
       this.dialogModel = {
         isVisible: true,
-        initialData: {},
       };
     },
     deleteItem(item: DbOrder) {
@@ -67,10 +66,10 @@ export default defineComponent({
     onRowEvent(event: TableItemEvent<DbOrder>) {
       switch (event.type) {
         case TableItemEventType.rowEditAction:
-          /*this.dialogModel = {
+          this.dialogModel = {
             isVisible: true,
-            initialData: event.item,
-          };*/
+            itemToUpdate: event.item,
+          };
           break;
         case TableItemEventType.rowDeleteAction:
           this.deleteItem(event.item);
