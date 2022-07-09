@@ -65,7 +65,6 @@ import {
   getSelectStores,
 } from "@/helpers/asyncSelectUtils";
 import { observableRef } from "@/components/common/VueComposition";
-import i18n from "@/i18n";
 import { addStore, updateStore } from "@/repositories/StoreRepository";
 export type StoreFormDialogModel = GenericFormDialogModel<{
   initialData: RecursivePartial<DbStore>;

@@ -4,6 +4,8 @@ import { findUsers } from "@/repositories/UserRepository";
 import i18n from "@/i18n";
 import { DbStoreAccessLevel } from "@/model/db/DbStore";
 import { DbUnitOfMeasure } from "@/model/db/DbUnitOfMeasure";
+import { findProducts } from "@/repositories/ProductRepository";
+import {findCustomers} from "@/repositories/CustomerRepository";
 
 const selectMaxItems = 10;
 export async function getSelectStores(
@@ -21,18 +23,42 @@ export async function getSelectStores(
     };
   });
 }
-export async function getSelectUsers(
+export async function getSelectCustomers(
   query: string
 ): Promise<AsyncSelectItem[]> {
-  const paginatedResult = await findUsers({
+  const paginatedResult = await findCustomers({
     searchName: query,
     limit: selectMaxItems,
   });
   return paginatedResult.results.map((el) => {
     return {
       id: el.id,
-      text: el.username,
+      text: el.name,
     };
+  });
+}
+export async function getSelectProductKind(
+  query: string
+): Promise<AsyncSelectItem[]> {
+  const paginatedResult = await findProducts({
+    searchName: query,
+    limit: selectMaxItems,
+  });
+  return paginatedResult.results.flatMap((el) => {
+    const kinds = new Array<AsyncSelectItem>();
+    kinds.push({
+      id: el.id,
+      text: el.name,
+    });
+    kinds.push(
+      ...el.kinds.map((kind) => {
+        return {
+          id: el.id + "_" + kind.id,
+          text: el.name + " " + kind.name,
+        };
+      })
+    );
+    return kinds;
   });
 }
 export async function getSelectStoreAccessLevel(): Promise<AsyncSelectItem[]> {
