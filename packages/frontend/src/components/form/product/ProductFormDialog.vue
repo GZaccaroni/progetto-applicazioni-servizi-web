@@ -31,7 +31,7 @@
             v-model="formData.unitOfMeasure"
             :label="$t('model.product.unitOfMeasure').toString()"
             :find-items-fn="findUnitOfMeasureFn"
-            :return-object="false"
+            :lazy="false"
           />
         </v-col>
       </v-row>

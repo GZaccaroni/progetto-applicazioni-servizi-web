@@ -33,10 +33,7 @@ import { defineComponent, ref } from "@vue/composition-api";
 import { DataTableHeader } from "vuetify";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
-import {
-  FindOrdersInput,
-  observeOrders,
-} from "@/repositories/OrdersRepository";
+import { FindOrdersInput, observeOrders } from "@/repositories/OrderRepository";
 import { FindStoresInput } from "@/repositories/StoreRepository";
 import ListOrdersFilter from "@/components/orders/ListOrdersFilter.vue";
 import { DbOrder } from "@/model/db/DbOrder";

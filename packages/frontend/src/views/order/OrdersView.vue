@@ -28,7 +28,7 @@ import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
 import ListOrders from "@/components/orders/ListOrders.vue";
 import { DbOrder } from "@/model/db/DbOrder";
-import { deleteOrder } from "@/repositories/OrdersRepository";
+import { deleteOrder } from "@/repositories/OrderRepository";
 
 export default defineComponent({
   components: {

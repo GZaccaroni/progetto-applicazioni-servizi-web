@@ -1,36 +1,77 @@
-import { findStores } from "@/repositories/StoreRepository";
-import { AsyncSelectItem } from "@/components/common/AsyncSelect.vue";
-import { findUsers } from "@/repositories/UserRepository";
+import { findStore, findStores } from "@/repositories/StoreRepository";
+import {
+  AsyncSelectItem,
+  FindSelectItemsInput,
+} from "@/components/common/AsyncSelect.vue";
 import i18n from "@/i18n";
-import { DbStoreAccessLevel } from "@/model/db/DbStore";
+import { DbStore, DbStoreAccessLevel } from "@/model/db/DbStore";
 import { DbUnitOfMeasure } from "@/model/db/DbUnitOfMeasure";
 import { findProducts } from "@/repositories/ProductRepository";
-import {findCustomers} from "@/repositories/CustomerRepository";
+import { findCustomer, findCustomers } from "@/repositories/CustomerRepository";
+import { compact } from "lodash";
+import { DbCustomer } from "@/model/db/DbCustomer";
+import { DbUser } from "@/model/db/DbUser";
+import { findUser, findUsers } from "@/repositories/UserRepository";
 
 const selectMaxItems = 10;
 export async function getSelectStores(
-  query: string
+  input?: FindSelectItemsInput
 ): Promise<AsyncSelectItem[]> {
-  const paginatedResult = await findStores({
-    authorized: true,
-    searchName: query,
-    limit: selectMaxItems,
-  });
-  return paginatedResult.results.map((el) => {
+  let items: DbStore[];
+  if (input?.ids != undefined) {
+    items = await findAll(input.ids, findStore);
+  } else {
+    items = (
+      await findStores({
+        authorized: true,
+        searchName: input?.query,
+        limit: selectMaxItems,
+      })
+    ).results;
+  }
+  return items.map((el) => {
     return {
       id: el.id,
       text: el.name,
     };
   });
 }
-export async function getSelectCustomers(
-  query: string
+export async function getSelectUsers(
+  input?: FindSelectItemsInput
 ): Promise<AsyncSelectItem[]> {
-  const paginatedResult = await findCustomers({
-    searchName: query,
-    limit: selectMaxItems,
+  let items: DbUser[];
+  if (input?.ids != undefined) {
+    items = await findAll(input.ids, findUser);
+  } else {
+    items = (
+      await findUsers({
+        searchName: input?.query,
+        limit: selectMaxItems,
+      })
+    ).results;
+  }
+  return items.map((el) => {
+    return {
+      id: el.id,
+      text: el.username,
+    };
   });
-  return paginatedResult.results.map((el) => {
+}
+export async function getSelectCustomers(
+  input?: FindSelectItemsInput
+): Promise<AsyncSelectItem[]> {
+  let items: DbCustomer[];
+  if (input?.ids != undefined) {
+    items = await findAll(input.ids, findCustomer);
+  } else {
+    items = (
+      await findCustomers({
+        searchName: input?.query,
+        limit: selectMaxItems,
+      })
+    ).results;
+  }
+  return items.map((el) => {
     return {
       id: el.id,
       text: el.name,
@@ -38,10 +79,10 @@ export async function getSelectCustomers(
   });
 }
 export async function getSelectProductKind(
-  query: string
+  input?: FindSelectItemsInput
 ): Promise<AsyncSelectItem[]> {
   const paginatedResult = await findProducts({
-    searchName: query,
+    searchName: input?.query,
     limit: selectMaxItems,
   });
   return paginatedResult.results.flatMap((el) => {
@@ -76,4 +117,17 @@ export async function getSelectUnitOfMeasure(): Promise<AsyncSelectItem[]> {
       text: i18n.t("model.unitOfMeasure." + elKey).toString(),
     };
   });
+}
+
+async function findAll<Item>(
+  ids: string[],
+  findItemFn: (id: string) => Promise<Item>
+): Promise<Item[]> {
+  const promises = ids.map((id) => findItemFn(id));
+
+  const result = await Promise.allSettled(promises);
+
+  return compact(
+    result.map((el) => (el.status == "fulfilled" ? el.value : undefined))
+  );
 }

@@ -12,29 +12,26 @@
     :multiple="multiple"
     :small-chips="multiple"
     :clearable="clearable"
-    :return-object="returnObject"
   >
   </v-autocomplete>
 </template>
 <script lang="ts">
-import {
-  defineComponent,
-  PropType,
-  ref,
-  toRefs,
-  WritableComputedRef,
-} from "@vue/composition-api";
+import { defineComponent, PropType, ref } from "@vue/composition-api";
 import { DbIdentifiable } from "@/model/db/DbIdentifiable";
-import { mappedVModel, passthroughVModel } from "@/helpers/passthroughVModel";
+import { passthroughVModel } from "@/helpers/passthroughVModel";
 import { debounce } from "lodash";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { Mapper } from "@/helpers/types";
 
 export interface AsyncSelectItem extends DbIdentifiable {
   id: string;
   text: string;
 }
-export type FindSelectItemsFn = (query?: string) => Promise<AsyncSelectItem[]>;
+export type FindSelectItemsInput =
+  | { ids: string[]; query?: undefined }
+  | { ids?: undefined; query: string };
+export type FindSelectItemsFn = (
+  input?: FindSelectItemsInput
+) => Promise<AsyncSelectItem[]>;
 
 export default defineComponent({
   props: {
@@ -43,9 +40,7 @@ export default defineComponent({
       required: true,
     },
     value: {
-      type: [Object, Array, String] as PropType<
-        AsyncSelectItem | AsyncSelectItem[]
-      >,
+      type: [Object, Array, String] as PropType<string | string[]>,
     },
     multiple: {
       type: Boolean,
@@ -59,7 +54,7 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    returnObject: {
+    lazy: {
       type: Boolean,
       default: true,
     },
@@ -69,14 +64,6 @@ export default defineComponent({
     const items = ref<AsyncSelectItem[]>();
     const valueState = passthroughVModel(props, context, "value");
     const searchQuery = ref<string>();
-    const propsRef = toRefs(props).value?.value;
-    if (propsRef != undefined) {
-      if (Array.isArray(propsRef)) {
-        items.value = propsRef;
-      } else if (typeof propsRef == "object") {
-        items.value = [propsRef];
-      }
-    }
     return {
       isLoading,
       items,
@@ -85,23 +72,49 @@ export default defineComponent({
     };
   },
   created() {
+    if (this.lazy) {
+      this.loadSelectedItems();
+    }
     this.updateItems();
     this.updateItems = debounce(this.updateItems, 500);
   },
   methods: {
     updateItems() {
       this.isLoading = true;
-      this.findItemsFn(this.searchQuery)
+      let input: FindSelectItemsInput | undefined;
+      if (this.searchQuery != undefined) {
+        input = { query: this.searchQuery };
+      } else {
+        input = undefined;
+      }
+      this.findItemsFn(input)
+        .then((el) => {
+          this.items = el;
+        })
+        .catch(repositoryErrorHandler)
+        .finally(() => (this.isLoading = false));
+    },
+    loadSelectedItems() {
+      this.isLoading = true;
+      let ids: string[] = [];
+      if (Array.isArray(this.valueState)) {
+        ids = this.valueState;
+      } else if (typeof this.valueState == "string") {
+        ids = [this.valueState];
+      }
+      this.findItemsFn({ ids: ids })
         .then((el) => {
           this.items = el;
           this.isLoading = false;
         })
-        .catch(repositoryErrorHandler);
+        .catch(repositoryErrorHandler)
+        .finally(() => (this.isLoading = false));
     },
   },
 
   watch: {
     searchQuery(newValue) {
+      if (!this.lazy) return;
       if (newValue == undefined) return;
       this.isLoading = true;
       this.updateItems();

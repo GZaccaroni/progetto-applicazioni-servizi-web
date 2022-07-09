@@ -22,19 +22,24 @@
           <v-icon>mdi-plus-circle</v-icon>
         </v-btn>
       </v-row>
-      <v-row v-for="(_, index) in authorizedUsers" :key="index" align="center">
+      <v-row
+        v-for="(_, index) in formData.authorizations"
+        :key="index"
+        align="center"
+      >
         <v-col cols="6">
           <async-select
-            v-model="authorizedUsers[index].user"
+            v-model="formData.authorizations[index].userId"
             :label="$t('word.user').toString()"
-            :find-items-fn="findStoresSelectFn"
+            :find-items-fn="findUsersSelectFn"
           />
         </v-col>
         <v-col cols="4">
           <async-select
-            v-model="authorizedUsers[index].accessLevel"
+            v-model="formData.authorizations[index].accessLevel"
             :label="$t('model.store.accessLevel.name').toString()"
             :find-items-fn="findStoreAccessLevelSelectFn"
+            :lazy="false"
           />
         </v-col>
         <v-spacer />
@@ -55,23 +60,30 @@ import FormDialog, {
 } from "@/components/common/FormDialog.vue";
 import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
-import { DbStore, DbStoreAccessLevel } from "@/model/db/DbStore";
+import { DbStore } from "@/model/db/DbStore";
 import { RecursivePartial } from "@/helpers/types";
-import AsyncSelect, {
-  AsyncSelectItem,
-} from "@/components/common/AsyncSelect.vue";
+import AsyncSelect from "@/components/common/AsyncSelect.vue";
 import {
   getSelectStoreAccessLevel,
-  getSelectStores,
+  getSelectUsers,
 } from "@/helpers/asyncSelectUtils";
-import { observableRef } from "@/components/common/VueComposition";
 import { addStore, updateStore } from "@/repositories/StoreRepository";
+import { UpdateStoreInput } from "@/model/UpdateStoreInput";
 export type StoreFormDialogModel = GenericFormDialogModel<{
-  initialData: RecursivePartial<DbStore>;
+  itemToUpdate?: DbStore;
 }>;
-interface AuthorizationViewData {
-  user?: Partial<AsyncSelectItem>;
-  accessLevel?: DbStoreAccessLevel;
+function mapInitialValue(store?: DbStore): RecursivePartial<UpdateStoreInput> {
+  return {
+    id: store?.id,
+    name: store?.name,
+    authorizations:
+      store?.authorizations.map((el) => {
+        return {
+          userId: el.user.id,
+          accessLevel: el.accessLevel,
+        };
+      }) ?? [],
+  };
 }
 export default defineComponent({
   components: { AsyncSelect, FormDialog },
@@ -84,45 +96,18 @@ export default defineComponent({
 
   setup(props) {
     const submitButtonLoading = ref(false);
-    const formData = ref<RecursivePartial<DbStore>>({});
+    const formData = ref<RecursivePartial<UpdateStoreInput>>({});
     const create = ref(false);
     const isVisible = ref(false);
-    const findStoresSelectFn = getSelectStores;
+    const findUsersSelectFn = getSelectUsers;
     const findStoreAccessLevelSelectFn = getSelectStoreAccessLevel;
 
-    console.log("Initial data ", props.value);
-    const authorizedUsers = observableRef<AuthorizationViewData[]>(
-      [],
-      (newValue) => {
-        formData.value.authorizations = newValue.map((value) => {
-          return {
-            user: {
-              id: value.user?.id,
-              username: value.user?.text,
-            },
-            accessLevel: value.accessLevel,
-          };
-        });
-      }
-    );
     watch(
       () => props.value,
       (el) => {
         if (el.isVisible) {
-          create.value = el.initialData.id == undefined;
-          const initialData = clone(el.initialData);
-          initialData.authorizations = initialData.authorizations ?? [];
-          formData.value = initialData;
-          authorizedUsers.value =
-            formData.value.authorizations?.map((el) => {
-              return {
-                accessLevel: el.accessLevel,
-                user: {
-                  id: el.user?.id,
-                  text: el.user?.username,
-                },
-              };
-            }) ?? [];
+          create.value = el.itemToUpdate == undefined;
+          formData.value = mapInitialValue(el.itemToUpdate);
         }
         isVisible.value = el.isVisible;
       }
@@ -132,22 +117,19 @@ export default defineComponent({
       formData,
       create,
       isVisible,
-      findStoresSelectFn,
+      findUsersSelectFn,
       findStoreAccessLevelSelectFn,
-      authorizedUsers,
     };
   },
   methods: {
     closeForm() {
-      console.log("Is visible: false");
       this.$emit("input", { isVisible: false });
     },
     addAuthorizedUser() {
-      console.log("Add item to authorized users!");
-      this.authorizedUsers.push({});
+      this.formData.authorizations?.push({});
     },
     removeAuthorizedUser(index: number) {
-      this.authorizedUsers.splice(index);
+      this.formData.authorizations?.splice(index, 1);
     },
     async saveForm() {
       this.submitButtonLoading = true;

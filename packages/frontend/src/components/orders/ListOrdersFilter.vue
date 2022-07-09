@@ -4,7 +4,7 @@
       <v-row no-gutters>
         <v-col cols="4">
           <async-select
-            v-model="selectedStore"
+            v-model="form.storeId"
             :label="$t('word.store').toString()"
             :find-items-fn="findItemsFn"
             :clearable="true"
@@ -33,13 +33,10 @@
 <script lang="ts">
 import { defineComponent, reactive, watch } from "@vue/composition-api";
 import { removeBlanks } from "@/helpers/utils";
-import { FindOrdersInput } from "@/repositories/OrdersRepository";
+import { FindOrdersInput } from "@/repositories/OrderRepository";
 import TextFieldDatePicker from "@/components/common/TextFieldDatePicker.vue";
-import AsyncSelect, {
-  AsyncSelectItem,
-} from "@/components/common/AsyncSelect.vue";
+import AsyncSelect from "@/components/common/AsyncSelect.vue";
 import { getSelectStores } from "@/helpers/asyncSelectUtils";
-import { observableRef } from "@/components/common/VueComposition";
 
 export default defineComponent({
   components: {
@@ -60,13 +57,7 @@ export default defineComponent({
       },
       { deep: true }
     );
-    const selectedStore = observableRef<AsyncSelectItem | undefined>(
-      undefined,
-      (newValue) => {
-        form.storeId = newValue?.id;
-      }
-    );
-    return { findItemsFn, form, selectedStore };
+    return { findItemsFn, form };
   },
 });
 </script>

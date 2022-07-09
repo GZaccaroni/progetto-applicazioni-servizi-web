@@ -5,11 +5,14 @@ import {
 } from "@vue/composition-api";
 import { Mapper } from "@/helpers/types";
 
-export function passthroughVModel<T>(
-  props: T,
+export function passthroughVModel<
+  PropsType,
+  KeyType extends keyof PropsType & string
+>(
+  props: PropsType,
   context: SetupContext,
-  name: keyof T & string
-) {
+  name: KeyType
+): WritableComputedRef<PropsType[KeyType]> {
   return computed({
     get: () => props[name],
     set: (value) => context.emit(`input`, value),
