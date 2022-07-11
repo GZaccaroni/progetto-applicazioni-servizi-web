@@ -34,11 +34,15 @@ const enrichOrder = async (order)=>{
   order.entries.forEach(entry => {
     entry["price"] = entry.pricePerUnit * entry.quantity;
     entryPromises.push(Product.findById(entry.productId).then(product => {
-      entry["name"] = product.name + entry.variantId ? " " + product.kinds.find(x => x.id == entry.variantId).name : "";
+      let productFullName=product.name;
+      if(entry.variantId){
+        productFullName+=" "+product.kinds.find(x => x.id == entry.variantId).name;
+      }
+      entry["name"] = productFullName;
     }).then(() => enrichedOrder["entries"].push(entry)));
   })
   //compute tot
-  promises.push(Promise.all(entryPromises).then(() => enrichedOrder["price"] = enrichedOrder.entries.reduce((sum, entry) => sum + entry.price, 0)))
+  promises.push(Promise.all(entryPromises).then(() => enrichedOrder["price"] = enrichedOrder.entries.reduce((sum, entry) => sum + entry.price, 0)).catch(err=>console.log(err)))
   //get Customer data
   if (order.customerId) {
     promises.push(Customer.findById(order.customerId,CustomerProjection).then(customer=>{
@@ -49,7 +53,7 @@ const enrichOrder = async (order)=>{
       }
     }));
   }
-  await Promise.all(promises);
+  await Promise.all(promises).catch(err=>console.log(err));
   return enrichedOrder;
 }
 
@@ -58,6 +62,7 @@ export const addOrder=(req,res: Response)=>{
     res.status(400).json({message:"Invalid Input"});
     return;
   }
+  //TODO Not authorized
   enrichOrder(req.body).then(newOrder => {
     Order.create(newOrder).then(order => {
       Log.create({
@@ -78,19 +83,30 @@ export const addOrder=(req,res: Response)=>{
   });
 }
 export const getOrders=(req,res: Response)=>{
-  if (!mongoose.isValidObjectId(req.query.limit)) {
+  if (!req.query.limit) {
     res.status(400).json({message: "Bad request"});
     return;
   }
   const query={};
-  if(req.query.storeId){
-    query["storeId"]=req.query.storeId;
+  if(req.query.storeId ){
+    if(mongoose.isValidObjectId(req.query.storeId)) {
+      query["storeId"] = req.query.storeId;
+    } else {
+      res.status(400).json({message: "Bad request"});
+    }
   }
+  //TODO check correct date format
   if (req.query.fromDate) {
-    query["date"]["$gte"]= req.query.fromDate;
+    if(!query["date"]){
+      query["date"]={};
+    }
+    query["date"]["$gte"] = new Date(req.query.fromDate);
   }
   if (req.query.toDate) {
-    query["date"]["$lte"]= req.query.toDate;
+    if(!query["date"]){
+      query["date"]={};
+    }
+    query["date"]["$lte"] = new Date(req.query.toDate);
   }
   const options = paginateOptions(query,OrderProjection,
     req.query.limit,
@@ -122,12 +138,12 @@ export const updateOrder=(req,res: Response)=>{
   if(!validateRequest<UpdateOrder>("UpdateOrder",req.body)
     || !mongoose.isValidObjectId(req.params.orderId)
     || req.params.orderId!=req.body.id){
-    res.status(400).send("Invalid Input");
+    res.status(400).json("Invalid Input");
     return;
   }
 
   enrichOrder(req.body).then( newOrder => {
-    Order.findByIdAndUpdate(req.params.orderId,newOrder).then(order => {
+    Order.findOneAndReplace({_id:req.params.orderId},newOrder).then(order => {
       Log.create({
         username: req.user.username,
         action: "Update",
@@ -135,7 +151,7 @@ export const updateOrder=(req,res: Response)=>{
           id: order._id,
           type: "Order"
         }
-      }).then(() => res.json("Add Order"));
+      }).then(() => res.json("Order Updated"));
     })
   }).catch(err => {
     if(err.code && err.message){
@@ -147,8 +163,8 @@ export const updateOrder=(req,res: Response)=>{
 
 }
 export const deleteOrder=(req,res: Response)=>{
-  if (!req.params.orderId) {
-    res.status(400).send({message: "Invalid ID supplied"});
+  if (!mongoose.isValidObjectId(req.params.orderId)) {
+    res.status(400).json({message: "Invalid ID supplied"});
     return;
   }
   //TODO not authorized
@@ -170,5 +186,4 @@ export const deleteOrder=(req,res: Response)=>{
       }
     }
   })
-  res.send("Add Order")
 }
