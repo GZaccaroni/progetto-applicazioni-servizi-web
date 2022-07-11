@@ -65,7 +65,7 @@ export const OrderProjection= { _id: 0,
   storeId: 1,
   storeName: 1,
   date: 1,
-  entries: [{
+  entries: {
     productId: 1,
     variantId: 1,
     name: 1,
@@ -73,7 +73,7 @@ export const OrderProjection= { _id: 0,
     grade: 1,
     pricePerUnit: 1,
     price: 1
-  }],
+  },
   price: 1,
   note: 1
 }
