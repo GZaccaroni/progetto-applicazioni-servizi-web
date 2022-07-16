@@ -26,7 +26,7 @@
   </v-menu>
 </template>
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from "@vue/composition-api";
+import { computed, defineComponent, PropType, ref } from "vue";
 
 export default defineComponent({
   props: {

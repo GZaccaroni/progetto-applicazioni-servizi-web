@@ -16,22 +16,15 @@
   </v-autocomplete>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, ref } from "@vue/composition-api";
-import { DbIdentifiable } from "@/model/db/DbIdentifiable";
+import { defineComponent, PropType, ref } from "vue";
 import { passthroughVModel } from "@/helpers/passthroughVModel";
 import { debounce } from "lodash";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-
-export interface AsyncSelectItem extends DbIdentifiable {
-  id: string;
-  text: string;
-}
-export type FindSelectItemsInput =
-  | { ids: string[]; query?: undefined }
-  | { ids?: undefined; query: string };
-export type FindSelectItemsFn = (
-  input?: FindSelectItemsInput
-) => Promise<AsyncSelectItem[]>;
+import {
+  AsyncSelectItem,
+  FindSelectItemsFn,
+  FindSelectItemsInput,
+} from "./AsyncSelectTypes";
 
 export default defineComponent({
   props: {

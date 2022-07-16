@@ -1,5 +1,5 @@
 import { Cancellable } from "@/repositories/common/Cancellable";
-import { onDeactivated } from "@vue/composition-api";
+import { onDeactivated } from "vue";
 
 export function useCancellablesListener() {
   let cancellables: Cancellable[] = [];

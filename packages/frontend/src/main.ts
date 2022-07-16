@@ -1,5 +1,5 @@
 import Vue from "vue";
-import VueCompositionAPI from "@vue/composition-api";
+import VueCompositionAPI from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
@@ -10,7 +10,6 @@ import ConfirmDialog from "@/plugins/confirm-dialog/main";
 import i18n from "./i18n";
 
 Vue.config.productionTip = false;
-Vue.use(VueCompositionAPI);
 Vue.use(PaginatedTableBuilder);
 Vue.use(TableBuilder);
 Vue.use(ConfirmDialog);

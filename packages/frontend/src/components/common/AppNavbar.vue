@@ -42,7 +42,7 @@
 </template>
 <script lang="ts">
 import UserLoginDialog from "@/components/form/user/UserLoginDialog.vue";
-import { defineComponent, PropType } from "@vue/composition-api";
+import { defineComponent, PropType } from "vue";
 import { DbUser } from "@/model/db/DbUser";
 import AppNavigationDrawer from "@/components/common/AppNavigationDrawer.vue";
 

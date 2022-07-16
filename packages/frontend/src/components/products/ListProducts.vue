@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "@vue/composition-api";
+import { defineComponent, ref } from "vue";
 import { DataTableHeader } from "vuetify";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";

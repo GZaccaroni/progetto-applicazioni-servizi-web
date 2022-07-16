@@ -7,7 +7,7 @@
   />
 </template>
 <script lang="ts">
-import { computed, defineComponent, PropType } from "@vue/composition-api";
+import { computed, defineComponent, PropType } from "vue";
 import { getSelectProductKind } from "@/helpers/asyncSelectUtils";
 import AsyncSelect from "@/components/common/AsyncSelect.vue";
 

@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from "@vue/composition-api";
+import { defineComponent, PropType, ref } from "vue";
 import { debounce, isEqual, pickBy } from "lodash";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { useCancellablesListener } from "@/components/common/UnsubscribeMixin";

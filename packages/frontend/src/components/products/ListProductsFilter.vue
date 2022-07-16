@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, watch } from "@vue/composition-api";
+import { defineComponent, reactive, watch } from "vue";
 import { removeBlanks } from "@/helpers/utils";
 import { FindProductsInput } from "@/repositories/ProductRepository";
 

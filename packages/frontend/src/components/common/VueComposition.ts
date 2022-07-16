@@ -1,4 +1,4 @@
-import { Ref, ref, UnwrapRef, watch } from "@vue/composition-api";
+import { Ref, ref, UnwrapRef, watch } from "vue";
 
 export function observableRef<T>(
   initialValue: T,

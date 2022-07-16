@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, watch } from "@vue/composition-api";
+import { defineComponent, reactive, watch } from "vue";
 import { removeBlanks } from "@/helpers/utils";
 import { FindOrdersInput } from "@/repositories/OrderRepository";
 import TextFieldDatePicker from "@/components/common/TextFieldDatePicker.vue";

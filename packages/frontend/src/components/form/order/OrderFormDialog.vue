@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, watch } from "@vue/composition-api";
+import { defineComponent, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import FormDialog, {

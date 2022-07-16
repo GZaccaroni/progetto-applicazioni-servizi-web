@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "@vue/composition-api";
+import { defineComponent, ref } from "vue";
 import { FindUsersInput, observeUsers } from "@/repositories/UserRepository";
 import { DataTableHeader } from "vuetify";
 import { DbUser } from "@/model/db/DbUser";

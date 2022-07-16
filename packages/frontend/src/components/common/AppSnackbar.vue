@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { mapGetters, mapMutations } from "vuex";
-import { defineComponent, ref } from "@vue/composition-api";
+import { defineComponent, ref } from "vue";
 import { SnackbarState } from "@/store/snackbar/types";
 
 export default defineComponent({

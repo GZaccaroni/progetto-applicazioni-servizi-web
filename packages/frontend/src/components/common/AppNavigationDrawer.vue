@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import { mapGetters } from "vuex";
-import { defineComponent } from "@vue/composition-api";
+import { defineComponent } from "vue";
 
 interface MenuGroup {
   title?: string;

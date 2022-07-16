@@ -53,7 +53,7 @@
 <script lang="ts">
 import ActionsTable from "./ActionsTable.vue";
 import { DataTableHeader } from "vuetify";
-import { defineComponent, PropType } from "@vue/composition-api";
+import { defineComponent, PropType } from "vue";
 import { pickBy } from "lodash";
 import { TableItemEventType } from "@/plugins/table-builder/TableItemEventType";
 

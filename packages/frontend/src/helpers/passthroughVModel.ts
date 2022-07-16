@@ -1,8 +1,4 @@
-import {
-  computed,
-  SetupContext,
-  WritableComputedRef,
-} from "@vue/composition-api";
+import { computed, SetupContext, WritableComputedRef } from "vue";
 import { Mapper } from "@/helpers/types";
 
 export function passthroughVModel<

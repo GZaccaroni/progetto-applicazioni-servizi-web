@@ -10,9 +10,8 @@
   },
   "dependencies": {
     "@colture-in-cloud/common": "^1.0.0",
-    "@vue/composition-api": "^1.7.0",
     "axios": "^0.27.2",
-    "core-js": "^3.8.3",
+    "core-js": "^3.23.4",
     "lodash": "^4.17.21",
     "socket.io-client": "^4.5.1",
     "vue": "^2.6.14",
@@ -28,8 +27,8 @@
     "@babel/cli": "^7.17.10",
     "@babel/preset-env": "^7.18.2",
     "@types/lodash": "^4.14.182",
-    "@typescript-eslint/eslint-plugin": "^5.30.5",
-    "@typescript-eslint/parser": "^5.30.5",
+    "@typescript-eslint/eslint-plugin": "^5.30.6",
+    "@typescript-eslint/parser": "^5.30.6",
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-eslint": "^5.0.8",
     "@vue/cli-plugin-router": "^5.0.8",
@@ -43,12 +42,11 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.2.0",
     "prettier": "^2.4.1",
-    "sass": "~1.32.0",
-    "sass-loader": "^10.0.0",
+    "sass": "^1.53.0",
+    "sass-loader": "^13.0.2",
     "typescript": "^4.7.4",
     "vue-cli-plugin-i18n": "~2.3.1",
     "vue-cli-plugin-vuetify": "~2.5.1",
-    "vue-template-compiler": "^2.6.14",
-    "vuetify-loader": "^1.7.0"
+    "vuetify-loader": "^1.9.1"
   }
 }

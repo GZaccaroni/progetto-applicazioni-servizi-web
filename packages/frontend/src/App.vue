@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import AppSnackbar from "@/components/common/AppSnackbar.vue";
-import { defineComponent } from "@vue/composition-api";
+import { defineComponent } from "vue";
 import AppNavbar from "@/components/common/AppNavbar.vue";
 import { mapGetters } from "vuex";
 

@@ -2,7 +2,7 @@ import { findStore, findStores } from "@/repositories/StoreRepository";
 import {
   AsyncSelectItem,
   FindSelectItemsInput,
-} from "@/components/common/AsyncSelect.vue";
+} from "@/components/common/AsyncSelectTypes";
 import i18n from "@/i18n";
 import { DbStore, DbStoreAccessLevel } from "@/model/db/DbStore";
 import { DbUnitOfMeasure } from "@/model/db/DbUnitOfMeasure";
