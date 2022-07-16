@@ -1,12 +1,7 @@
 <template>
   <div>
-    <v-snackbar
-      top
-      v-if="message !== undefined"
-      :value="message !== undefined"
-      :color="message.color"
-    >
-      {{ message.text }}
+    <v-snackbar top v-model="isVisible" :color="message?.color">
+      {{ message?.text }}
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="hideSnackbar">
           {{ $t("word.close") }}
