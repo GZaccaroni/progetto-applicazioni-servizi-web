@@ -2,24 +2,24 @@ import {Router} from "express";
 import {
   createUser,
   deleteUser,
-  getUserById,
+  getUserByName,
   getUsers,
   updateUser,
   userLogin,
   userLogout
 } from "../controllers/UserController";
+import {isUserLoggedIn} from "../utils";
 
 const UserRoutes = Router();
 
-UserRoutes.route("/").post(createUser);
-
-UserRoutes.route("/find").get(getUsers);
-
-UserRoutes.route("/:id").get(getUserById)
-                              .put(updateUser)
-                              .delete(deleteUser);
 
 UserRoutes.route("/login").post(userLogin);
-UserRoutes.route("/logout").get(userLogout);
+UserRoutes.route("/logout").post(userLogout);
+UserRoutes.use(isUserLoggedIn);
+UserRoutes.route("/").post(createUser);
+UserRoutes.route("/find").get(getUsers);
+UserRoutes.route("/:username").get(getUserByName)
+                                    .put(updateUser)
+                                    .delete(deleteUser);
 
 export default UserRoutes;

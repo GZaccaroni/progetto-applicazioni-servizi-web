@@ -1,0 +1,30 @@
+{
+  "required": [
+    "date",
+    "entries",
+    "storeId"
+  ],
+  "type": "object",
+  "properties": {
+    "customerId": {
+      "type": "string"
+    },
+    "storeId": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "entries": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "CreateOrderEntry#"
+      }
+    },
+    "note": {
+      "type": "string"
+    }
+  }
+}

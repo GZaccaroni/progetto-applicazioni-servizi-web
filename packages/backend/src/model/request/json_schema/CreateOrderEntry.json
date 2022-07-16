@@ -1,0 +1,32 @@
+{
+  "required": [
+    "pricePerUnit",
+    "productId",
+    "quantity"
+  ],
+  "type": "object",
+  "properties": {
+    "productId": {
+      "type": "string"
+    },
+    "variantId": {
+      "type": "string"
+    },
+    "grade": {
+      "type": "string",
+      "enum": [
+        "first",
+        "second",
+        "mixed"
+      ]
+    },
+    "quantity": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "pricePerUnit": {
+      "minimum": 0,
+      "type": "number"
+    }
+  }
+}

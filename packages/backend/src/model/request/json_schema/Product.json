@@ -1,0 +1,32 @@
+{
+  "required": [
+    "kinds",
+    "name",
+    "unitOfMeasure"
+  ],
+  "type": "object",
+  "properties": {
+    "name": {
+      "maximum": 250,
+      "type": "string"
+    },
+    "pricePerUnit": {
+      "exclusiveMinimum": 0,
+      "type": "number"
+    },
+    "kinds": {
+      "type": "array",
+      "items": {
+        "$ref": "ProductKind#"
+      }
+    },
+    "unitOfMeasure": {
+      "type": "string",
+      "description": "Order Status",
+      "enum": [
+        "kilogram",
+        "piece"
+      ]
+    }
+  }
+}

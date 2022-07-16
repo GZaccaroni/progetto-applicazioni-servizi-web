@@ -1,0 +1,19 @@
+{
+  "required": [
+    "accessLevel",
+    "userId"
+  ],
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string"
+    },
+    "accessLevel": {
+      "type": "string",
+      "enum": [
+        "salesman",
+        "manager"
+      ]
+    }
+  }
+}

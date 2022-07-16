@@ -7,7 +7,7 @@ ProductRoutes.route("/").post(addProduct);
 
 ProductRoutes.route("/find").get(getProducts);
 
-ProductRoutes.route("/:id").get(getProductById)
+ProductRoutes.route("/:productId").get(getProductById)
                                   .post(updateProduct)
                                   .delete(deleteProduct);
 
