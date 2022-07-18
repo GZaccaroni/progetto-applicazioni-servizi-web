@@ -97,3 +97,28 @@ export const updateStore = (req, res: Response) => {
     }
   });
 }
+
+export const deleteStore = (req, res: Response) => {
+  if (!mongoose.isValidObjectId(req.params.storeId)) {
+    res.status(400).send({message: "Invalid ID supplied"});
+    return;
+  }
+  Store.findByIdAndDelete(req.params.storeId, (err, store) => {
+    if (err)
+      res.json(err);
+    else {
+      if (store == null) {
+        res.status(404).json({message: "Store not found"});
+      } else {
+        Log.create({
+          username: req.user.username,
+          action: "Delete",
+          object: {
+            id: store._id,
+            type: "Store"
+          }
+        }).then(() => res.json({message: "Store deleted"}), err => res.json(err));
+      }
+    }
+  });
+}
