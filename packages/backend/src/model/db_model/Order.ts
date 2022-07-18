@@ -30,8 +30,10 @@ const OrderSchema = new mongoose.Schema({
     address: String,
     vatNumber: String
   },
-  storeId: String,
-  storeName: String,
+  store:{
+    id: String,
+    name: String
+  },
   date: Date,
   entries: [{
     productId: String,
@@ -62,8 +64,10 @@ export const OrderProjection= { _id: 0,
     address: 1,
     vatNumber: 1
   },
-  storeId: 1,
-  storeName: 1,
+  store: {
+    id: 1,
+    name: 1
+  },
   date: 1,
   entries: {
     productId: 1,

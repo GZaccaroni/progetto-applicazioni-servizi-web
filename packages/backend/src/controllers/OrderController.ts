@@ -12,7 +12,6 @@ import mongoose from "mongoose";
 
 const enrichOrder = async (order)=>{
   const enrichedOrder={
-    storeId:order.storeId,
     date: order.date,
     entries:[]
   }
@@ -21,12 +20,12 @@ const enrichOrder = async (order)=>{
   }
   const promises=[]
   //get Store data
-  promises.push(Store.findById(order.storeId).then(
+  promises.push(Store.findById(order.storeId, {id: "_id", name: 1}).then(
     store => {
       if (store != null) {
-        enrichedOrder["storeName"] = store.name;
+        enrichedOrder["store"] = store;
       } else {
-        throw {code: 400, message:"Invalid Input"};
+        throw {code: 400, message: "Invalid Input"};
       }
     }))
   //generate product name
@@ -90,7 +89,7 @@ export const getOrders=(req,res: Response)=>{
   const query={};
   if(req.query.storeId ){
     if(mongoose.isValidObjectId(req.query.storeId)) {
-      query["storeId"] = req.query.storeId;
+      query["store.id"] = req.query.storeId;
     } else {
       res.status(400).json({message: "Bad request"});
     }
