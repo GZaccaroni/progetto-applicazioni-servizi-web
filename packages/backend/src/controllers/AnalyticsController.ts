@@ -10,7 +10,7 @@ export const getAnalytics=(req,res: Response)=>{
   const query={};
   if(req.query.storeId ){
     if(mongoose.isValidObjectId(req.query.storeId)) {
-      query["storeId"] = req.query.storeId;
+      query["store.id"] = req.query.storeId;
     } else {
       res.status(400).json({message: "Invalid storeId supplied"});
       return;
