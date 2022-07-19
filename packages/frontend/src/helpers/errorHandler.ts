@@ -1,5 +1,7 @@
 import { showMessage } from "./snackbar";
 import { AxiosError } from "axios";
+import store from "@/store";
+import router from "@/router";
 
 export function repositoryErrorHandler(reason: unknown) {
   let errorMessage: string;
@@ -13,6 +15,8 @@ export function repositoryErrorHandler(reason: unknown) {
         errorMessage = "Elemento non trovato.";
         break;
       case 401:
+        store.dispatch("user/logout");
+        router.push("/");
         errorMessage = "Utente non autenticato.";
         break;
       case 403:
