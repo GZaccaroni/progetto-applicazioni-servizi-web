@@ -5,9 +5,13 @@ import User from "./model/db_model/User";
 import cors from 'cors';
 import routes from "./routes/Routes";
 import mongoose from "mongoose";
+import {Server} from "socket.io";
+import * as http from "http";
 
 const app = express();
 const port = 3000;
+const server= http.createServer(app);
+export const io = new Server(server);
 
 app.use(cors());
 
