@@ -59,8 +59,7 @@ export const getCustomerById=(req:Request,res: Response)=>{
 
 export const updateCustomer=(req,res: Response)=>{
   if(!validateRequest<UpdateCustomer>("UpdateCustomer",req.body)
-    || !mongoose.isValidObjectId(req.params.customerId)
-    || req.params.customerId!=req.body.id){
+    || !mongoose.isValidObjectId(req.params.customerId)){
     res.status(400).json({message:"Invalid Input"});
     return;
   }

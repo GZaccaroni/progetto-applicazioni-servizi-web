@@ -9,8 +9,6 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Identifiable } from './Identifiable';
 import { Product } from './Product';
 
-export interface UpdateProduct extends Product,Identifiable {
-}
+export type UpdateProduct = Product;

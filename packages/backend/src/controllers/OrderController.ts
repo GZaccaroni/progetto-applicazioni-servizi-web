@@ -135,8 +135,7 @@ export const getOrderById=(req:Request,res: Response)=>{
 }
 export const updateOrder=(req,res: Response)=>{
   if(!validateRequest<UpdateOrder>("UpdateOrder",req.body)
-    || !mongoose.isValidObjectId(req.params.orderId)
-    || req.params.orderId!=req.body.id){
+    || !mongoose.isValidObjectId(req.params.orderId)){
     res.status(400).json("Invalid Input");
     return;
   }

@@ -71,8 +71,7 @@ export const updateStore = (req, res: Response) => {
     res.status(403).json({message: "User not authorized"});
   }
   if (!validateRequest<UpdateStore>("UpdateStore", req.body)
-    || !mongoose.isValidObjectId(req.params.storeId)
-    || req.params.storeId!=req.body.id) {
+    || !mongoose.isValidObjectId(req.params.storeId)) {
     res.status(400).json({message: "Invalid Input"});
     return;
   }

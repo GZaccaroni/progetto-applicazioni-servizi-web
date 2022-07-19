@@ -1,10 +1,3 @@
 {
-  "allOf": [
-    {
-      "$ref": "Store#"
-    },
-    {
-      "$ref": "Identifiable#"
-    }
-  ]
+  "$ref": "Store#"
 }

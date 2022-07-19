@@ -10,7 +10,5 @@
  * Do not edit the class manually.
  */
 import { CreateOrder } from './CreateOrder';
-import {Identifiable} from "./Identifiable";
 
-export interface UpdateOrder extends CreateOrder, Identifiable {
-}
+export type UpdateOrder = CreateOrder;
