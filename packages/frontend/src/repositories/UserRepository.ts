@@ -53,7 +53,7 @@ export type UpdateUserInput = Omit<AddUserInput, "password"> & {
 } & DbIdentifiable;
 export async function updateUser(item: UpdateUserInput): Promise<void> {
   const result = await Client.post<void>(
-    `${resource}/${item.id}`,
+    `${resource}/${item.username}`,
     omit(item, "id")
   );
   return result.data;
