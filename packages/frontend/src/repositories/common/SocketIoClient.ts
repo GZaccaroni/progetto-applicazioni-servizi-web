@@ -1,11 +1,21 @@
 import { io, Socket } from "socket.io-client";
 const domain = "https://localhost/";
+
 export interface ServerToClientEvents {
-  orderChanged: (id: string) => void;
-  productChanged: (id: string) => void;
-  storeChanged: (id: string) => void;
-  userChanged: (id: string) => void;
-  customerChanged: (id: string) => void;
+  orderChanged: (data: ServerEventData) => void;
+  productChanged: (data: ServerEventData) => void;
+  storeChanged: (data: ServerEventData) => void;
+  userChanged: (data: ServerEventData) => void;
+  customerChanged: (data: ServerEventData) => void;
+}
+export interface ServerEventData {
+  id: string;
+  action: ServerEventAction;
+}
+export enum ServerEventAction {
+  create = "create",
+  update = "update",
+  delete = "delete",
 }
 
 export type ClientToServerEvents = Record<string, never>;

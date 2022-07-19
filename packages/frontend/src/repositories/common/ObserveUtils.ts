@@ -4,6 +4,7 @@ import {
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
 import socketIoClient, {
+  ServerEventData,
   ServerToClientEvents,
 } from "@/repositories/common/SocketIoClient";
 import { Cancellable } from "@/repositories/common/Cancellable";
@@ -26,12 +27,13 @@ export function observePaginatedResult<Input, Item extends DbIdentifiable>(
 ): Cancellable {
   let currentResult: PaginatedResult<Item> | undefined = undefined;
   let isLoading = false;
-  const listener = (id?: string) => {
+  const listener = (data?: ServerEventData) => {
     if (isLoading) return;
     if (
-      id == undefined ||
+      data == undefined ||
       currentResult == undefined ||
-      currentResult.results.some((el) => el.id == id)
+      data.action == "create" ||
+      currentResult.results.some((el) => el.id == data.id)
     ) {
       isLoading = true;
       findItemsFn(input).then((result) => {
