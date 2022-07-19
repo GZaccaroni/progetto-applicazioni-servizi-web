@@ -9,6 +9,7 @@ import Store from "../model/db_model/Store";
 import Product from "../model/db_model/Product";
 import Customer, {CustomerProjection} from "../model/db_model/Customer";
 import mongoose from "mongoose";
+import {io} from "../app";
 
 const enrichOrder = async (order)=>{
   const enrichedOrder={
@@ -71,7 +72,10 @@ export const addOrder=(req,res: Response)=>{
           id: order._id,
           type: "Order"
         }
-      }).then(() => res.json("Add Order"));
+      }).then(() => {
+        io.emit("orderChanged", order._id);
+        res.json("Add Order");
+      });
     })
   }).catch(err => {
     if(err.code && err.message){
@@ -149,7 +153,10 @@ export const updateOrder=(req,res: Response)=>{
           id: order._id,
           type: "Order"
         }
-      }).then(() => res.json("Order Updated"));
+      }).then(() => {
+        io.emit("orderChanged", order._id);
+        res.json("Order Updated")
+      });
     })
   }).catch(err => {
     if(err.code && err.message){
@@ -180,7 +187,10 @@ export const deleteOrder=(req,res: Response)=>{
             id: order._id,
             type: "Order"
           }
-        }).then(() => res.json({message: "Order deleted"}), err => res.json(err));
+        }).then(() => {
+          io.emit("orderChanged", order._id);
+          res.json({message: "Order deleted"})
+        }, err => res.json(err));
       }
     }
   })

@@ -7,6 +7,7 @@ import passport from "passport";
 import UserDb, {UserProjection} from "../model/db_model/User";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
+import {io} from "../app";
 
 export const createUser = (req, res: Response) => {
   if (!validateRequest<CreateUser>("CreateUser", req.body)) {
@@ -29,7 +30,10 @@ export const createUser = (req, res: Response) => {
         id: user._id,
         type: "User"
       }
-    }).then(() => res.json({message: "User added"}), err => res.json(err));
+    }).then(() => {
+      io.emit("userChanged", user._id);
+      res.json({message: "User added"})
+    }, err => res.json(err));
   });
 }
 export const getUsers = (req, res: Response) => {
@@ -145,7 +149,10 @@ export const deleteUser = (req, res: Response) => {
                 id: user._id,
                 type: "User"
               }
-            }).then(() => res.json({message: "User deleted"}), err => res.json(err));
+            }).then(() => {
+              io.emit("userChanged", user._id);
+              res.json({message: "User deleted"})
+            }, err => res.json(err));
           }
         });
       }

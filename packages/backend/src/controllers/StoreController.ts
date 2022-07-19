@@ -6,6 +6,7 @@ import Store, {StoreProjection} from "../model/db_model/Store";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
+import {io} from "../app";
 
 export const addStore=(req,res: Response)=>{
   if(!req.user.isAdmin){
@@ -25,7 +26,10 @@ export const addStore=(req,res: Response)=>{
           id: store._id,
           type: "Store"
         }
-      }).then(() => res.json("Add Store"));
+      }).then(() => {
+        io.emit("storeChanged", store._id);
+        res.json("Add Store")
+      });
     });
 
 }
@@ -91,7 +95,10 @@ export const updateStore = (req, res: Response) => {
             id: store._id,
             type: "Store"
           }
-        }).then(() => res.json({message: "Store Updated"}), (err) => res.json(err));
+        }).then(() => {
+          io.emit("storeChanged", store._id);
+          res.json({message: "Store Updated"})
+        }, (err) => res.json(err));
       }
     }
   });
@@ -116,7 +123,10 @@ export const deleteStore = (req, res: Response) => {
             id: store._id,
             type: "Store"
           }
-        }).then(() => res.json({message: "Store deleted"}), err => res.json(err));
+        }).then(() => {
+          io.emit("storeChanged", store._id);
+          res.json({message: "Store deleted"})
+        }, err => res.json(err));
       }
     }
   });
