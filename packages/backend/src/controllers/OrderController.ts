@@ -9,10 +9,10 @@ import Store from "../model/db_model/Store";
 import Product from "../model/db_model/Product";
 import Customer, {CustomerProjection} from "../model/db_model/Customer";
 import mongoose from "mongoose";
+import {io} from "../app";
 
 const enrichOrder = async (order)=>{
   const enrichedOrder={
-    storeId:order.storeId,
     date: order.date,
     entries:[]
   }
@@ -21,12 +21,12 @@ const enrichOrder = async (order)=>{
   }
   const promises=[]
   //get Store data
-  promises.push(Store.findById(order.storeId).then(
+  promises.push(Store.findById(order.storeId, {id: "_id", name: 1}).then(
     store => {
       if (store != null) {
-        enrichedOrder["storeName"] = store.name;
+        enrichedOrder["store"] = store;
       } else {
-        throw {code: 400, message:"Invalid Input"};
+        throw {code: 400, message: "Invalid Input"};
       }
     }))
   //generate product name
@@ -72,7 +72,10 @@ export const addOrder=(req,res: Response)=>{
           id: order._id,
           type: "Order"
         }
-      }).then(() => res.json("Add Order"));
+      }).then(() => {
+        io.emit("orderChanged", order._id);
+        res.json("Add Order");
+      });
     })
   }).catch(err => {
     if(err.code && err.message){
@@ -90,7 +93,7 @@ export const getOrders=(req,res: Response)=>{
   const query={};
   if(req.query.storeId ){
     if(mongoose.isValidObjectId(req.query.storeId)) {
-      query["storeId"] = req.query.storeId;
+      query["store.id"] = req.query.storeId;
     } else {
       res.status(400).json({message: "Bad request"});
     }
@@ -136,8 +139,7 @@ export const getOrderById=(req:Request,res: Response)=>{
 }
 export const updateOrder=(req,res: Response)=>{
   if(!validateRequest<UpdateOrder>("UpdateOrder",req.body)
-    || !mongoose.isValidObjectId(req.params.orderId)
-    || req.params.orderId!=req.body.id){
+    || !mongoose.isValidObjectId(req.params.orderId)){
     res.status(400).json("Invalid Input");
     return;
   }
@@ -151,7 +153,10 @@ export const updateOrder=(req,res: Response)=>{
           id: order._id,
           type: "Order"
         }
-      }).then(() => res.json("Order Updated"));
+      }).then(() => {
+        io.emit("orderChanged", order._id);
+        res.json("Order Updated")
+      });
     })
   }).catch(err => {
     if(err.code && err.message){
@@ -182,7 +187,10 @@ export const deleteOrder=(req,res: Response)=>{
             id: order._id,
             type: "Order"
           }
-        }).then(() => res.json({message: "Order deleted"}), err => res.json(err));
+        }).then(() => {
+          io.emit("orderChanged", order._id);
+          res.json({message: "Order deleted"})
+        }, err => res.json(err));
       }
     }
   })

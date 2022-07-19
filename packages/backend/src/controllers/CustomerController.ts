@@ -6,6 +6,7 @@ import Customer, {CustomerProjection} from "../model/db_model/Customer";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
+import {io} from "../app";
 
 export const addCustomer=(req,res: Response)=>{
   if(!validateRequest<CreateCustomer>("CreateCustomer",req.body)){
@@ -21,7 +22,10 @@ export const addCustomer=(req,res: Response)=>{
           id: customer._id,
           type: "Customer"
         }
-      }).then(() => res.json("Add Customer"));
+      }).then(() => {
+        io.emit("customerChanged", customer._id);
+        res.json("Add Customer")
+      });
     });
 }
 export const getCustomers=(req:Request,res: Response)=>{
@@ -59,8 +63,7 @@ export const getCustomerById=(req:Request,res: Response)=>{
 
 export const updateCustomer=(req,res: Response)=>{
   if(!validateRequest<UpdateCustomer>("UpdateCustomer",req.body)
-    || !mongoose.isValidObjectId(req.params.customerId)
-    || req.params.customerId!=req.body.id){
+    || !mongoose.isValidObjectId(req.params.customerId)){
     res.status(400).json({message:"Invalid Input"});
     return;
   }
@@ -80,7 +83,10 @@ export const updateCustomer=(req,res: Response)=>{
             id: customer._id,
             type: "Customer"
           }
-        }).then(() => res.json({message: "Customer updated"}), (err) => res.json(err));
+        }).then(() => {
+          io.emit("customerChanged", customer._id);
+          res.json({message: "Customer updated"})
+        }, (err) => res.json(err));
       }
     }
   });
@@ -104,7 +110,10 @@ export const deleteCustomer=(req,res: Response)=>{
             id: customer._id,
             type: "Customer"
           }
-        }).then(() => res.json({message: "Customer deleted"}), err => res.json(err));
+        }).then(() => {
+          io.emit("customerChanged", customer._id);
+          res.json({message: "Customer deleted"})
+        }, err => res.json(err));
       }
     }
   });

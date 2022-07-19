@@ -28,6 +28,7 @@
     "cors": "^2.8.5",
     "ajv": "^8.11.0",
     "ajv-formats": "^2.1.1",
+    "socket.io": "^4.5.1",
     "@colture-in-cloud/common": "^1.0.0"
   }
 }

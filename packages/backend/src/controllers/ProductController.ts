@@ -6,6 +6,7 @@ import Product, {ProductProjection} from "../model/db_model/Product";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
+import {io} from "../app";
 
 export const addProduct=(req,res: Response)=>{
   if (!req.user.isAdmin) {
@@ -23,7 +24,10 @@ export const addProduct=(req,res: Response)=>{
         id: product._id,
         type: "Product"
       }
-    }).then(() => res.json("Add Product"));
+    }).then(() => {
+      io.emit("productChanged", product._id);
+      res.json("Add Product")
+    });
   });
 
 
@@ -65,8 +69,7 @@ export const updateProduct=(req,res: Response)=>{
     res.status(403).json({message:"User not authorized"});
   }
   if (!validateRequest<UpdateProduct>("UpdateProduct", req.body)
-    || !mongoose.isValidObjectId(req.params.productId)
-    || req.params.productId!=req.body.id) {
+    || !mongoose.isValidObjectId(req.params.productId)) {
     res.status(400).send("Invalid Input");
     return;
   }
@@ -86,7 +89,10 @@ export const updateProduct=(req,res: Response)=>{
             id: product._id,
             type: "Product"
           }
-        }).then(() => res.json({message: "Product updated"}), (err) => res.json(err));
+        }).then(() => {
+          io.emit("productChanged", product._id);
+          res.json({message: "Product updated"})
+        }, (err) => res.json(err));
       }
     }
   });
@@ -110,7 +116,10 @@ export const deleteProduct=(req,res: Response)=>{
             id: product._id,
             type: "Product"
           }
-        }).then(() => res.json({message: "Product deleted"}), err => res.json(err));
+        }).then(() => {
+          io.emit("productChanged", product._id);
+          res.json({message: "Product deleted"})
+        }, err => res.json(err));
       }
     }
   });

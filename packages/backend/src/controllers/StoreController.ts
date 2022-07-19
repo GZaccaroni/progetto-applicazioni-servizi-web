@@ -6,6 +6,7 @@ import Store, {StoreProjection} from "../model/db_model/Store";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
+import {io} from "../app";
 
 export const addStore=(req,res: Response)=>{
   if(!req.user.isAdmin){
@@ -25,7 +26,10 @@ export const addStore=(req,res: Response)=>{
           id: store._id,
           type: "Store"
         }
-      }).then(() => res.json("Add Store"));
+      }).then(() => {
+        io.emit("storeChanged", store._id);
+        res.json("Add Store")
+      });
     });
 
 }
@@ -71,8 +75,7 @@ export const updateStore = (req, res: Response) => {
     res.status(403).json({message: "User not authorized"});
   }
   if (!validateRequest<UpdateStore>("UpdateStore", req.body)
-    || !mongoose.isValidObjectId(req.params.storeId)
-    || req.params.storeId!=req.body.id) {
+    || !mongoose.isValidObjectId(req.params.storeId)) {
     res.status(400).json({message: "Invalid Input"});
     return;
   }
@@ -92,7 +95,38 @@ export const updateStore = (req, res: Response) => {
             id: store._id,
             type: "Store"
           }
-        }).then(() => res.json({message: "Store Updated"}), (err) => res.json(err));
+        }).then(() => {
+          io.emit("storeChanged", store._id);
+          res.json({message: "Store Updated"})
+        }, (err) => res.json(err));
+      }
+    }
+  });
+}
+
+export const deleteStore = (req, res: Response) => {
+  if (!mongoose.isValidObjectId(req.params.storeId)) {
+    res.status(400).send({message: "Invalid ID supplied"});
+    return;
+  }
+  Store.findByIdAndDelete(req.params.storeId, (err, store) => {
+    if (err)
+      res.json(err);
+    else {
+      if (store == null) {
+        res.status(404).json({message: "Store not found"});
+      } else {
+        Log.create({
+          username: req.user.username,
+          action: "Delete",
+          object: {
+            id: store._id,
+            type: "Store"
+          }
+        }).then(() => {
+          io.emit("storeChanged", store._id);
+          res.json({message: "Store deleted"})
+        }, err => res.json(err));
       }
     }
   });

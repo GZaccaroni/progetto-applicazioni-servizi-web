@@ -10,7 +10,5 @@
  * Do not edit the class manually.
  */
 import { Customer } from './Customer';
-import { Identifiable } from './Identifiable';
 
-export interface UpdateCustomer extends Customer,Identifiable {
-}
+export type UpdateCustomer = Customer;
