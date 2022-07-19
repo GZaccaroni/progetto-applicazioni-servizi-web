@@ -50,6 +50,8 @@ export default defineComponent({
     const form = reactive<FindOrdersInput>({
       limit: 10,
       storeId: undefined,
+      fromDate: undefined,
+      toDate: undefined,
     });
 
     watch(
