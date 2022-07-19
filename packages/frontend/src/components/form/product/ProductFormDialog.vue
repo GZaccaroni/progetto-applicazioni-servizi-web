@@ -173,6 +173,7 @@ export default defineComponent({
           type: "success",
           text: message.toString(),
         });
+        this.closeForm();
       } catch (e) {
         repositoryErrorHandler(e);
       }
