@@ -3,6 +3,7 @@
     <v-text-field
       v-model="form.searchName"
       :label="$t('components.ListStoresFilter.searchPerName')"
+      :clearable="true"
     ></v-text-field>
   </v-form>
 </template>
