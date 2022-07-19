@@ -1,7 +1,6 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import store from "@/store";
-import WelcomeView from "@/views/WelcomeView.vue";
 import i18n from "@/i18n";
 
 Vue.use(VueRouter);
@@ -10,7 +9,8 @@ const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "welcome",
-    component: WelcomeView,
+    component: () =>
+      import(/* webpackChunkName: "welcome" */ "../views/WelcomeView.vue"),
   },
   {
     path: "/customers",
