@@ -10,6 +10,7 @@ const client = axios.create({
   headers: {
     // "Authorization": "Bearer xxxxx"
   },
+  withCredentials: true,
 });
 client.interceptors.response.use((originalResponse) => {
   deserializeDates(originalResponse.data);
