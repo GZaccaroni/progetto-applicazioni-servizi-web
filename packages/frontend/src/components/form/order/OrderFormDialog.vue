@@ -31,39 +31,64 @@
         />
       </v-row>
       <v-row class="pt-6 pb-4">
-        <div class="text-h5">Utenti</div>
+        <div class="text-h5">Voci</div>
         <v-spacer />
         <v-btn @click="addEntry" icon>
           <v-icon>mdi-plus-circle</v-icon>
         </v-btn>
       </v-row>
       <v-row v-for="(_, index) in formData.entries" :key="index" align="center">
-        <v-col cols="6">
-          <async-select
-            v-model="formData.entries[index].userId"
-            :label="$t('word.user').toString()"
-            :find-items-fn="getSelectUsers"
-          />
-        </v-col>
         <v-col cols="4">
           <async-select
-            v-model="formData.entries[index].accessLevel"
-            :label="$t('model.store.accessLevel.name').toString()"
-            :find-items-fn="getSelectStoreAccessLevel"
-            :lazy="false"
+            v-model="productKindsIdentifiers[index]"
+            :label="$t('model.order.product').toString()"
+            :find-items-fn="getSelectProductKinds"
           />
+        </v-col>
+        <v-col cols="2">
+          <async-select
+            v-model="formData.entries[index].grade"
+            :label="$t('model.order.productGrade').toString()"
+            :find-items-fn="getSelectProductGrade"
+          />
+        </v-col>
+        <v-col cols="3">
+          <v-text-field
+            type="number"
+            v-model.number="formData.entries[index].pricePerUnit"
+            :label="$t('model.order.pricePerUnit')"
+            :min="0"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field
+            type="number"
+            v-model.number="formData.entries[index].quantity"
+            :label="$t('model.order.quantity')"
+            :min="0"
+          ></v-text-field>
         </v-col>
         <v-spacer />
         <v-btn @click="removeEntry(index)" icon>
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </v-row>
+      <v-row>
+        <v-col>
+          <v-textarea
+            :label="$t('model.order.note')"
+            v-model="formData.note"
+            rows="1"
+            auto-grow
+          ></v-textarea>
+        </v-col>
+      </v-row>
     </v-form>
   </form-dialog>
 </template>
 
 <script setup lang="ts">
-import { defineProps, PropType, ref, watch } from "vue";
+import { computed, defineProps, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import FormDialog, {
@@ -74,9 +99,10 @@ import AsyncSelect from "@/components/common/AsyncSelect.vue";
 import { showMessage } from "@/helpers/snackbar";
 import {
   getSelectCustomers,
-  getSelectStoreAccessLevel,
+  getSelectProductGrade,
+  getSelectProductKinds,
   getSelectStores,
-  getSelectUsers,
+  PRODUCT_KIND_IDENTIFIER_SEPARATOR,
 } from "@/helpers/asyncSelectUtils";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
@@ -107,7 +133,20 @@ const create = ref(false);
 const dialogLoading = ref(false);
 const isVisible = ref(false);
 const changePassword = ref(false);
+const productKindsIdentifiers = ref<(string | undefined)[]>([]);
 
+watch(
+  productKindsIdentifiers,
+  (newValue) => {
+    newValue.forEach((el, index) => {
+      const splittedId = el?.split(PRODUCT_KIND_IDENTIFIER_SEPARATOR);
+      formData.value.entries = formData.value.entries ?? [];
+      formData.value.entries[index].productId = splittedId?.[0];
+      formData.value.entries[index].variantId = splittedId?.[1];
+    });
+  },
+  { deep: true }
+);
 watch(
   () => props.value,
   (el) => {
@@ -130,14 +169,23 @@ async function onBecameVisible(itemToUpdate?: string) {
     create.value = true;
     formData.value = defaultValues;
   }
+  setProductKindsIdentifiers();
   changePassword.value = create.value;
   dialogLoading.value = false;
 }
-
+function setProductKindsIdentifiers() {
+  productKindsIdentifiers.value = (formData.value.entries ?? []).map((el) =>
+    el.variantId == undefined
+      ? el.productId
+      : `${el.productId}${PRODUCT_KIND_IDENTIFIER_SEPARATOR}${el.variantId}`
+  );
+}
 function addEntry() {
   formData.value.entries?.push({});
+  productKindsIdentifiers.value.push();
 }
 function removeEntry(index: number) {
+  productKindsIdentifiers.value.splice(index, 1);
   formData.value.entries?.splice(index, 1);
 }
 async function saveForm() {
@@ -153,6 +201,7 @@ async function saveForm() {
       submitButtonLoading.value = false;
       return;
     }
+    console.log("Data ", data);
     if (create.value) {
       await addOrder(data);
     } else {

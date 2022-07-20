@@ -8,7 +8,7 @@
 </template>
 <script lang="ts">
 import { computed, defineComponent, PropType } from "vue";
-import { getSelectProductKind } from "@/helpers/asyncSelectUtils";
+import { getSelectProductKinds } from "@/helpers/asyncSelectUtils";
 import AsyncSelect from "@/components/common/AsyncSelect.vue";
 
 export interface ProductKind {
@@ -62,7 +62,7 @@ export default defineComponent({
         }
       },
     });
-    const findProductKindsSelectFn = getSelectProductKind;
+    const findProductKindsSelectFn = getSelectProductKinds;
 
     return {
       valueState,

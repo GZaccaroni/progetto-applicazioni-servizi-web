@@ -2,9 +2,9 @@ import { DbUnitOfMeasure } from "./DbUnitOfMeasure";
 import { DbIdentifiable } from "./DbIdentifiable";
 
 export enum DbProductGrade {
-  First = "first",
-  Second = "second",
-  Mixed = "mixed",
+  first = "first",
+  second = "second",
+  mixed = "mixed",
 }
 export interface DbProductKind {
   id: string;
