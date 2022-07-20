@@ -11,7 +11,7 @@
       <v-form
         @submit.prevent="submitForm"
         :disabled="submitButtonLoading"
-        class="pa-4"
+        class="pa-sm-4"
       >
         <v-toolbar
           v-if="$vuetify.breakpoint.xsOnly && !dialogLoading"
