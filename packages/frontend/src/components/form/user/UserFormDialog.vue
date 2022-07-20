@@ -4,6 +4,7 @@
     :submit-button-text="$t('word.save').toString()"
     :submit-button-loading="submitButtonLoading"
     :submit-button-enabled="validateForm(formData)"
+    :dialog-loading="dialogLoading"
     :title="$t(create ? 'model.user.add' : 'model.user.edit').toString()"
     @submit="saveForm"
   >
@@ -11,6 +12,9 @@
       <v-text-field
         v-model="formData.username"
         :label="$t('model.user.username')"
+        minlength="4"
+        maxlength="30"
+        counter
         :disabled="!create"
       ></v-text-field>
       <v-checkbox
@@ -27,14 +31,15 @@
         type="password"
         v-if="changePassword"
         v-model="formData.password"
+        minlength="6"
         :label="$t('model.user.password')"
       ></v-text-field>
     </v-form>
   </form-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType, ref, watch } from "vue";
+<script setup lang="ts">
+import { defineProps, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import FormDialog, {
@@ -44,94 +49,108 @@ import { showMessage } from "@/helpers/snackbar";
 import {
   addUser,
   AddUserInput,
+  findUser,
   updateUser,
   UpdateUserInput,
 } from "@/repositories/UserRepository";
 import { removeBlanks } from "@/helpers/utils";
+import { RecursivePartial } from "@/helpers/types";
+import { DbUser } from "@/model/db/DbUser";
+import i18n from "@/i18n";
 export type UserFormDialogModel = GenericFormDialogModel<{
-  initialData: Partial<UpdateUserInput>;
+  userToUpdate?: string;
 }>;
-export default defineComponent({
-  components: { FormDialog },
-  props: {
-    value: {
-      type: Object as PropType<UserFormDialogModel>,
-      required: true,
-    },
-  },
-
-  setup(props) {
-    const submitButtonLoading = ref(false);
-    const formActionsDisabled = ref(false);
-    const formData = ref<Partial<UpdateUserInput>>({});
-    const create = ref(false);
-    const isVisible = ref(false);
-    const changePassword = ref(false);
-
-    watch(
-      () => props.value,
-      (el) => {
-        if (el.isVisible) {
-          create.value = el.initialData.id == undefined;
-          changePassword.value = create.value;
-          formData.value = el.initialData;
-        }
-        isVisible.value = el.isVisible;
-      }
-    );
-    return {
-      submitButtonLoading,
-      formActionsDisabled,
-      formData,
-      create,
-      changePassword,
-      isVisible,
-    };
-  },
-  methods: {
-    closeForm() {
-      this.$emit("input", { isVisible: false });
-    },
-    async saveForm() {
-      this.submitButtonLoading = true;
-      this.formActionsDisabled = true;
-      const data = clone(removeBlanks(this.formData));
-      try {
-        if (!this.validateForm(data)) {
-          showMessage({
-            text: this.$t("error.formGeneric").toString(),
-            type: "error",
-          });
-          this.submitButtonLoading = false;
-          return;
-        }
-        if (this.create) {
-          await addUser(data as AddUserInput);
-        } else {
-          await updateUser(data);
-        }
-        this.closeForm();
-        const message = this.create
-          ? this.$t("model.user.added")
-          : this.$t("model.user.edited");
-        showMessage({
-          type: "success",
-          text: message.toString(),
-        });
-        this.closeForm();
-      } catch (e) {
-        repositoryErrorHandler(e);
-      }
-      this.formActionsDisabled = false;
-      this.submitButtonLoading = false;
-    },
-    validateForm(form: Partial<UpdateUserInput>): form is UpdateUserInput {
-      const data = clone(removeBlanks(this.formData));
-      if (this.changePassword && data.password == undefined) {
-        return false;
-      }
-      return data.username != undefined;
-    },
+const props = defineProps({
+  value: {
+    type: Object as PropType<UserFormDialogModel>,
+    required: true,
   },
 });
+const emit = defineEmits(["input"]);
+
+const submitButtonLoading = ref(false);
+const formActionsDisabled = ref(false);
+const formData = ref<Partial<UpdateUserInput>>({});
+const create = ref(false);
+const dialogLoading = ref(false);
+const isVisible = ref(false);
+const changePassword = ref(false);
+
+watch(
+  () => props.value,
+  (el) => {
+    if (el.isVisible) {
+      onBecameVisible(el.userToUpdate);
+    }
+    isVisible.value = el.isVisible;
+  }
+);
+
+async function onBecameVisible(userToUpdate?: string) {
+  dialogLoading.value = true;
+  if (userToUpdate != undefined) {
+    create.value = false;
+    const item = await findUser(userToUpdate).catch(repositoryErrorHandler);
+    if (item != undefined) {
+      formData.value = mapToFormValue(item);
+    }
+  } else {
+    create.value = true;
+    formData.value = defaultValues;
+  }
+  changePassword.value = create.value;
+  dialogLoading.value = false;
+}
+async function saveForm() {
+  submitButtonLoading.value = true;
+  formActionsDisabled.value = true;
+  const data = clone(removeBlanks(formData.value));
+  try {
+    if (!validateForm(data)) {
+      showMessage({
+        text: i18n.t("error.formGeneric").toString(),
+        type: "error",
+      });
+      submitButtonLoading.value = false;
+      return;
+    }
+    if (create.value) {
+      await addUser(data as AddUserInput);
+    } else {
+      await updateUser(data);
+    }
+    closeForm();
+    const message = create.value
+      ? i18n.t("model.user.added")
+      : i18n.t("model.user.edited");
+    showMessage({
+      type: "success",
+      text: message.toString(),
+    });
+    closeForm();
+  } catch (e) {
+    repositoryErrorHandler(e);
+  }
+  formActionsDisabled.value = false;
+  submitButtonLoading.value = false;
+}
+function closeForm() {
+  emit("input", { isVisible: false });
+}
+function validateForm(form: Partial<UpdateUserInput>): form is UpdateUserInput {
+  const data = clone(removeBlanks(form));
+  if (changePassword.value && data.password == undefined) {
+    return false;
+  }
+  return data.username != undefined;
+}
+
+// Helpers
+
+function mapToFormValue(item: DbUser): RecursivePartial<UpdateUserInput> {
+  return item;
+}
+const defaultValues: RecursivePartial<UpdateUserInput> = {
+  isAdmin: false,
+};
 </script>
