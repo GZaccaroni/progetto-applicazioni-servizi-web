@@ -31,7 +31,7 @@ export const createUser = (req, res: Response) => {
         type: "User"
       }
     }).then(() => {
-      io.emit("userChanged", user._id);
+      io.emit("userChanged", {id: user._id, action: "create"});
       res.json({message: "User added"})
     }, err => res.json(err));
   });
@@ -150,7 +150,7 @@ export const deleteUser = (req, res: Response) => {
                 type: "User"
               }
             }).then(() => {
-              io.emit("userChanged", user._id);
+              io.emit("userChanged", {id: user._id, action: "delete"});
               res.json({message: "User deleted"})
             }, err => res.json(err));
           }

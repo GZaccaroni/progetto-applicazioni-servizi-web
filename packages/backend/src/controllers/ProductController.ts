@@ -25,7 +25,7 @@ export const addProduct=(req,res: Response)=>{
         type: "Product"
       }
     }).then(() => {
-      io.emit("productChanged", product._id);
+      io.emit("productChanged", {id: product._id, action: "create"});
       res.json("Add Product")
     });
   });
@@ -90,7 +90,7 @@ export const updateProduct=(req,res: Response)=>{
             type: "Product"
           }
         }).then(() => {
-          io.emit("productChanged", product._id);
+          io.emit("productChanged", {id: product._id, action: "update"});
           res.json({message: "Product updated"})
         }, (err) => res.json(err));
       }
@@ -117,7 +117,7 @@ export const deleteProduct=(req,res: Response)=>{
             type: "Product"
           }
         }).then(() => {
-          io.emit("productChanged", product._id);
+          io.emit("productChanged", {id:product._id, action:"delete"});
           res.json({message: "Product deleted"})
         }, err => res.json(err));
       }

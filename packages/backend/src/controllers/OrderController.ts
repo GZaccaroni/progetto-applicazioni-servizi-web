@@ -73,7 +73,7 @@ export const addOrder=(req,res: Response)=>{
           type: "Order"
         }
       }).then(() => {
-        io.emit("orderChanged", order._id);
+        io.emit("orderChanged", {id: order._id, action: "create"});
         res.json("Add Order");
       });
     })
@@ -154,7 +154,7 @@ export const updateOrder=(req,res: Response)=>{
           type: "Order"
         }
       }).then(() => {
-        io.emit("orderChanged", order._id);
+        io.emit("orderChanged", {id: order._id, action: "update"});
         res.json("Order Updated")
       });
     })
@@ -188,7 +188,7 @@ export const deleteOrder=(req,res: Response)=>{
             type: "Order"
           }
         }).then(() => {
-          io.emit("orderChanged", order._id);
+          io.emit("orderChanged", {id: order._id, action: "delete"});
           res.json({message: "Order deleted"})
         }, err => res.json(err));
       }
