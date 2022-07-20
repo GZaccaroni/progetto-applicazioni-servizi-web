@@ -74,6 +74,11 @@
       "store": "Punto Vendita",
       "customer": "Cliente",
       "price": "Importo totale",
+      "pricePerUnit": "Prezzo unitario",
+      "quantity": "Quantità",
+      "product": "Prodotto",
+      "productGrade": "Qualità",
+      "note": "Note",
       "add": "Aggiungi ordine",
       "edit": "Modifica ordine",
       "added": "Ordine aggiunto con successo",
@@ -87,6 +92,11 @@
       "edit": "Modifica prodotto",
       "added": "Prodotto aggiunto con successo",
       "edited": "Prodotto modificato con successo"
+    },
+    "productGrade": {
+      "first": "Prima",
+      "second": "Seconda",
+      "mixed": "Mista"
     },
     "unitOfMeasure": {
       "kilogram": "Kg",
