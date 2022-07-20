@@ -49,7 +49,6 @@ export default defineComponent({
     openNewItemDialog() {
       this.dialogModel = {
         isVisible: true,
-        userToUpdate: undefined,
       };
     },
     deleteItem(item: DbUser) {

@@ -30,8 +30,8 @@
   </form-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType, ref, watch } from "vue";
+<script setup lang="ts">
+import { defineProps, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import FormDialog, {
@@ -39,81 +39,103 @@ import FormDialog, {
 } from "@/components/common/FormDialog.vue";
 import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
+import { RecursivePartial } from "@/helpers/types";
+import i18n from "@/i18n";
 import { DbCustomer } from "@/model/db/DbCustomer";
-import { addCustomer, updateCustomer } from "@/repositories/CustomerRepository";
+import {
+  addCustomer,
+  findCustomer,
+  updateCustomer,
+} from "@/repositories/CustomerRepository";
 export type CustomerFormDialogModel = GenericFormDialogModel<{
-  initialData: Partial<DbCustomer>;
+  customerToUpdate?: string;
 }>;
-export default defineComponent({
-  components: { FormDialog },
-  props: {
-    value: {
-      type: Object as PropType<CustomerFormDialogModel>,
-      required: true,
-    },
-  },
-
-  setup(props) {
-    const submitButtonLoading = ref(false);
-    const formData = ref<Partial<DbCustomer>>({});
-    const create = ref(false);
-    const isVisible = ref(false);
-
-    watch(
-      () => props.value,
-      (el) => {
-        if (el.isVisible) {
-          create.value = el.initialData.id == undefined;
-          formData.value = el.initialData;
-        }
-        isVisible.value = el.isVisible;
-      }
-    );
-    return {
-      submitButtonLoading,
-      formData,
-      create,
-      isVisible,
-    };
-  },
-  methods: {
-    closeForm() {
-      this.$emit("input", { isVisible: false });
-    },
-    async saveForm() {
-      this.submitButtonLoading = true;
-      const data = clone(removeBlanks(this.formData));
-      try {
-        if (!this.validateForm(data)) {
-          showMessage({
-            text: this.$t("error.formGeneric").toString(),
-            type: "error",
-          });
-          this.submitButtonLoading = false;
-          return;
-        }
-        if (this.create) {
-          await addCustomer(data);
-        } else {
-          await updateCustomer(data);
-        }
-        const message = this.create
-          ? this.$t("model.customer.added")
-          : this.$t("model.customer.edited");
-        showMessage({
-          type: "success",
-          text: message.toString(),
-        });
-        this.closeForm();
-      } catch (e) {
-        repositoryErrorHandler(e);
-      }
-      this.submitButtonLoading = false;
-    },
-    validateForm(form: Partial<DbCustomer>): form is DbCustomer {
-      const data = clone(removeBlanks(this.formData));
-      return data.name != undefined;
-    },
+const props = defineProps({
+  value: {
+    type: Object as PropType<CustomerFormDialogModel>,
+    required: true,
   },
 });
+const emit = defineEmits(["input"]);
+
+const submitButtonLoading = ref(false);
+const formActionsDisabled = ref(false);
+const formData = ref<RecursivePartial<DbCustomer>>({});
+const create = ref(false);
+const dialogLoading = ref(false);
+const isVisible = ref(false);
+const changePassword = ref(false);
+
+watch(
+  () => props.value,
+  (el) => {
+    if (el.isVisible) {
+      onBecameVisible(el.customerToUpdate);
+    }
+    isVisible.value = el.isVisible;
+  }
+);
+
+async function onBecameVisible(itemToUpdate?: string) {
+  dialogLoading.value = true;
+  if (itemToUpdate != undefined) {
+    create.value = false;
+    const item = await findCustomer(itemToUpdate).catch(repositoryErrorHandler);
+    if (item != undefined) {
+      formData.value = mapToFormValue(item);
+    }
+  } else {
+    create.value = true;
+    formData.value = defaultValues;
+  }
+  changePassword.value = create.value;
+  dialogLoading.value = false;
+}
+async function saveForm() {
+  submitButtonLoading.value = true;
+  formActionsDisabled.value = true;
+  const data = clone(removeBlanks(formData.value));
+  try {
+    if (!validateForm(data)) {
+      showMessage({
+        text: i18n.t("error.formGeneric").toString(),
+        type: "error",
+      });
+      submitButtonLoading.value = false;
+      return;
+    }
+    if (create.value) {
+      await addCustomer(data);
+    } else {
+      await updateCustomer(data);
+    }
+    closeForm();
+    const message = create.value
+      ? i18n.t("model.customer.added")
+      : i18n.t("model.customer.edited");
+    showMessage({
+      type: "success",
+      text: message.toString(),
+    });
+    closeForm();
+  } catch (e) {
+    repositoryErrorHandler(e);
+  }
+  formActionsDisabled.value = false;
+  submitButtonLoading.value = false;
+}
+function closeForm() {
+  emit("input", { isVisible: false });
+}
+function validateForm(form: RecursivePartial<DbCustomer>): form is DbCustomer {
+  const data = clone(removeBlanks(form));
+  return data.name != undefined;
+}
+
+// Helpers
+
+function mapToFormValue(item: DbCustomer): RecursivePartial<DbCustomer> {
+  return item;
+}
+const defaultValues: RecursivePartial<DbCustomer> = {};
 </script>
