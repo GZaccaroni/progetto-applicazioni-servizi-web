@@ -43,7 +43,7 @@ export const getStores = (req, res: Response) => {
     query["authorizations.userId"]=req.user.id;
   }
   if (req.query.searchName) {
-    query["name"] = {$regex: req.query.searchName};
+    query["name"] = {$regex: req.query.searchName, $options: "i"};
   }
   const options = paginateOptions(query,StoreProjection,
                                     req.query.limit,

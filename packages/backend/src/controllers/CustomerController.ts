@@ -35,7 +35,7 @@ export const getCustomers=(req:Request,res: Response)=>{
   }
   const query={};
   if (req.query.searchName) {
-    query["name"] = {$regex: req.query.searchName};
+    query["name"] = {$regex: req.query.searchName, $options:"i"};
   }
   const options = paginateOptions(query,CustomerProjection,
     req.query.limit,

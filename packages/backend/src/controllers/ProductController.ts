@@ -39,7 +39,7 @@ export const getProducts = (req, res: Response) => {
   }
   const query = {};
   if (req.query.searchName) {
-    query["name"] = {$regex: req.query.searchName};
+    query["name"] = {$regex: req.query.searchName, $options: "i"};
   }
   const options = paginateOptions(query, ProductProjection,req.query.limit,
     req.query.pagingNext,

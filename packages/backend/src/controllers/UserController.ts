@@ -48,7 +48,7 @@ export const getUsers = (req, res: Response) => {
 
   const query = {};
   if (req.query.searchName) {
-    query["username"] = {$regex: req.query.searchName};
+    query["username"] = {$regex: req.query.searchName, $options: "i"};
   }
   const options = paginateOptions(query,
                                   UserProjection,
