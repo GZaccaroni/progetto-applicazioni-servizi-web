@@ -49,7 +49,7 @@ export default defineComponent({
     openNewItemDialog() {
       this.dialogModel = {
         isVisible: true,
-        initialData: {},
+        userToUpdate: undefined,
       };
     },
     deleteItem(item: DbUser) {
@@ -62,7 +62,7 @@ export default defineComponent({
         )
         .then((confirmed) => {
           if (confirmed) {
-            deleteUser(item.id).catch(repositoryErrorHandler);
+            deleteUser(item.username).catch(repositoryErrorHandler);
           }
         });
     },
@@ -71,7 +71,7 @@ export default defineComponent({
         case TableItemEventType.rowEditAction:
           this.dialogModel = {
             isVisible: true,
-            initialData: event.item,
+            userToUpdate: event.item.username,
           };
           break;
         case TableItemEventType.rowDeleteAction:

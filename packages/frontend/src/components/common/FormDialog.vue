@@ -13,7 +13,11 @@
         :disabled="submitButtonLoading"
         class="pa-4"
       >
-        <v-toolbar v-if="$vuetify.breakpoint.xsOnly" dark color="primary">
+        <v-toolbar
+          v-if="$vuetify.breakpoint.xsOnly && !dialogLoading"
+          dark
+          color="primary"
+        >
           <v-btn icon dark :disabled="submitButtonLoading" @click="closeForm">
             <v-icon>mdi-close</v-icon>
           </v-btn>
@@ -33,11 +37,16 @@
           <span class="headline">{{ title }}</span>
         </v-card-title>
         <v-card-text>
-          <v-container>
+          <v-container v-if="!dialogLoading">
             <slot></slot>
           </v-container>
+          <v-progress-linear
+            v-else
+            indeterminate
+            class="mb-0"
+          ></v-progress-linear>
         </v-card-text>
-        <v-card-actions v-if="!$vuetify.breakpoint.xsOnly">
+        <v-card-actions v-if="!$vuetify.breakpoint.xsOnly && !dialogLoading">
           <v-spacer></v-spacer>
           <v-btn
             color="blue darken-1"
@@ -102,6 +111,10 @@ export default defineComponent({
     value: {
       type: Boolean,
       required: true,
+    },
+    dialogLoading: {
+      value: Boolean,
+      default: false,
     },
   },
   setup(props, context) {
