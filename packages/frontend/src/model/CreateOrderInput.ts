@@ -4,6 +4,7 @@ export interface CreateOrderEntry {
   productId: string;
   variantId?: string;
   pricePerUnit: number;
+  quantity: number;
   grade?: DbProductGrade;
 }
 export interface CreateOrderInput {
