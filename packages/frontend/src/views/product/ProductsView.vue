@@ -49,7 +49,6 @@ export default defineComponent({
     openNewItemDialog() {
       this.dialogModel = {
         isVisible: true,
-        initialData: {},
       };
     },
     deleteItem(item: DbProduct) {
@@ -71,7 +70,7 @@ export default defineComponent({
         case TableItemEventType.rowEditAction:
           this.dialogModel = {
             isVisible: true,
-            initialData: event.item,
+            productToUpdate: event.item.id,
           };
           break;
         case TableItemEventType.rowDeleteAction:

@@ -70,7 +70,7 @@ const emit = defineEmits(["input"]);
 
 const submitButtonLoading = ref(false);
 const formActionsDisabled = ref(false);
-const formData = ref<Partial<UpdateUserInput>>({});
+const formData = ref<RecursivePartial<UpdateUserInput>>({});
 const create = ref(false);
 const dialogLoading = ref(false);
 const isVisible = ref(false);
@@ -137,7 +137,9 @@ async function saveForm() {
 function closeForm() {
   emit("input", { isVisible: false });
 }
-function validateForm(form: Partial<UpdateUserInput>): form is UpdateUserInput {
+function validateForm(
+  form: RecursivePartial<UpdateUserInput>
+): form is UpdateUserInput {
   const data = clone(removeBlanks(form));
   if (changePassword.value && data.password == undefined) {
     return false;

@@ -30,7 +30,7 @@
           <async-select
             v-model="formData.unitOfMeasure"
             :label="$t('model.product.unitOfMeasure').toString()"
-            :find-items-fn="findUnitOfMeasureFn"
+            :find-items-fn="getSelectUnitOfMeasure"
             :lazy="false"
           />
         </v-col>
@@ -70,119 +70,133 @@
     </v-form>
   </form-dialog>
 </template>
-
-<script lang="ts">
-import { defineComponent, PropType, ref, watch } from "vue";
+<script setup lang="ts">
+import { computed, defineProps, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import FormDialog, {
   GenericFormDialogModel,
 } from "@/components/common/FormDialog.vue";
+import AsyncSelect from "@/components/common/AsyncSelect.vue";
 import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
-import { DbStore } from "@/model/db/DbStore";
 import { RecursivePartial } from "@/helpers/types";
+import i18n from "@/i18n";
 import { getSelectUnitOfMeasure } from "@/helpers/asyncSelectUtils";
 import { DbProduct } from "@/model/db/DbProduct";
-import AsyncSelect from "@/components/common/AsyncSelect.vue";
-import { addProduct, updateProduct } from "@/repositories/ProductRepository";
+import {
+  addProduct,
+  findProduct,
+  updateProduct,
+} from "@/repositories/ProductRepository";
 
 export type ProductFormDialogModel = GenericFormDialogModel<{
-  initialData: RecursivePartial<DbProduct>;
+  productToUpdate?: string;
 }>;
-export default defineComponent({
-  components: { AsyncSelect, FormDialog },
-  props: {
-    value: {
-      type: Object as PropType<ProductFormDialogModel>,
-      required: true,
-    },
-  },
-
-  setup(props) {
-    const submitButtonLoading = ref(false);
-    const formData = ref<RecursivePartial<DbProduct>>({});
-    const create = ref(false);
-    const isVisible = ref(false);
-    const findUnitOfMeasureFn = getSelectUnitOfMeasure;
-    console.log("Initial data ", props.value);
-    watch(
-      () => props.value,
-      (el) => {
-        if (el.isVisible) {
-          create.value = el.initialData.id == undefined;
-          const initialData = clone(el.initialData);
-          initialData.kinds = initialData.kinds ?? [];
-          formData.value = initialData;
-        }
-        isVisible.value = el.isVisible;
-      }
-    );
-    return {
-      submitButtonLoading,
-      formData,
-      create,
-      isVisible,
-      findUnitOfMeasureFn,
-      findStoreAccessLevelSelectFn: findUnitOfMeasureFn,
-    };
-  },
-  computed: {
-    priceSuffix() {
-      let suffix = "€";
-      if (this.formData.unitOfMeasure == undefined) return suffix;
-      suffix += "/";
-      suffix += this.$t(
-        "model.unitOfMeasure." + this.formData.unitOfMeasure
-      ).toString();
-      return suffix;
-    },
-  },
-  methods: {
-    closeForm() {
-      this.$emit("input", { isVisible: false });
-    },
-    addKind() {
-      this.formData.kinds?.push({ id: crypto.randomUUID() });
-    },
-    removeKind(index: number) {
-      this.formData.kinds?.splice(index, 1);
-    },
-    async saveForm() {
-      this.submitButtonLoading = true;
-      const data = clone(removeBlanks(this.formData));
-      try {
-        if (!this.validateForm(data)) {
-          showMessage({
-            text: this.$t("error.formGeneric").toString(),
-            type: "error",
-          });
-          this.submitButtonLoading = false;
-          return;
-        }
-        console.log("Final data", data);
-        if (this.create) {
-          await addProduct(data);
-        } else {
-          await updateProduct(data);
-        }
-        const message = this.create
-          ? this.$t("model.product.added")
-          : this.$t("model.product.edited");
-        showMessage({
-          type: "success",
-          text: message.toString(),
-        });
-        this.closeForm();
-      } catch (e) {
-        repositoryErrorHandler(e);
-      }
-      this.submitButtonLoading = false;
-    },
-    validateForm(form: RecursivePartial<DbStore>): form is DbProduct {
-      const data = clone(removeBlanks(this.formData));
-      return data.name != undefined;
-    },
+const props = defineProps({
+  value: {
+    type: Object as PropType<ProductFormDialogModel>,
+    required: true,
   },
 });
+const emit = defineEmits(["input"]);
+
+const submitButtonLoading = ref(false);
+const formActionsDisabled = ref(false);
+const formData = ref<RecursivePartial<DbProduct>>({});
+const create = ref(false);
+const dialogLoading = ref(false);
+const isVisible = ref(false);
+const changePassword = ref(false);
+
+const priceSuffix = computed(() => {
+  let suffix = "€";
+  if (formData.value.unitOfMeasure == undefined) return suffix;
+  suffix += "/";
+  suffix += i18n
+    .t("model.unitOfMeasure." + formData.value.unitOfMeasure)
+    .toString();
+  return suffix;
+});
+watch(
+  () => props.value,
+  (el) => {
+    if (el.isVisible) {
+      onBecameVisible(el.productToUpdate);
+    }
+    isVisible.value = el.isVisible;
+  }
+);
+
+async function onBecameVisible(itemToUpdate?: string) {
+  dialogLoading.value = true;
+  if (itemToUpdate != undefined) {
+    create.value = false;
+    const item = await findProduct(itemToUpdate).catch(repositoryErrorHandler);
+    if (item != undefined) {
+      formData.value = mapToFormValue(item);
+    }
+  } else {
+    create.value = true;
+    formData.value = defaultValues;
+  }
+  changePassword.value = create.value;
+  dialogLoading.value = false;
+}
+
+function addKind() {
+  formData.value.kinds?.push({ id: crypto.randomUUID() });
+}
+function removeKind(index: number) {
+  formData.value.kinds?.splice(index, 1);
+}
+async function saveForm() {
+  submitButtonLoading.value = true;
+  formActionsDisabled.value = true;
+  const data = clone(removeBlanks(formData.value));
+  try {
+    if (!validateForm(data)) {
+      showMessage({
+        text: i18n.t("error.formGeneric").toString(),
+        type: "error",
+      });
+      submitButtonLoading.value = false;
+      return;
+    }
+    if (create.value) {
+      await addProduct(data);
+    } else {
+      await updateProduct(data);
+    }
+    closeForm();
+    const message = create.value
+      ? i18n.t("model.product.added")
+      : i18n.t("model.product.edited");
+    showMessage({
+      type: "success",
+      text: message.toString(),
+    });
+    closeForm();
+  } catch (e) {
+    repositoryErrorHandler(e);
+  }
+  formActionsDisabled.value = false;
+  submitButtonLoading.value = false;
+}
+function closeForm() {
+  emit("input", { isVisible: false });
+}
+function validateForm(form: RecursivePartial<DbProduct>): form is DbProduct {
+  const data = clone(removeBlanks(form));
+  return data.name != undefined;
+}
+
+// Helpers
+
+function mapToFormValue(item: DbProduct): RecursivePartial<DbProduct> {
+  return item;
+}
+const defaultValues: RecursivePartial<DbProduct> = {
+  kinds: [],
+};
 </script>
