@@ -13,14 +13,14 @@
         <async-select
           v-model="formData.storeId"
           :label="$t('model.order.store').toString()"
-          :find-items-fn="findStoreSelectFn"
+          :find-items-fn="getSelectStores"
         />
       </v-row>
       <v-row>
         <async-select
           v-model="formData.customerId"
           :label="$t('model.order.customer').toString()"
-          :find-items-fn="findCustomerSelectFn"
+          :find-items-fn="getSelectCustomers"
         />
       </v-row>
       <v-row>
@@ -42,14 +42,14 @@
           <async-select
             v-model="formData.entries[index].userId"
             :label="$t('word.user').toString()"
-            :find-items-fn="findUsersSelectFn"
+            :find-items-fn="getSelectUsers"
           />
         </v-col>
         <v-col cols="4">
           <async-select
             v-model="formData.entries[index].accessLevel"
             :label="$t('model.store.accessLevel.name').toString()"
-            :find-items-fn="findStoreAccessLevelSelectFn"
+            :find-items-fn="getSelectStoreAccessLevel"
             :lazy="false"
           />
         </v-col>
@@ -62,37 +62,136 @@
   </form-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType, ref, watch } from "vue";
+<script setup lang="ts">
+import { defineProps, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import FormDialog, {
   GenericFormDialogModel,
 } from "@/components/common/FormDialog.vue";
-import { showMessage } from "@/helpers/snackbar";
-import { removeBlanks } from "@/helpers/utils";
-import { RecursivePartial } from "@/helpers/types";
+import TextFieldDatePicker from "@/components/common/TextFieldDatePicker.vue";
 import AsyncSelect from "@/components/common/AsyncSelect.vue";
+import { showMessage } from "@/helpers/snackbar";
 import {
   getSelectCustomers,
   getSelectStoreAccessLevel,
   getSelectStores,
   getSelectUsers,
 } from "@/helpers/asyncSelectUtils";
-import { DbOrder } from "@/model/db/DbOrder";
+import { removeBlanks } from "@/helpers/utils";
+import { RecursivePartial } from "@/helpers/types";
+import i18n from "@/i18n";
+import {
+  addOrder,
+  findOrder,
+  updateOrder,
+} from "@/repositories/OrderRepository";
 import { UpdateOrderInput } from "@/model/UpdateOrderInput";
-import { addOrder, updateOrder } from "@/repositories/OrderRepository";
-import TextFieldDatePicker from "@/components/common/TextFieldDatePicker.vue";
+import { DbOrder } from "@/model/db/DbOrder";
+
 export type OrderFormDialogModel = GenericFormDialogModel<{
-  itemToUpdate?: DbOrder;
+  orderToUpdate?: string;
 }>;
-function mapInitialValue(order?: DbOrder): RecursivePartial<UpdateOrderInput> {
+const props = defineProps({
+  value: {
+    type: Object as PropType<OrderFormDialogModel>,
+    required: true,
+  },
+});
+const emit = defineEmits(["input"]);
+
+const submitButtonLoading = ref(false);
+const formActionsDisabled = ref(false);
+const formData = ref<RecursivePartial<UpdateOrderInput>>({});
+const create = ref(false);
+const dialogLoading = ref(false);
+const isVisible = ref(false);
+const changePassword = ref(false);
+
+watch(
+  () => props.value,
+  (el) => {
+    if (el.isVisible) {
+      onBecameVisible(el.orderToUpdate);
+    }
+    isVisible.value = el.isVisible;
+  }
+);
+
+async function onBecameVisible(itemToUpdate?: string) {
+  dialogLoading.value = true;
+  if (itemToUpdate != undefined) {
+    create.value = false;
+    const item = await findOrder(itemToUpdate).catch(repositoryErrorHandler);
+    if (item != undefined) {
+      formData.value = mapToFormValue(item);
+    }
+  } else {
+    create.value = true;
+    formData.value = defaultValues;
+  }
+  changePassword.value = create.value;
+  dialogLoading.value = false;
+}
+
+function addEntry() {
+  formData.value.entries?.push({});
+}
+function removeEntry(index: number) {
+  formData.value.entries?.splice(index, 1);
+}
+async function saveForm() {
+  submitButtonLoading.value = true;
+  formActionsDisabled.value = true;
+  const data = clone(removeBlanks(formData.value));
+  try {
+    if (!validateForm(data)) {
+      showMessage({
+        text: i18n.t("error.formGeneric").toString(),
+        type: "error",
+      });
+      submitButtonLoading.value = false;
+      return;
+    }
+    if (create.value) {
+      await addOrder(data);
+    } else {
+      await updateOrder(data);
+    }
+    closeForm();
+    const message = create.value
+      ? i18n.t("model.order.added")
+      : i18n.t("model.order.edited");
+    showMessage({
+      type: "success",
+      text: message.toString(),
+    });
+    closeForm();
+  } catch (e) {
+    repositoryErrorHandler(e);
+  }
+  formActionsDisabled.value = false;
+  submitButtonLoading.value = false;
+}
+function closeForm() {
+  emit("input", { isVisible: false });
+}
+function validateForm(
+  form: RecursivePartial<UpdateOrderInput>
+): form is UpdateOrderInput {
+  const data = clone(removeBlanks(form));
+  return data.date != undefined;
+}
+
+// Helpers
+
+function mapToFormValue(item: DbOrder): RecursivePartial<UpdateOrderInput> {
   return {
-    customerId: order?.customer?.id,
-    storeId: order?.store.id,
-    date: order?.date,
+    customerId: item.customer?.id,
+    storeId: item.store.id,
+    date: item.date,
     entries:
-      order?.entries.map((entry) => {
+      item.entries.map((entry) => {
         return {
           productId: entry.productId,
           variantId: entry.variantId,
@@ -100,96 +199,10 @@ function mapInitialValue(order?: DbOrder): RecursivePartial<UpdateOrderInput> {
           grade: entry.grade,
         };
       }) ?? [],
-    note: order?.note,
+    note: item.note,
   };
 }
-export default defineComponent({
-  components: { TextFieldDatePicker, AsyncSelect, FormDialog },
-  props: {
-    value: {
-      type: Object as PropType<OrderFormDialogModel>,
-      required: true,
-    },
-  },
-
-  setup(props) {
-    const submitButtonLoading = ref(false);
-    const formData = ref<RecursivePartial<UpdateOrderInput>>({});
-    const create = ref(false);
-    const isVisible = ref(false);
-    const findUsersSelectFn = getSelectUsers;
-    const findStoreAccessLevelSelectFn = getSelectStoreAccessLevel;
-    const findStoreSelectFn = getSelectStores;
-    const findCustomerSelectFn = getSelectCustomers;
-
-    watch(
-      () => props.value,
-      (el) => {
-        if (el.isVisible) {
-          create.value = el.itemToUpdate == undefined;
-          formData.value = mapInitialValue(el.itemToUpdate);
-        }
-        isVisible.value = el.isVisible;
-      }
-    );
-    return {
-      submitButtonLoading,
-      formData,
-      create,
-      isVisible,
-      findUsersSelectFn,
-      findStoreSelectFn,
-      findCustomerSelectFn,
-      findStoreAccessLevelSelectFn,
-    };
-  },
-  methods: {
-    closeForm() {
-      this.$emit("input", { isVisible: false });
-    },
-    addEntry() {
-      this.formData.entries?.push({});
-    },
-    removeEntry(index: number) {
-      this.formData.entries?.splice(index, 1);
-    },
-    async saveForm() {
-      this.submitButtonLoading = true;
-      const data = clone(removeBlanks(this.formData));
-      try {
-        if (!this.validateForm(data)) {
-          showMessage({
-            text: this.$t("error.formGeneric").toString(),
-            type: "error",
-          });
-          this.submitButtonLoading = false;
-          return;
-        }
-        console.log("Final data", data);
-        if (this.create) {
-          await addOrder(data);
-        } else {
-          await updateOrder(data);
-        }
-        const message = this.create
-          ? this.$t("model.order.added")
-          : this.$t("model.order.edited");
-        showMessage({
-          type: "success",
-          text: message.toString(),
-        });
-        this.closeForm();
-      } catch (e) {
-        repositoryErrorHandler(e);
-      }
-      this.submitButtonLoading = false;
-    },
-    validateForm(
-      form: RecursivePartial<UpdateOrderInput>
-    ): form is UpdateOrderInput {
-      const data = clone(removeBlanks(form));
-      return data.date != undefined;
-    },
-  },
-});
+const defaultValues: RecursivePartial<UpdateOrderInput> = {
+  entries: [],
+};
 </script>

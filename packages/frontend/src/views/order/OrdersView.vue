@@ -68,7 +68,7 @@ export default defineComponent({
         case TableItemEventType.rowEditAction:
           this.dialogModel = {
             isVisible: true,
-            itemToUpdate: event.item,
+            orderToUpdate: event.item.id,
           };
           break;
         case TableItemEventType.rowDeleteAction:
