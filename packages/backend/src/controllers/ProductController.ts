@@ -8,6 +8,11 @@ import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
 
+const enrichProduct=(product)=>{
+  product.kinds.forEach((k,i,self)=>self[i]["fullName"]=product.name+" "+k.name);
+  return product;
+}
+
 export const addProduct=(req,res: Response)=>{
   if (!req.user.isAdmin) {
     res.status(403).json({message: "User not authorized"});
@@ -16,7 +21,8 @@ export const addProduct=(req,res: Response)=>{
     res.status(400).send("Invalid Input");
     return;
   }
-  Product.create(req.body).then(product=>{
+  const enrichedProduct=enrichProduct(req.body);
+  Product.create(enrichedProduct).then(product=>{
     Log.create({
       username: req.user.username,
       action: "Create",
@@ -73,7 +79,8 @@ export const updateProduct=(req,res: Response)=>{
     res.status(400).send("Invalid Input");
     return;
   }
-  Product.findByIdAndUpdate(req.params.productId, req.body, {new: true}, (err, product) => {
+  const enrichedProduct=req.body;
+  Product.findByIdAndUpdate(req.params.productId, enrichedProduct, {new: true}, (err, product) => {
     if (err)
       res.json(err);
     else {

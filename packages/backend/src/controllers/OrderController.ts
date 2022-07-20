@@ -30,15 +30,11 @@ const enrichOrder = async (order)=>{
       }
     }))
   //generate product name
-  const entryPromises=[];
+  const entryPromises = [];
   order.entries.forEach(entry => {
     entry["price"] = entry.pricePerUnit * entry.quantity;
     entryPromises.push(Product.findById(entry.productId).then(product => {
-      let productFullName=product.name;
-      if(entry.variantId){
-        productFullName+=" "+product.kinds.find(x => x.id == entry.variantId).name;
-      }
-      entry["name"] = productFullName;
+      entry["name"] = !entry.variantId ? product.name : product.kinds.find(x => x.id == entry.variantId).fullName;
     }).then(() => enrichedOrder["entries"].push(entry)));
   })
   //compute tot

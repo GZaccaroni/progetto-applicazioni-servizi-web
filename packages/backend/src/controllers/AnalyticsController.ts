@@ -138,12 +138,11 @@ export const getAnalytics=(req,res: Response)=>{
             }}, 0]}
       }
     },
-    {$addFields:{
-      "name":{
-        $concat:[{$first: "$product.name"},{$toString: {$cond: ["$variant.name",{$concat:[" ","$variant.name"]}, ""]}}]
+    {
+      $addFields: {
+        "name": {$ifNull: ["$variant.fullName", "$product.name"]}
       }
-
-      }},
+    },
     {
       $unset:["_id","product","variant"]
     }

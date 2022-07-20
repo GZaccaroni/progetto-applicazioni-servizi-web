@@ -9,6 +9,7 @@ const ProductSchema = new mongoose.Schema({
   kinds: [{
     id: String,
     name: String,
+    fullName:String,
     pricePerUnit: Number
   }],
   unitOfMeasure: {
