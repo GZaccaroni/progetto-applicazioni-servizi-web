@@ -73,7 +73,11 @@ export type StoreFormDialogModel = GenericFormDialogModel<{
   itemToUpdate?: DbStore;
 }>;
 function mapInitialValue(store?: DbStore): RecursivePartial<UpdateStoreInput> {
-  return store ?? {};
+  return (
+    store ?? {
+      authorizations: [],
+    }
+  );
 }
 export default defineComponent({
   components: { AsyncSelect, FormDialog },
