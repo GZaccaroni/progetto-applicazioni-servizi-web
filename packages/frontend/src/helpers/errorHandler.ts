@@ -3,13 +3,17 @@ import { AxiosError } from "axios";
 import store from "@/store";
 import router from "@/router";
 
-export function repositoryErrorHandler(reason: unknown) {
+export function repositoryErrorHandler(reason: unknown, isLogin = false) {
   let errorMessage: string;
   console.error("Repository error", reason);
   if (reason instanceof AxiosError) {
     switch (reason.response?.status) {
       case 400:
-        errorMessage = "Nome utente/ Password non validi.";
+        if (isLogin) {
+          errorMessage = "Nome utente/ Password non validi.";
+        } else {
+          errorMessage = "La richiesta è fallita.";
+        }
         break;
       case 404:
         errorMessage = "Elemento non trovato.";
