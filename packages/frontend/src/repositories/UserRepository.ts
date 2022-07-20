@@ -8,8 +8,6 @@ import { DbUser } from "@/model/db/DbUser";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 import { DbIdentifiable } from "@/model/db/DbIdentifiable";
-import user from "@/store/user";
-
 const resource = "/user";
 
 export function observeUsers(
@@ -56,9 +54,10 @@ export async function updateUser(item: UpdateUserInput): Promise<void> {
     `${resource}/${item.username}`,
     omit(item, "id")
   );
+
   return result.data;
 }
-export async function deleteUser(id: string): Promise<void> {
-  const result = await Client.delete<void>(`${resource}/${id}`);
+export async function deleteUser(username: string): Promise<void> {
+  const result = await Client.delete<void>(`${resource}/${username}`);
   return result.data;
 }
