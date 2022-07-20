@@ -15,10 +15,15 @@ const enrichProduct=(product)=>{
 
 export const addProduct=(req,res: Response)=>{
   if (!req.user.isAdmin) {
-    res.status(403).json({message: "User not authorized"});
+    res.status(403).json({
+      errCode: "notAuthorized",
+      message: "User not authorized"});
   }
-  if (!validateRequest<CreateProduct>("CreateProduct",req.body)){
-    res.status(400).send("Invalid Input");
+  if (!validateRequest<CreateProduct>("CreateProduct", req.body)) {
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
   const enrichedProduct=enrichProduct(req.body);
@@ -40,7 +45,9 @@ export const addProduct=(req,res: Response)=>{
 }
 export const getProducts = (req, res: Response) => {
   if (!req.query.limit) {
-    res.status(400).json({message: "Bad request"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Bad request"});
     return;
   }
   const query = {};
@@ -57,14 +64,19 @@ export const getProducts = (req, res: Response) => {
 
 export const getProductById = (req: Request, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.productId)) {
-    res.status(400).json({message: "Invalid ID supplied"});
+    res.status(400).json({
+      errCode: "invaliArgument",
+      message: "Invalid ID supplied"
+    });
     return;
   }
   //TODO Not authorized
-  Product.findById(req.params.productId,ProductProjection).then(product => {
-
+  Product.findById(req.params.productId, ProductProjection).then(product => {
     if (product == null) {
-      res.status(404).json({message: "Product not found"});
+      res.status(404).json({
+        errCode: "itemNotFound",
+        message: "Product not found"
+      });
     } else {
       res.json(product);
     }
@@ -72,11 +84,16 @@ export const getProductById = (req: Request, res: Response) => {
 }
 export const updateProduct=(req,res: Response)=>{
   if(!req.user.isAdmin){
-    res.status(403).json({message:"User not authorized"});
+    res.status(403).json({
+      errCode: "notAuthorized",
+      message:"User not authorized"});
   }
   if (!validateRequest<UpdateProduct>("UpdateProduct", req.body)
     || !mongoose.isValidObjectId(req.params.productId)) {
-    res.status(400).send("Invalid Input");
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message:"Invalid Input"
+    });
     return;
   }
   const enrichedProduct=req.body;
@@ -106,7 +123,10 @@ export const updateProduct=(req,res: Response)=>{
 }
 export const deleteProduct=(req,res: Response)=>{
   if (!mongoose.isValidObjectId(req.params.productId)) {
-    res.status(400).send({message: "Invalid ID supplied"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid ID supplied"
+    });
     return;
   }
   Product.findByIdAndDelete(req.params.productId, (err, product) => {
@@ -114,7 +134,10 @@ export const deleteProduct=(req,res: Response)=>{
       res.json(err);
     else {
       if (product == null) {
-        res.status(404).json({message: "Product not found"});
+        res.status(404).json({
+          errCode: "itemNotFound",
+          message: "Product not found"
+        });
       } else {
         Log.create({
           username: req.user.username,
