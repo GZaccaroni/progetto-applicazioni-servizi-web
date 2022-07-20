@@ -70,7 +70,7 @@ export default defineComponent({
         case TableItemEventType.rowEditAction:
           this.dialogModel = {
             isVisible: true,
-            itemToUpdate: event.item,
+            storeToUpdate: event.item.id,
           };
           break;
         case TableItemEventType.rowDeleteAction:
