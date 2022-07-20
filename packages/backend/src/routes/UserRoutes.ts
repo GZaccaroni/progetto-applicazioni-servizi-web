@@ -19,7 +19,7 @@ UserRoutes.use(isUserLoggedIn);
 UserRoutes.route("/").post(createUser);
 UserRoutes.route("/find").get(getUsers);
 UserRoutes.route("/:username").get(getUserByName)
-                                    .put(updateUser)
+                                    .post(updateUser)
                                     .delete(deleteUser);
 
 export default UserRoutes;

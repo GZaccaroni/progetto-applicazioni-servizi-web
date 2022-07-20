@@ -30,15 +30,11 @@ const enrichOrder = async (order)=>{
       }
     }))
   //generate product name
-  const entryPromises=[];
+  const entryPromises = [];
   order.entries.forEach(entry => {
     entry["price"] = entry.pricePerUnit * entry.quantity;
     entryPromises.push(Product.findById(entry.productId).then(product => {
-      let productFullName=product.name;
-      if(entry.variantId){
-        productFullName+=" "+product.kinds.find(x => x.id == entry.variantId).name;
-      }
-      entry["name"] = productFullName;
+      entry["name"] = !entry.variantId ? product.name : product.kinds.find(x => x.id == entry.variantId).fullName;
     }).then(() => enrichedOrder["entries"].push(entry)));
   })
   //compute tot
@@ -73,7 +69,7 @@ export const addOrder=(req,res: Response)=>{
           type: "Order"
         }
       }).then(() => {
-        io.emit("orderChanged", order._id);
+        io.emit("orderChanged", {id: order._id, action: "create"});
         res.json("Add Order");
       });
     })
@@ -154,7 +150,7 @@ export const updateOrder=(req,res: Response)=>{
           type: "Order"
         }
       }).then(() => {
-        io.emit("orderChanged", order._id);
+        io.emit("orderChanged", {id: order._id, action: "update"});
         res.json("Order Updated")
       });
     })
@@ -188,7 +184,7 @@ export const deleteOrder=(req,res: Response)=>{
             type: "Order"
           }
         }).then(() => {
-          io.emit("orderChanged", order._id);
+          io.emit("orderChanged", {id: order._id, action: "delete"});
           res.json({message: "Order deleted"})
         }, err => res.json(err));
       }

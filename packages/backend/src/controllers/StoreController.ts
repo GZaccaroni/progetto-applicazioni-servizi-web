@@ -27,7 +27,7 @@ export const addStore=(req,res: Response)=>{
           type: "Store"
         }
       }).then(() => {
-        io.emit("storeChanged", store._id);
+        io.emit("storeChanged", {id: store._id, action: "create"});
         res.json("Add Store")
       });
     });
@@ -43,7 +43,7 @@ export const getStores = (req, res: Response) => {
     query["authorizations.userId"]=req.user.id;
   }
   if (req.query.searchName) {
-    query["name"] = {$regex: req.query.searchName};
+    query["name"] = {$regex: req.query.searchName, $options: "i"};
   }
   const options = paginateOptions(query,StoreProjection,
                                     req.query.limit,
@@ -96,7 +96,7 @@ export const updateStore = (req, res: Response) => {
             type: "Store"
           }
         }).then(() => {
-          io.emit("storeChanged", store._id);
+          io.emit("storeChanged", {id: store._id, action: "update"});
           res.json({message: "Store Updated"})
         }, (err) => res.json(err));
       }
@@ -124,7 +124,7 @@ export const deleteStore = (req, res: Response) => {
             type: "Store"
           }
         }).then(() => {
-          io.emit("storeChanged", store._id);
+          io.emit("storeChanged", {id: store._id, action: "delete"});
           res.json({message: "Store deleted"})
         }, err => res.json(err));
       }

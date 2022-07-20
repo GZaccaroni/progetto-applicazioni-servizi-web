@@ -23,7 +23,7 @@ export const addCustomer=(req,res: Response)=>{
           type: "Customer"
         }
       }).then(() => {
-        io.emit("customerChanged", customer._id);
+        io.emit("customerChanged", {id: customer._id, action: "create"});
         res.json("Add Customer")
       });
     });
@@ -35,7 +35,7 @@ export const getCustomers=(req:Request,res: Response)=>{
   }
   const query={};
   if (req.query.searchName) {
-    query["name"] = {$regex: req.query.searchName};
+    query["name"] = {$regex: req.query.searchName, $options:"i"};
   }
   const options = paginateOptions(query,CustomerProjection,
     req.query.limit,
@@ -84,7 +84,7 @@ export const updateCustomer=(req,res: Response)=>{
             type: "Customer"
           }
         }).then(() => {
-          io.emit("customerChanged", customer._id);
+          io.emit("customerChanged", {id: customer._id, action: "update"});
           res.json({message: "Customer updated"})
         }, (err) => res.json(err));
       }
@@ -111,7 +111,7 @@ export const deleteCustomer=(req,res: Response)=>{
             type: "Customer"
           }
         }).then(() => {
-          io.emit("customerChanged", customer._id);
+          io.emit("customerChanged", {id: customer._id, action: "delete"});
           res.json({message: "Customer deleted"})
         }, err => res.json(err));
       }

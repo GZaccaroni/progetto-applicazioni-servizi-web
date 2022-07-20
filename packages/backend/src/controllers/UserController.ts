@@ -31,7 +31,7 @@ export const createUser = (req, res: Response) => {
         type: "User"
       }
     }).then(() => {
-      io.emit("userChanged", user._id);
+      io.emit("userChanged", {id: user._id, action: "create"});
       res.json({message: "User added"})
     }, err => res.json(err));
   });
@@ -48,7 +48,7 @@ export const getUsers = (req, res: Response) => {
 
   const query = {};
   if (req.query.searchName) {
-    query["username"] = {$regex: req.query.searchName};
+    query["username"] = {$regex: req.query.searchName, $options: "i"};
   }
   const options = paginateOptions(query,
                                   UserProjection,
@@ -90,7 +90,7 @@ export const updateUser = (req, res: Response) => {
     res.status(400).json("Invalid Username supplied");
     return;
   }
-  if (req.user.username != req.params.username) {
+  if (req.user.username != req.params.username && !req.user.isAdmin) {
     res.status(403).json({message: "User not authorized"});
     return;
   }
@@ -125,7 +125,7 @@ export const deleteUser = (req, res: Response) => {
     res.status(400).json({message: "Invalid Username supplied"});
     return;
   }
-  if (req.user.username != req.params.username) {
+  if (req.user.username != req.params.username  && !req.user.isAdmin) {
     res.status(403).json({message: "User not authorized"});
     return;
   }
@@ -150,7 +150,7 @@ export const deleteUser = (req, res: Response) => {
                 type: "User"
               }
             }).then(() => {
-              io.emit("userChanged", user._id);
+              io.emit("userChanged", {id: user._id, action: "delete"});
               res.json({message: "User deleted"})
             }, err => res.json(err));
           }

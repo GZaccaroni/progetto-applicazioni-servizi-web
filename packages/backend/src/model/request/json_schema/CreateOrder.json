@@ -14,7 +14,7 @@
     },
     "date": {
       "type": "string",
-      "format": "date"
+      "format": "date-time"
     },
     "entries": {
       "minItems": 1,
