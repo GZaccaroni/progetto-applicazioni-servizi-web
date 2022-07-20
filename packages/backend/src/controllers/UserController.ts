@@ -90,7 +90,7 @@ export const updateUser = (req, res: Response) => {
     res.status(400).json("Invalid Username supplied");
     return;
   }
-  if (req.user.username != req.params.username) {
+  if (req.user.username != req.params.username && !req.user.isAdmin) {
     res.status(403).json({message: "User not authorized"});
     return;
   }
