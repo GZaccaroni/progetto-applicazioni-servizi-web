@@ -21,7 +21,7 @@ const enrichOrder = async (order)=>{
   }
   const promises=[]
   //get Store data
-  promises.push(Store.findById(order.storeId, {id: "_id", name: 1}).then(
+  promises.push(Store.findById(order.storeId, {id: "$_id", name: 1}).then(
     store => {
       if (store != null) {
         enrichedOrder["store"] = store;
