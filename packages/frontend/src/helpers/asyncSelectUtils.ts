@@ -19,7 +19,7 @@ export const PRODUCT_KIND_IDENTIFIER_SEPARATOR = "_$_";
 
 export async function getSelectStores(
   input?: FindSelectItemsInput
-): Promise<AsyncSelectItem[]> {
+): Promise<AsyncSelectItem<DbStore>[]> {
   let items: DbStore[];
   if (input?.ids != undefined) {
     items = await findAll(input.ids, findStore);
@@ -36,12 +36,13 @@ export async function getSelectStores(
     return {
       id: el.id,
       text: el.name,
+      item: el,
     };
   });
 }
 export async function getSelectUsers(
   input?: FindSelectItemsInput
-): Promise<AsyncSelectItem[]> {
+): Promise<AsyncSelectItem<DbUser>[]> {
   let items: DbUser[];
   if (input?.ids != undefined) {
     items = await findAll(input.ids, findUser);
@@ -57,12 +58,13 @@ export async function getSelectUsers(
     return {
       id: el.id,
       text: el.username,
+      item: el,
     };
   });
 }
 export async function getSelectCustomers(
   input?: FindSelectItemsInput
-): Promise<AsyncSelectItem[]> {
+): Promise<AsyncSelectItem<DbCustomer>[]> {
   let items: DbCustomer[];
   if (input?.ids != undefined) {
     items = await findAll(input.ids, findCustomer);
@@ -78,12 +80,19 @@ export async function getSelectCustomers(
     return {
       id: el.id,
       text: el.name,
+      item: el,
     };
   });
 }
+export interface SelectProductKind {
+  productId: string;
+  variantId?: string;
+  unitOfMeasure: DbUnitOfMeasure;
+  pricePerUnit?: number;
+}
 export async function getSelectProductKinds(
   input?: FindSelectItemsInput
-): Promise<AsyncSelectItem[]> {
+): Promise<AsyncSelectItem<SelectProductKind>[]> {
   const idSeparator = PRODUCT_KIND_IDENTIFIER_SEPARATOR;
   let items: DbProduct[];
   if (input?.ids != undefined) {
@@ -98,43 +107,65 @@ export async function getSelectProductKinds(
     ).results;
   }
   return items.flatMap((el) => {
-    const kinds = new Array<AsyncSelectItem>();
+    const kinds = new Array<AsyncSelectItem<SelectProductKind>>();
     kinds.push({
       id: el.id,
       text: el.name,
+      item: {
+        productId: el.id,
+        unitOfMeasure: el.unitOfMeasure,
+        pricePerUnit: el.pricePerUnit,
+      },
     });
     kinds.push(
       ...el.kinds.map((kind) => {
         return {
           id: el.id + idSeparator + kind.id,
           text: el.name + " " + kind.name,
+          item: {
+            productId: el.id,
+            variantId: kind.id,
+            pricePerUnit: kind.pricePerUnit ?? el.pricePerUnit,
+            unitOfMeasure: el.unitOfMeasure,
+          },
         };
       })
     );
     return kinds;
   });
 }
-export async function getSelectStoreAccessLevel(): Promise<AsyncSelectItem[]> {
-  return Object.keys(DbStoreAccessLevel).map((elKey) => {
+export async function getSelectStoreAccessLevel(): Promise<
+  AsyncSelectItem<DbStoreAccessLevel>[]
+> {
+  return Object.values(DbStoreAccessLevel).map((elKey) => {
     return {
       id: elKey,
-      text: i18n.t("model.store.accessLevel." + elKey).toString(),
+      text: i18n
+        .t("model.store.accessLevel." + DbStoreAccessLevel[elKey])
+        .toString(),
+      item: elKey,
     };
   });
 }
-export async function getSelectUnitOfMeasure(): Promise<AsyncSelectItem[]> {
-  return Object.keys(DbUnitOfMeasure).map((elKey) => {
+export async function getSelectUnitOfMeasure(): Promise<
+  AsyncSelectItem<DbUnitOfMeasure>[]
+> {
+  return Object.values(DbUnitOfMeasure).map((elKey) => {
     return {
       id: elKey,
-      text: i18n.t("model.unitOfMeasure." + elKey).toString(),
+      text: i18n.t("model.unitOfMeasure." + DbUnitOfMeasure[elKey]).toString(),
+      item: elKey,
     };
   });
 }
-export async function getSelectProductGrade(): Promise<AsyncSelectItem[]> {
-  return Object.keys(DbProductGrade).map((elKey) => {
+export async function getSelectProductGrade(): Promise<
+  AsyncSelectItem<DbProductGrade>[]
+> {
+  return Object.values(DbProductGrade).map((elKey) => {
     return {
       id: elKey,
-      text: i18n.t("model.productGrade." + elKey).toString(),
+      text: i18n.t("model.productGrade." + DbProductGrade[elKey]).toString(),
+      item: elKey,
     };
   });
 }
