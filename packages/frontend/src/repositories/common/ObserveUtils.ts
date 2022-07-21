@@ -28,6 +28,7 @@ export function observePaginatedResult<Input, Item extends DbIdentifiable>(
   let currentResult: PaginatedResult<Item> | undefined = undefined;
   let isLoading = false;
   const listener = (data?: ServerEventData) => {
+    console.log("Event received", data);
     if (isLoading) return;
     if (
       data == undefined ||
@@ -39,14 +40,14 @@ export function observePaginatedResult<Input, Item extends DbIdentifiable>(
       findItemsFn(input).then((result) => {
         isLoading = false;
         currentResult = result;
+        console.log("Result: ", eventName, result);
         onNext(result);
       }, onError);
     }
   };
-  socketIoClient.on("customerChanged", listener);
-  socketIoClient.removeListener();
+  socketIoClient.on(eventName, listener);
   listener();
   return () => {
-    socketIoClient.removeListener("customerChanged", listener);
+    socketIoClient.removeListener(eventName, listener);
   };
 }

@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-const domain = "https://localhost/";
+const domain = "http://localhost:3000/";
 
 export interface ServerToClientEvents {
   orderChanged: (data: ServerEventData) => void;
@@ -20,6 +20,7 @@ export enum ServerEventAction {
 
 export type ClientToServerEvents = Record<string, never>;
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(domain);
-
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(domain, {
+  withCredentials: true,
+});
 export default socket;
