@@ -3,7 +3,7 @@
     v-model="isVisibleState"
     :persistent="isPersistent"
     :fullscreen="$vuetify.breakpoint.xsOnly"
-    max-width="700"
+    max-width="900"
     @click:outside="closeFormIfNotPersistent"
     @keydown.esc="closeFormIfNotPersistent"
   >
