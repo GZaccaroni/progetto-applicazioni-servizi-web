@@ -53,11 +53,7 @@ export const getUsers = (req, res: Response) => {
   if (req.query.searchName) {
     query["username"] = {$regex: req.query.searchName, $options: "i"};
   }
-  const options = paginateOptions(query,
-                                  UserProjection,
-                                  req.query.limit,
-                                  req.query.pagingNext,
-                                  req.query.pagingPrevious)
+  const options = paginateOptions(query, UserProjection, {}, req.query.limit, req.query.pagingNext, req.query.pagingPrevious)
   UserDb.paginate(options, err => res.json(err)).then((result) => {
     res.json(paginateResponse(result));
   });

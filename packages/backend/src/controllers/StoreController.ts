@@ -47,10 +47,7 @@ export const getStores = (req, res: Response) => {
   if (req.query.searchName) {
     query["name"] = {$regex: req.query.searchName, $options: "i"};
   }
-  const options = paginateOptions(query,StoreProjection,
-                                    req.query.limit,
-                                    req.query.pagingNext,
-                                    req.query.paginatePrevious);
+  const options = paginateOptions(query, StoreProjection, {}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
   Store.paginate(options, err => res.json(err)).then((result) => {
     res.json(paginateResponse(result));
   });

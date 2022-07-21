@@ -121,10 +121,7 @@ export const getOrders = (req, res: Response) => {
     }
     query["date"]["$lte"] = new Date(req.query.toDate);
   }
-  const options = paginateOptions(query,OrderProjection,
-    req.query.limit,
-    req.query.pagingNext,
-    req.query.paginatePrevious);
+  const options = paginateOptions(query, OrderProjection, {date: -1}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
   Order.paginate(options, err => res.json(err)).then((result) => {
     res.json(paginateResponse(result));
   });

@@ -43,10 +43,7 @@ export const getCustomers=(req:Request,res: Response)=>{
   if (req.query.searchName) {
     query["name"] = {$regex: req.query.searchName, $options:"i"};
   }
-  const options = paginateOptions(query,CustomerProjection,
-    req.query.limit,
-    req.query.pagingNext,
-    req.query.paginatePrevious);
+  const options = paginateOptions(query, CustomerProjection, {}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
   Customer.paginate(options, err => res.json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
