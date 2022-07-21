@@ -70,6 +70,12 @@ export default defineComponent({
         sortable: false,
       },
       { text: "", value: "data-table-expand" },
+      {
+        text: i18n.t("word.actions").toString(),
+        value: "actions",
+        sortable: false,
+        width: "130px",
+      },
     ]);
     return {
       observeItemsFn,
