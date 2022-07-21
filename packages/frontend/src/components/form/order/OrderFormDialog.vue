@@ -38,33 +38,37 @@
         </v-btn>
       </v-row>
       <v-row v-for="(_, index) in formData.entries" :key="index" align="center">
-        <v-col cols="4">
+        <v-col cols="6" md="4" class="py-0">
           <async-select
-            v-model="productKindsIdentifiers[index]"
+            v-model="selectedProducts[index]"
             :label="$t('model.order.product').toString()"
             :find-items-fn="getSelectProductKinds"
+            :return-object="true"
           />
         </v-col>
-        <v-col cols="2">
+        <v-col cols="6" md="2" class="py-0">
           <async-select
             v-model="formData.entries[index].grade"
             :label="$t('model.order.productGrade').toString()"
             :find-items-fn="getSelectProductGrade"
           />
         </v-col>
-        <v-col cols="3">
+        <v-col cols="6" md="3" class="py-0">
           <v-text-field
             type="number"
             v-model.number="formData.entries[index].pricePerUnit"
             :label="$t('model.order.pricePerUnit')"
+            :placeholder="priceHint(index)"
+            :suffix="priceSuffix(index)"
             :min="0"
           ></v-text-field>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="5" md="2" class="py-0">
           <v-text-field
             type="number"
             v-model.number="formData.entries[index].quantity"
             :label="$t('model.order.quantity')"
+            :suffix="unitOfMeasure(index)"
             :min="0"
           ></v-text-field>
         </v-col>
@@ -72,6 +76,9 @@
         <v-btn @click="removeEntry(index)" icon>
           <v-icon>mdi-delete</v-icon>
         </v-btn>
+        <v-col v-if="$vuetify.breakpoint.smAndDown" cols="12" class="px-2">
+          <v-divider cols="12" />
+        </v-col>
       </v-row>
       <v-row>
         <v-col>
@@ -103,6 +110,7 @@ import {
   getSelectProductKinds,
   getSelectStores,
   PRODUCT_KIND_IDENTIFIER_SEPARATOR,
+  SelectProductKind,
 } from "@/helpers/asyncSelectUtils";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
@@ -114,6 +122,8 @@ import {
 } from "@/repositories/OrderRepository";
 import { UpdateOrderInput } from "@/model/UpdateOrderInput";
 import { DbOrder } from "@/model/db/DbOrder";
+import { AsyncSelectItem } from "@/components/common/AsyncSelectTypes";
+import { DbProduct } from "@/model/db/DbProduct";
 
 export type OrderFormDialogModel = GenericFormDialogModel<{
   orderToUpdate?: string;
@@ -133,16 +143,17 @@ const create = ref(false);
 const dialogLoading = ref(false);
 const isVisible = ref(false);
 const changePassword = ref(false);
-const productKindsIdentifiers = ref<(string | undefined)[]>([]);
+const selectedProducts = ref<
+  (AsyncSelectItem<SelectProductKind> | undefined)[]
+>([]);
 
 watch(
-  productKindsIdentifiers,
+  selectedProducts,
   (newValue) => {
     newValue.forEach((el, index) => {
-      const splittedId = el?.split(PRODUCT_KIND_IDENTIFIER_SEPARATOR);
       formData.value.entries = formData.value.entries ?? [];
-      formData.value.entries[index].productId = splittedId?.[0];
-      formData.value.entries[index].variantId = splittedId?.[1];
+      formData.value.entries[index].productId = el?.item?.productId;
+      formData.value.entries[index].variantId = el?.item?.variantId;
     });
   },
   { deep: true }
@@ -162,7 +173,9 @@ async function onBecameVisible(itemToUpdate?: string) {
   if (itemToUpdate != undefined) {
     create.value = false;
     const item = await findOrder(itemToUpdate).catch(repositoryErrorHandler);
+    console.log("Order to update", item);
     if (item != undefined) {
+      console.log("Order mapped", mapToFormValue(item));
       formData.value = mapToFormValue(item);
     }
   } else {
@@ -174,18 +187,50 @@ async function onBecameVisible(itemToUpdate?: string) {
   dialogLoading.value = false;
 }
 function setProductKindsIdentifiers() {
-  productKindsIdentifiers.value = (formData.value.entries ?? []).map((el) =>
-    el.variantId == undefined
-      ? el.productId
-      : `${el.productId}${PRODUCT_KIND_IDENTIFIER_SEPARATOR}${el.variantId}`
-  );
+  selectedProducts.value = (formData.value.entries ?? []).map((el) => {
+    const id =
+      el.variantId == undefined
+        ? el.productId
+        : `${el.productId}${PRODUCT_KIND_IDENTIFIER_SEPARATOR}${el.variantId}`;
+    if (id != undefined) {
+      return {
+        id: id,
+        text: "",
+      };
+    } else {
+      return undefined;
+    }
+  });
+}
+function priceSuffix(index: number): string | undefined {
+  const item = selectedProducts.value[index]?.item;
+  if (item != undefined) {
+    let suffix = "€";
+    const unit = unitOfMeasure(index);
+    if (unit == undefined) return suffix;
+    suffix += "/" + unit;
+    return suffix;
+  } else {
+    return undefined;
+  }
+}
+function priceHint(index: number): string | undefined {
+  return selectedProducts.value[index]?.item?.pricePerUnit?.toString();
+}
+function unitOfMeasure(index: number): string | undefined {
+  const item = selectedProducts.value[index]?.item;
+  if (item != undefined) {
+    return i18n.t("model.unitOfMeasure." + item.unitOfMeasure).toString();
+  } else {
+    return undefined;
+  }
 }
 function addEntry() {
   formData.value.entries?.push({});
-  productKindsIdentifiers.value.push();
+  selectedProducts.value.push();
 }
 function removeEntry(index: number) {
-  productKindsIdentifiers.value.splice(index, 1);
+  selectedProducts.value.splice(index, 1);
   formData.value.entries?.splice(index, 1);
 }
 async function saveForm() {
@@ -245,6 +290,7 @@ function mapToFormValue(item: DbOrder): RecursivePartial<UpdateOrderInput> {
           productId: entry.productId,
           variantId: entry.variantId,
           pricePerUnit: entry.pricePerUnit,
+          quantity: entry.quantity,
           grade: entry.grade,
         };
       }) ?? [],
