@@ -10,11 +10,13 @@ import {io} from "../app";
 
 export const addStore=(req,res: Response)=>{
   if(!req.user.isAdmin){
-    res.status(403).json({message:"User not authorized"});
+    res.status(403).json({
+      errCode:"notAuthorized",
+      message:"User not authorized"});
     return;
   }
-  if(!validateRequest<CreateStore>("CreateStore",req.body)){
-    res.status(400).json({ message:"Invalid Input"});
+  if (!validateRequest<CreateStore>("CreateStore", req.body)) {
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
   Store.create(req.body).then(
@@ -35,7 +37,7 @@ export const addStore=(req,res: Response)=>{
 }
 export const getStores = (req, res: Response) => {
   if (!req.query.limit) {
-    res.status(400).json({message: "Bad request"});
+    res.status(400).json({errCode: "invalidArgument", message: "Bad request"});
     return;
   }
   const query={};
@@ -54,9 +56,9 @@ export const getStores = (req, res: Response) => {
   });
 }
 
-export const getStoreById=(req:Request,res: Response)=>{
+export const getStoreById = (req: Request, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.storeId)) {
-    res.status(400).json({message: "Invalid ID supplied"});
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid ID supplied"});
     return;
   }
   //TODO Not authorized
@@ -72,11 +74,11 @@ export const getStoreById=(req:Request,res: Response)=>{
 }
 export const updateStore = (req, res: Response) => {
   if(!req.user.isAdmin) {
-    res.status(403).json({message: "User not authorized"});
+    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
   }
   if (!validateRequest<UpdateStore>("UpdateStore", req.body)
     || !mongoose.isValidObjectId(req.params.storeId)) {
-    res.status(400).json({message: "Invalid Input"});
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
   Store.findByIdAndUpdate(req.params.storeId, req.body, {new: true}, (err, store) => {
@@ -85,6 +87,7 @@ export const updateStore = (req, res: Response) => {
     else {
       if (store == null) {
         res.status(404).send({
+          errCode: "itemNotFound",
           message: "Store not found"
         });
       } else {
@@ -106,7 +109,7 @@ export const updateStore = (req, res: Response) => {
 
 export const deleteStore = (req, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.storeId)) {
-    res.status(400).send({message: "Invalid ID supplied"});
+    res.status(400).send({errCode: "invalidArgument", message: "Invalid ID supplied"});
     return;
   }
   Store.findByIdAndDelete(req.params.storeId, (err, store) => {
@@ -114,7 +117,7 @@ export const deleteStore = (req, res: Response) => {
       res.json(err);
     else {
       if (store == null) {
-        res.status(404).json({message: "Store not found"});
+        res.status(404).json({errCode: "itemNotFound", message: "Store not found"});
       } else {
         Log.create({
           username: req.user.username,

@@ -8,9 +8,12 @@ import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
 
-export const addCustomer=(req,res: Response)=>{
-  if(!validateRequest<CreateCustomer>("CreateCustomer",req.body)){
-    res.status(400).json({ message:"Invalid Input"});
+export const addCustomer = (req, res: Response) => {
+  if (!validateRequest<CreateCustomer>("CreateCustomer", req.body)) {
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
   Customer.create(req.body).then(
@@ -30,7 +33,10 @@ export const addCustomer=(req,res: Response)=>{
 }
 export const getCustomers=(req:Request,res: Response)=>{
   if (!req.query.limit) {
-    res.status(400).json({message: "Bad request"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Bad request"
+    });
     return;
   }
   const query={};
@@ -48,23 +54,32 @@ export const getCustomers=(req:Request,res: Response)=>{
 
 export const getCustomerById=(req:Request,res: Response)=>{
   if (!mongoose.isValidObjectId(req.params.customerId)) {
-    res.status(400).json({message: "Invalid ID supplied"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid ID supplied"
+    });
     return;
   }
   //TODO Not authorized
-  Customer.findById(req.params.customerId,CustomerProjection).then(customer=>{
+  Customer.findById(req.params.customerId, CustomerProjection).then(customer => {
     if (customer == null) {
-      res.status(404).json({message: "Product not found"});
+      res.status(404).json({
+        errCode: "itemNotFound",
+        message: "Product not found"
+      });
     } else {
       res.json(customer);
     }
   });
 }
 
-export const updateCustomer=(req,res: Response)=>{
-  if(!validateRequest<UpdateCustomer>("UpdateCustomer",req.body)
-    || !mongoose.isValidObjectId(req.params.customerId)){
-    res.status(400).json({message:"Invalid Input"});
+export const updateCustomer = (req, res: Response) => {
+  if (!validateRequest<UpdateCustomer>("UpdateCustomer", req.body)
+    || !mongoose.isValidObjectId(req.params.customerId)) {
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
   Customer.findByIdAndUpdate(req.params.customerId, req.body, {new: true}, (err, customer) => {
@@ -73,6 +88,7 @@ export const updateCustomer=(req,res: Response)=>{
     else {
       if (customer == null) {
         res.status(404).send({
+          errCode: "itemNotFound",
           message: 'Customer not found'
         });
       } else {
@@ -93,7 +109,10 @@ export const updateCustomer=(req,res: Response)=>{
 }
 export const deleteCustomer=(req,res: Response)=>{
   if (!mongoose.isValidObjectId(req.params.customerId)) {
-    res.status(400).send({message: "Invalid ID supplied"});
+    res.status(400).send({
+      errCode: "invalidArgument",
+      message: "Invalid ID supplied"
+    });
     return;
   }
   Customer.findByIdAndDelete(req.params.customerId,(err,customer)=>{
@@ -101,7 +120,10 @@ export const deleteCustomer=(req,res: Response)=>{
       res.json(err);
     else {
       if (customer == null) {
-        res.status(404).json({message: "Customer not found"});
+        res.status(404).json({
+          errCode: "itemNotFound",
+          message: "Customer not found"
+        });
       } else {
         Log.create({
           username: req.user.username,

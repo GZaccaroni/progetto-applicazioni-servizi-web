@@ -2,9 +2,12 @@ import { Response} from "express";
 import mongoose from "mongoose";
 import Order from "../model/db_model/Order";
 
-export const getAnalytics=(req,res: Response)=>{
-  if(req.query.dataType!="quantity" && req.query.dataType!="price"){
-    res.status(400).json({message:"Invalid Input"});
+export const getAnalytics = (req, res: Response) => {
+  if (req.query.dataType != "quantity" && req.query.dataType != "price") {
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
   const query={};
@@ -12,7 +15,10 @@ export const getAnalytics=(req,res: Response)=>{
     if(mongoose.isValidObjectId(req.query.storeId)) {
       query["store.id"] = req.query.storeId;
     } else {
-      res.status(400).json({message: "Invalid storeId supplied"});
+      res.status(400).json({
+        errCode: "invalidArgument",
+        message: "Invalid storeId supplied"
+      });
       return;
     }
   }
@@ -20,7 +26,10 @@ export const getAnalytics=(req,res: Response)=>{
     if (mongoose.isValidObjectId(req.query.customerId)) {
       query["customer.id"] = req.query.customerId;
     } else {
-      res.status(400).json({message: "Invalid customerId supplied"});
+      res.status(400).json({
+        errCode: "invalidArgument",
+        message: "Invalid customerId supplied"
+      });
       return;
     }
   }
@@ -56,7 +65,6 @@ export const getAnalytics=(req,res: Response)=>{
     });
     query["$or"]=products.concat(productAndVariant)
   }
-  console.log(query);
   const projection={
     date:1,
     name:"$entries.name",
@@ -70,8 +78,6 @@ export const getAnalytics=(req,res: Response)=>{
   } else {
     projection["value"] = "$entries.quantity";
   }
-  console.log(products);
-  console.log(products?.length?{$or:products}:{_id:null});
   Order.aggregate([
     {$unwind: "$entries"},
     {$match: query},

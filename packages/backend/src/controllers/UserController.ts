@@ -11,16 +11,19 @@ import {io} from "../app";
 
 export const createUser = (req, res: Response) => {
   if (!validateRequest<CreateUser>("CreateUser", req.body)) {
-    res.status(400).json({message: "Invalid Input"});
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
   if (!req.user.isAdmin) {
-    res.status(403).json({message: "User not authorized"});
+    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
     return;
   }
   UserDb.register(req.body, req.body.password, (err, user) => {
     if (err) {
-      res.status(400).json({message: "registration error"});
+      res.status(400).json({
+        errCode: "invalidArgument",
+        message: "Registration error"
+      });
       return;
     }
     Log.create({
@@ -38,11 +41,11 @@ export const createUser = (req, res: Response) => {
 }
 export const getUsers = (req, res: Response) => {
   if (!req.user.isAdmin) {
-    res.status(403).json({message: "User not authorized"});
+    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
     return;
   }
   if (!req.query.limit) {
-    res.status(400).json({message: "Bad request"});
+    res.status(400).json({errCode: "invalidArgument", message: "Bad request"});
     return;
   }
 
@@ -62,11 +65,11 @@ export const getUsers = (req, res: Response) => {
 
 export const getUserByName = (req, res: Response) => {
   if (!req.params.username) {
-    res.status(400).json({message: "Invalid Username supplied"});
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid Username supplied"});
     return;
   }
   if (!req.user.isAdmin && req.params.username != req.user.username) {
-    res.status(403).json({message: "User not authorized"});
+    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
     return;
   }
   UserDb.findOne({username: req.params.username}, UserProjection, (err, user) => {
@@ -74,7 +77,7 @@ export const getUserByName = (req, res: Response) => {
       res.json(err);
     } else {
       if (!user) {
-        res.status(404).json({message: "User not found"});
+        res.status(404).json({errCode: "itemNotFound", message: "User not found"});
       } else {
         res.json(user);
       }
@@ -83,15 +86,15 @@ export const getUserByName = (req, res: Response) => {
 }
 export const updateUser = (req, res: Response) => {
   if (!validateRequest<UpdateUser>("UpdateUser", req.body) || !req.params.username) {
-    res.status(400).json({message: "Invalid user supplied"});
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid user supplied"});
     return;
   }
   if (!req.params.username) {
-    res.status(400).json("Invalid Username supplied");
+    res.status(400).json({errCode: "notAuthorized", message: "Invalid Username supplied"});
     return;
   }
   if (req.user.username != req.params.username && !req.user.isAdmin) {
-    res.status(403).json({message: "User not authorized"});
+    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
     return;
   }
   UserDb.findOne({username: req.params.username}, (err, user) => {
@@ -99,7 +102,7 @@ export const updateUser = (req, res: Response) => {
       res.json(err);
     } else {
       if (!user) {
-        res.status(404).json({message: "User not found"});
+        res.status(404).json({errCode: "itemNotFound", message: "User not found"});
       } else {
         user.setPassword(req.body.password, (err, user) => {
           if (err) {
@@ -122,11 +125,11 @@ export const updateUser = (req, res: Response) => {
 }
 export const deleteUser = (req, res: Response) => {
   if (!req.params.username) {
-    res.status(400).json({message: "Invalid Username supplied"});
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid Username supplied"});
     return;
   }
-  if (req.user.username != req.params.username  && !req.user.isAdmin) {
-    res.status(403).json({message: "User not authorized"});
+  if (req.user.username != req.params.username && !req.user.isAdmin) {
+    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
     return;
   }
   UserDb.findOneAndDelete({username: req.params.username}, (err, user) => {
@@ -134,7 +137,7 @@ export const deleteUser = (req, res: Response) => {
       res.json(err);
     else {
       if (user == null) {
-        res.status(404).json({message: "User not found"});
+        res.status(404).json({errCode: "itemNotFound", message: "User not found"});
       } else {
         const username= req.user.username;
         req.logout(function (err) {
@@ -165,7 +168,7 @@ export const userLogin = (req, res: Response) => {
     return;
   }
   if (!validateRequest<User>("User", req.body)) {
-    res.status(400).json({message: "Invalid Input"});
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
   passport.authenticate('local', function (err, user) {
@@ -182,7 +185,7 @@ export const userLogin = (req, res: Response) => {
         }
       });
     } else {
-      res.status(400).json({message: "Invalid username/password supplied"});
+      res.status(400).json({errCode: "invalidArgument", message: "Invalid username/password supplied"});
     }
   })(req, res);
 }

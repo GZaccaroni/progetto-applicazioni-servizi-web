@@ -103,6 +103,7 @@ export const updateProduct=(req,res: Response)=>{
     else {
       if (product == null) {
         res.status(404).send({
+          errCode: "itemNotFound",
           message: 'Product not found'
         });
       } else {

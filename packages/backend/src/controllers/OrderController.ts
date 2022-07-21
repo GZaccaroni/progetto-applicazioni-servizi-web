@@ -26,9 +26,12 @@ const enrichOrder = async (order)=>{
       if (store != null) {
         enrichedOrder["store"] = store;
       } else {
-        throw {code: 400, message: "Invalid Input"};
+        throw {
+          code: 400, error: {errCode: "itemNotFound", message: "Invalid Input"}
+        };
       }
-    }))
+    }
+  ))
   //generate product name
   const entryPromises = [];
   order.entries.forEach(entry => {
@@ -41,21 +44,26 @@ const enrichOrder = async (order)=>{
   promises.push(Promise.all(entryPromises).then(() => enrichedOrder["price"] = enrichedOrder.entries.reduce((sum, entry) => sum + entry.price, 0)).catch(err=>console.log(err)))
   //get Customer data
   if (order.customerId) {
-    promises.push(Customer.findById(order.customerId,CustomerProjection).then(customer=>{
-      if(customer!=null){
-        enrichedOrder["customer"]=customer;
+    promises.push(Customer.findById(order.customerId, CustomerProjection).then(customer => {
+      if (customer != null) {
+        enrichedOrder["customer"] = customer;
       } else {
-        throw {code: 400, message: "Invalid Input"};
+        throw {
+          code: 400, error: {errCode: "itemNotFound", message: "Invalid Input"}
+        };
       }
     }));
   }
-  await Promise.all(promises).catch(err=>console.log(err));
+  await Promise.all(promises);
   return enrichedOrder;
 }
 
 export const addOrder=(req,res: Response)=>{
   if(!validateRequest<CreateOrder>("CreateOrder",req.body)){
-    res.status(400).json({message:"Invalid Input"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
   //TODO Not authorized
@@ -74,16 +82,19 @@ export const addOrder=(req,res: Response)=>{
       });
     })
   }).catch(err => {
-    if(err.code && err.message){
-      res.status(err.code).json({message: err.message})
+    if(err.code && err.error){
+      res.status(err.code).json(err.error)
     } else {
       res.status(500).json(err);
     }
   });
 }
-export const getOrders=(req,res: Response)=>{
+export const getOrders = (req, res: Response) => {
   if (!req.query.limit) {
-    res.status(400).json({message: "Bad request"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Bad request"
+    });
     return;
   }
   const query={};
@@ -91,7 +102,10 @@ export const getOrders=(req,res: Response)=>{
     if(mongoose.isValidObjectId(req.query.storeId)) {
       query["store.id"] = req.query.storeId;
     } else {
-      res.status(400).json({message: "Bad request"});
+      res.status(400).json({
+        errCode: "invalidArgument",
+        message: "Bad request"
+      });
     }
   }
   //TODO check correct date format
@@ -115,9 +129,12 @@ export const getOrders=(req,res: Response)=>{
     res.json(paginateResponse(result));
   });
 }
-export const getOrderById=(req:Request,res: Response)=>{
+export const getOrderById = (req: Request, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.orderId)) {
-    res.status(400).json({message: "Invalid ID supplied"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid ID supplied"
+    });
     return;
   }
   //TODO Not authorized
@@ -126,17 +143,19 @@ export const getOrderById=(req:Request,res: Response)=>{
       res.json(err);
     } else {
       if(order==null){
-        res.status(404).json({message: "Order not found"});
+        res.status(404).json({
+          errCode: "itemNotFound",
+          message: "Order not found"});
       } else {
         res.json(order);
       }
     }
   });
 }
-export const updateOrder=(req,res: Response)=>{
-  if(!validateRequest<UpdateOrder>("UpdateOrder",req.body)
-    || !mongoose.isValidObjectId(req.params.orderId)){
-    res.status(400).json("Invalid Input");
+export const updateOrder = (req, res: Response) => {
+  if (!validateRequest<UpdateOrder>("UpdateOrder", req.body)
+    || !mongoose.isValidObjectId(req.params.orderId)) {
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
 
@@ -151,12 +170,12 @@ export const updateOrder=(req,res: Response)=>{
         }
       }).then(() => {
         io.emit("orderChanged", {id: order._id, action: "update"});
-        res.json("Order Updated")
+        res.json("Order Updated");
       });
     })
   }).catch(err => {
-    if(err.code && err.message){
-      res.status(err.code).json({message: err.message})
+    if(err.code && err.error){
+      res.status(err.code).json( err.error);
     } else {
       res.status(500).json(err);
     }
@@ -165,7 +184,9 @@ export const updateOrder=(req,res: Response)=>{
 }
 export const deleteOrder=(req,res: Response)=>{
   if (!mongoose.isValidObjectId(req.params.orderId)) {
-    res.status(400).json({message: "Invalid ID supplied"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid ID supplied"});
     return;
   }
   //TODO not authorized
@@ -174,7 +195,9 @@ export const deleteOrder=(req,res: Response)=>{
       res.json(err);
     else {
       if (order == null) {
-        res.status(404).json({message: "Order not found"});
+        res.status(404).json({
+          errCode: "itemNotFound",
+          message: "Order not found"});
       } else {
         Log.create({
           username: req.user.username,
