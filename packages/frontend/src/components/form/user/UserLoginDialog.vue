@@ -11,11 +11,13 @@
       <v-text-field
         v-model="formData.username"
         :label="$t('model.user.username')"
+        autocomplete="username"
       ></v-text-field>
       <v-text-field
         type="password"
         v-model="formData.password"
         :label="$t('model.user.password')"
+        autocomplete="current-password"
       ></v-text-field>
     </v-form>
   </form-dialog>
