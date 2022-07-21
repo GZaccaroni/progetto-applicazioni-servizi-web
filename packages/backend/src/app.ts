@@ -31,7 +31,7 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use('/',routes);
 
-app.listen(port, () => {
+server.listen(port, () => {
   return console.log(`Express is listening at http://localhost:${port}`);
 });
 
