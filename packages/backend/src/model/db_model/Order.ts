@@ -38,9 +38,9 @@ const OrderSchema = new mongoose.Schema({
   entries: [{
     productId: String,
     variantId: String,
-    grade:{
-      type:String,
-      enum: [GradeEnum.First,GradeEnum.Second,GradeEnum.Mixed]
+    grade: {
+      type: String,
+      enum: [GradeEnum.First, GradeEnum.Second, GradeEnum.Mixed]
     },
     name: String,
     quantity: Number,
@@ -55,9 +55,10 @@ OrderSchema.plugin(mongoosePagination);
 
 export default mongoose.model<OrderDocument, Pagination<OrderDocument>>('order', OrderSchema, 'orders');
 
-export const OrderProjection= { _id: 0,
+export const OrderProjection = {
+  _id: 0,
   id: '$_id',
-  customer:{
+  customer: {
     id: 1,
     name: 1,
     phoneNumber: 1,

@@ -8,7 +8,10 @@ type UserDocument = mongoose.Document & {
 };
 
 const UserSchema = new mongoose.Schema({
-  username: String,
+  username: {
+    type: String,
+    unique: true
+  },
   isAdmin: Boolean
 });
 

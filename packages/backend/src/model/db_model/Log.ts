@@ -9,10 +9,10 @@ const Log= new mongoose.Schema({
   object:{
     id: String,
     type: {
-      type:String,
-      enum: ["User","Product","Customer","Order","Store"]
+      type: String,
+      enum: ["User", "Product", "Customer", "Order", "Store"]
     }
   }
-},{timestamps:true});
+}, {timestamps: true});
 
 export default mongoose.model("log",Log);
