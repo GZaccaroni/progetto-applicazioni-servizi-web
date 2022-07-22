@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import Order from "../model/db_model/Order";
 
 export const getAnalytics = (req, res: Response) => {
+  console.log(req.query);
   if (req.query.dataType != "quantity" && req.query.dataType != "price") {
     res.status(400).json({
       errCode: "invalidArgument",

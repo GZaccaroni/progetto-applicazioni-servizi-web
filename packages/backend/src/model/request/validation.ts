@@ -23,11 +23,14 @@ import PaginateParams from "./json_schema/PaginateParams.json";
 import FilterByName from "./json_schema/FilterByName.json";
 import FilterByDate from "./json_schema/FilterByDate.json";
 import FilterByStore from "./json_schema/FilterByStore.json";
+import FilterByProducts from "./json_schema/FilterByProducts.json";
+import FilterByCustomer from "./json_schema/FilterByCustomer.json";
 import GetProducts from "./json_schema/GetProducts.json";
 import GetOrders from "./json_schema/GetOrders.json";
 import GetCustomers from "./json_schema/GetCustomers.json";
 import GetStores from "./json_schema/GetStores.json";
 import GetUsers from "./json_schema/GetUsers.json";
+import GetAnalytics from "./json_schema/GetAnalytics.json";
 
 export const ajv=new Ajv();
 addFormats(ajv)
@@ -54,11 +57,14 @@ ajv.addSchema(PaginateParams,"PaginateParams");
 ajv.addSchema(FilterByName,"FilterByName");
 ajv.addSchema(FilterByDate,"FilterByDate");
 ajv.addSchema(FilterByStore,"FilterByStore");
+ajv.addSchema(FilterByCustomer,"FilterByCustomer");
+ajv.addSchema(FilterByProducts,"FilterByProducts");
 ajv.addSchema(GetProducts,"GetProducts");
 ajv.addSchema(GetOrders,"GetOrders");
 ajv.addSchema(GetCustomers,"GetCustomers");
 ajv.addSchema(GetStores,"GetStores");
 ajv.addSchema(GetUsers,"GetUsers");
+ajv.addSchema(GetAnalytics,"GetAnalytics");
 
 export function validateRequest<T>(key:string, reqBody:string):Promise<T> | boolean{
   const validate= ajv.getSchema<T>(key);

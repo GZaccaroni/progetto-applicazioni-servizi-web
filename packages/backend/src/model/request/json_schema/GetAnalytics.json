@@ -1,0 +1,28 @@
+{
+  "allOf": [
+    {
+      "$ref": "FilterByProducts#"
+    },
+    {
+      "$ref": "FilterByDate#"
+    },
+    {
+      "$ref": "FilterByStore#"
+    },
+    {
+      "$ref": "FilterByCustomer#"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "dataType": {
+          "type": "string",
+          "enum": [
+            "quantity",
+            "price"
+          ]
+        }
+      }
+    }
+  ]
+}

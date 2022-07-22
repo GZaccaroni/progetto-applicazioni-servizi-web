@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "customerId": {
+      "type": "string"
+    }
+  }
+}
