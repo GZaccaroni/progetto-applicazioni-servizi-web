@@ -7,6 +7,7 @@ import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
+import {GetCustomers} from "../model/request/type/GetCustomers";
 
 export const addCustomer = (req, res: Response) => {
   if (!validateRequest<CreateCustomer>("CreateCustomer", req.body)) {
@@ -31,11 +32,11 @@ export const addCustomer = (req, res: Response) => {
       });
     });
 }
-export const getCustomers=(req:Request,res: Response)=>{
-  if (!req.query.limit) {
+export const getCustomers=(req,res: Response)=>{
+  if (!validateRequest<GetCustomers>("GetCustomers", req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Bad request"
+      message: "Invalid Input"
     });
     return;
   }
