@@ -21,7 +21,10 @@ import CreateUser from "./json_schema/CreateUser.json";
 import UpdateUser from "./json_schema/UpdateUser.json";
 import PaginateParams from "./json_schema/PaginateParams.json";
 import FilterByName from "./json_schema/FilterByName.json";
+import FilterByDate from "./json_schema/FilterByDate.json";
+import FilterByStore from "./json_schema/FilterByStore.json";
 import GetProducts from "./json_schema/GetProducts.json";
+import GetOrders from "./json_schema/GetOrders.json";
 
 export const ajv=new Ajv();
 addFormats(ajv)
@@ -46,7 +49,10 @@ ajv.addSchema(CreateUser, "CreateUser");
 ajv.addSchema(UpdateUser,"UpdateUser");
 ajv.addSchema(PaginateParams,"PaginateParams");
 ajv.addSchema(FilterByName,"FilterByName");
+ajv.addSchema(FilterByDate,"FilterByDate");
+ajv.addSchema(FilterByStore,"FilterByStore");
 ajv.addSchema(GetProducts,"GetProducts");
+ajv.addSchema(GetOrders,"GetOrders");
 
 export function validateRequest<T>(key:string, reqBody:string):Promise<T> | boolean{
   const validate= ajv.getSchema<T>(key);

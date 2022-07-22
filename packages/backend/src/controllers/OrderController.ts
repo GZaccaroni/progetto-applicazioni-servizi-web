@@ -10,6 +10,7 @@ import Product from "../model/db_model/Product";
 import Customer, {CustomerProjection} from "../model/db_model/Customer";
 import mongoose from "mongoose";
 import {io} from "../app";
+import {GetOrders} from "../model/request/type/GetOrders";
 
 const enrichOrder = async (order)=>{
   const enrichedOrder={
@@ -90,25 +91,22 @@ export const addOrder=(req,res: Response)=>{
   });
 }
 export const getOrders = (req, res: Response) => {
-  if (!req.query.limit) {
+  if(!validateRequest<GetOrders>("GetOrders",req.query)){
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Bad request"
+      message: "Invalid Input"
     });
     return;
   }
   const query={};
-  if(req.query.storeId ){
-    if(mongoose.isValidObjectId(req.query.storeId)) {
-      query["store.id"] = req.query.storeId;
-    } else {
-      res.status(400).json({
-        errCode: "invalidArgument",
-        message: "Bad request"
-      });
-    }
+  if(mongoose.isValidObjectId(req.query.storeId)) {
+    query["store.id"] = req.query.storeId;
+  } else {
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Bad request"
+    });
   }
-  //TODO check correct date format
   if (req.query.fromDate) {
     if(!query["date"]){
       query["date"]={};

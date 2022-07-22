@@ -1,0 +1,13 @@
+{
+  "allOf": [
+    {
+      "$ref": "PaginateParams#"
+    },
+    {
+      "$ref": "FilterByDate#"
+    },
+    {
+      "$ref": "FilterByStore#"
+    }
+  ]
+}
