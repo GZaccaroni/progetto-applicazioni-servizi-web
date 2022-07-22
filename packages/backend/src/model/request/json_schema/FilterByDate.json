@@ -2,10 +2,12 @@
   "type": "object",
   "properties": {
     "fromDate": {
-      "type": "date-time"
+      "type": "string",
+      "format": "date-time"
     },
     "toDate": {
-      "type": "date-time"
+      "type": "string",
+      "format": "date-time"
     }
   }
 }
