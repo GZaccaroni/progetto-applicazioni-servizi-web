@@ -11,7 +11,10 @@ import {io} from "../app";
 
 export const createUser = (req, res: Response) => {
   if (!validateRequest<CreateUser>("CreateUser", req.body)) {
-    res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
   if (!req.user.isAdmin) {
@@ -44,11 +47,13 @@ export const getUsers = (req, res: Response) => {
     res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
     return;
   }
-  if (!req.query.limit) {
-    res.status(400).json({errCode: "invalidArgument", message: "Bad request"});
+  if (!validateRequest<CreateUser>("CreateUser", req.body)) {
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
-
   const query = {};
   if (req.query.searchName) {
     query["username"] = {$regex: req.query.searchName, $options: "i"};
@@ -61,11 +66,17 @@ export const getUsers = (req, res: Response) => {
 
 export const getUserByName = (req, res: Response) => {
   if (!req.params.username) {
-    res.status(400).json({errCode: "invalidArgument", message: "Invalid Username supplied"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Username supplied"
+    });
     return;
   }
   if (!req.user.isAdmin && req.params.username != req.user.username) {
-    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
+    res.status(403).json({
+      errCode: "notAuthorized",
+      message: "User not authorized"
+    });
     return;
   }
   UserDb.findOne({username: req.params.username}, UserProjection, (err, user) => {
@@ -82,15 +93,24 @@ export const getUserByName = (req, res: Response) => {
 }
 export const updateUser = (req, res: Response) => {
   if (!validateRequest<UpdateUser>("UpdateUser", req.body) || !req.params.username) {
-    res.status(400).json({errCode: "invalidArgument", message: "Invalid user supplied"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid user supplied"
+    });
     return;
   }
   if (!req.params.username) {
-    res.status(400).json({errCode: "notAuthorized", message: "Invalid Username supplied"});
+    res.status(400).json({
+      errCode: "notAuthorized",
+      message: "Invalid Username supplied"
+    });
     return;
   }
   if (req.user.username != req.params.username && !req.user.isAdmin) {
-    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
+    res.status(403).json({
+      errCode: "notAuthorized",
+      message: "User not authorized"
+    });
     return;
   }
   UserDb.findOne({username: req.params.username}, (err, user) => {
@@ -121,11 +141,17 @@ export const updateUser = (req, res: Response) => {
 }
 export const deleteUser = (req, res: Response) => {
   if (!req.params.username) {
-    res.status(400).json({errCode: "invalidArgument", message: "Invalid Username supplied"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Username supplied"
+    });
     return;
   }
   if (req.user.username != req.params.username && !req.user.isAdmin) {
-    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
+    res.status(403).json({
+      errCode: "notAuthorized",
+      message: "User not authorized"
+    });
     return;
   }
   UserDb.findOneAndDelete({username: req.params.username}, (err, user) => {
@@ -164,7 +190,10 @@ export const userLogin = (req, res: Response) => {
     return;
   }
   if (!validateRequest<User>("User", req.body)) {
-    res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
   passport.authenticate('local', function (err, user) {
@@ -181,7 +210,10 @@ export const userLogin = (req, res: Response) => {
         }
       });
     } else {
-      res.status(400).json({errCode: "invalidArgument", message: "Invalid username/password supplied"});
+      res.status(400).json({
+        errCode: "invalidArgument",
+        message: "Invalid username/password supplied"
+      });
     }
   })(req, res);
 }
