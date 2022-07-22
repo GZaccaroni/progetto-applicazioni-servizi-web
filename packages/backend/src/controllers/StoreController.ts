@@ -36,7 +36,7 @@ export const addStore=(req,res: Response)=>{
         io.emit("storeChanged", {id: store._id, action: "create"});
         res.json("Add Store")
       });
-    },err=> res.json(err));
+    },err=> res.status(500).json(err));
 }
 export const getStores = (req, res: Response) => {
   if (!validateRequest<GetStores>("GetStores", req.query)) {
@@ -54,7 +54,7 @@ export const getStores = (req, res: Response) => {
     query["name"] = {$regex: req.query.searchName, $options: "i"};
   }
   const options = paginateOptions(query, StoreProjection, {}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
-  Store.paginate(options, err => res.json(err)).then((result) => {
+  Store.paginate(options, err => res.status(500).json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
 }
@@ -65,14 +65,14 @@ export const getStoreById = (req: Request, res: Response) => {
     return;
   }
   //TODO Not authorized
-  Store.findById(req.params.storeId,StoreProjection).then(
-    store=>{
+  Store.findById(req.params.storeId, StoreProjection).then(
+    store => {
       if (store == null) {
         res.status(404).json({message: "Store not found"});
       } else {
         res.json(store);
       }
-    }
+    }, err => res.status(500).json(err)
   );
 }
 export const updateStore = (req, res: Response) => {
@@ -86,7 +86,7 @@ export const updateStore = (req, res: Response) => {
   }
   Store.findByIdAndUpdate(req.params.storeId, req.body, {new: true}, (err, store) => {
     if (err)
-      res.json(err);
+      res.status(500).json(err);
     else {
       if (store == null) {
         res.status(404).send({
@@ -104,7 +104,7 @@ export const updateStore = (req, res: Response) => {
         }).then(() => {
           io.emit("storeChanged", {id: store._id, action: "update"});
           res.json({message: "Store Updated"})
-        }, (err) => res.json(err));
+        }, (err) => res.status(500).json(err));
       }
     }
   });
@@ -117,7 +117,7 @@ export const deleteStore = (req, res: Response) => {
   }
   Store.findByIdAndDelete(req.params.storeId, (err, store) => {
     if (err)
-      res.json(err);
+      res.status(500).json(err);
     else {
       if (store == null) {
         res.status(404).json({errCode: "itemNotFound", message: "Store not found"});
@@ -132,7 +132,7 @@ export const deleteStore = (req, res: Response) => {
         }).then(() => {
           io.emit("storeChanged", {id: store._id, action: "delete"});
           res.json({message: "Store deleted"})
-        }, err => res.json(err));
+        }, err => res.status(500).json(err));
       }
     }
   });

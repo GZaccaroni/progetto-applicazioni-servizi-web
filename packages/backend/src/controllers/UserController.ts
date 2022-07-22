@@ -39,7 +39,7 @@ export const createUser = (req, res: Response) => {
     }).then(() => {
       io.emit("userChanged", {id: user._id, action: "create"});
       res.json({message: "User added"})
-    }, err => res.json(err));
+    }, err => res.status(500).json(err));
   });
 }
 export const getUsers = (req, res: Response) => {
@@ -59,7 +59,7 @@ export const getUsers = (req, res: Response) => {
     query["username"] = {$regex: req.query.searchName, $options: "i"};
   }
   const options = paginateOptions(query, UserProjection, {}, req.query.limit, req.query.pagingNext, req.query.pagingPrevious)
-  UserDb.paginate(options, err => res.json(err)).then((result) => {
+  UserDb.paginate(options, err => res.status(500).json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
 }
@@ -81,7 +81,7 @@ export const getUserByName = (req, res: Response) => {
   }
   UserDb.findOne({username: req.params.username}, UserProjection, (err, user) => {
     if (err) {
-      res.json(err);
+      res.status(500).json(err);
     } else {
       if (!user) {
         res.status(404).json({errCode: "itemNotFound", message: "User not found"});
@@ -115,14 +115,14 @@ export const updateUser = (req, res: Response) => {
   }
   UserDb.findOne({username: req.params.username}, (err, user) => {
     if (err) {
-      res.json(err);
+      res.status(500).json(err);
     } else {
       if (!user) {
         res.status(404).json({errCode: "itemNotFound", message: "User not found"});
       } else {
         user.setPassword(req.body.password, (err, user) => {
           if (err) {
-            res.json(err);
+            res.status(500).json(err);
           } else {
             user.save();
             Log.create({
@@ -132,7 +132,7 @@ export const updateUser = (req, res: Response) => {
                 id: user._id,
                 type: "User"
               }
-            }).then(() => res.json({message: "User password updated"}), err => res.json(err));
+            }).then(() => res.json({message: "User password updated"}), err => res.status(500).json(err));
           }
         });
       }
@@ -156,7 +156,7 @@ export const deleteUser = (req, res: Response) => {
   }
   UserDb.findOneAndDelete({username: req.params.username}, (err, user) => {
     if (err)
-      res.json(err);
+      res.status(500).json(err);
     else {
       if (user == null) {
         res.status(404).json({errCode: "itemNotFound", message: "User not found"});
@@ -164,7 +164,7 @@ export const deleteUser = (req, res: Response) => {
         const username= req.user.username;
         req.logout(function (err) {
           if (err) {
-            res.json(err);
+            res.status(500).json(err);
             return;
           } else {
             Log.create({
@@ -177,7 +177,7 @@ export const deleteUser = (req, res: Response) => {
             }).then(() => {
               io.emit("userChanged", {id: user._id, action: "delete"});
               res.json({message: "User deleted"})
-            }, err => res.json(err));
+            }, err => res.status(500).json(err));
           }
         });
       }
@@ -198,13 +198,13 @@ export const userLogin = (req, res: Response) => {
   }
   passport.authenticate('local', function (err, user) {
     if (err) {
-      res.status(401).json(err);
+      res.status(500).json(err);
       return;
     }
     if (user) {
       req.login(user, function (err) {
         if (err) {
-          res.json(err);
+          res.status(500).json(err);
         } else {
           res.json({message: "Logged In"});
         }
@@ -220,7 +220,7 @@ export const userLogin = (req, res: Response) => {
 export const userLogout = (req, res: Response) => {
   req.logout(function (err) {
     if (err) {
-      res.json(err);
+      res.status(500).json(err);
     } else {
       res.json({message: "logout"});
     }

@@ -42,7 +42,7 @@ const enrichOrder = async (order)=>{
     }).then(() => enrichedOrder["entries"].push(entry)));
   })
   //compute tot
-  promises.push(Promise.all(entryPromises).then(() => enrichedOrder["price"] = enrichedOrder.entries.reduce((sum, entry) => sum + entry.price, 0)).catch(err=>console.log(err)))
+  promises.push(Promise.all(entryPromises).then(() => enrichedOrder["price"] = enrichedOrder.entries.reduce((sum, entry) => sum + entry.price, 0)));
   //get Customer data
   if (order.customerId) {
     promises.push(Customer.findById(order.customerId, CustomerProjection).then(customer => {
@@ -120,7 +120,7 @@ export const getOrders = (req, res: Response) => {
     query["date"]["$lte"] = new Date(req.query.toDate);
   }
   const options = paginateOptions(query, OrderProjection, {date: -1}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
-  Order.paginate(options, err => res.json(err)).then((result) => {
+  Order.paginate(options, err => res.status(500).json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
 }
@@ -135,7 +135,7 @@ export const getOrderById = (req: Request, res: Response) => {
   //TODO Not authorized
   Order.findById(req.params.orderId,OrderProjection,(err,order)=>{
     if (err) {
-      res.json(err);
+      res.status(500).json(err);
     } else {
       if(order==null){
         res.status(404).json({
@@ -153,7 +153,6 @@ export const updateOrder = (req, res: Response) => {
     res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
-
   enrichOrder(req.body).then( newOrder => {
     Order.findOneAndReplace({_id:req.params.orderId},newOrder).then(order => {
       Log.create({
@@ -170,7 +169,7 @@ export const updateOrder = (req, res: Response) => {
     })
   }).catch(err => {
     if(err.code && err.error){
-      res.status(err.code).json( err.error);
+      res.status(err.code).json(err.error);
     } else {
       res.status(500).json(err);
     }
@@ -187,7 +186,7 @@ export const deleteOrder=(req,res: Response)=>{
   //TODO not authorized
   Order.findByIdAndDelete(req.params.orderId,(err,order)=>{
     if (err)
-      res.json(err);
+      res.status(500).json(err);
     else {
       if (order == null) {
         res.status(404).json({
@@ -204,7 +203,7 @@ export const deleteOrder=(req,res: Response)=>{
         }).then(() => {
           io.emit("orderChanged", {id: order._id, action: "delete"});
           res.json({message: "Order deleted"})
-        }, err => res.json(err));
+        }, err => res.status(500).json(err));
       }
     }
   })

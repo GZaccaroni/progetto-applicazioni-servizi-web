@@ -18,7 +18,7 @@ export const addCustomer = (req, res: Response) => {
     return;
   }
   Customer.create(req.body).then(
-    customer=>{
+    customer => {
       Log.create({
         username: req.user.username,
         action: "Create",
@@ -30,7 +30,7 @@ export const addCustomer = (req, res: Response) => {
         io.emit("customerChanged", {id: customer._id, action: "create"});
         res.json("Add Customer")
       });
-    });
+    }).catch(err => res.status(500).json(err));
 }
 export const getCustomers=(req,res: Response)=>{
   if (!validateRequest<GetCustomers>("GetCustomers", req.query)) {
@@ -45,7 +45,7 @@ export const getCustomers=(req,res: Response)=>{
     query["name"] = {$regex: req.query.searchName, $options:"i"};
   }
   const options = paginateOptions(query, CustomerProjection, {}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
-  Customer.paginate(options, err => res.json(err)).then((result) => {
+  Customer.paginate(options, err => res.status(500).json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
 }
@@ -68,7 +68,7 @@ export const getCustomerById=(req:Request,res: Response)=>{
     } else {
       res.json(customer);
     }
-  });
+  }, err=> res.status(500).json(err));
 }
 
 export const updateCustomer = (req, res: Response) => {
@@ -82,7 +82,7 @@ export const updateCustomer = (req, res: Response) => {
   }
   Customer.findByIdAndUpdate(req.params.customerId, req.body, {new: true}, (err, customer) => {
     if (err)
-      res.json(err);
+      res.status(500).json(err);
     else {
       if (customer == null) {
         res.status(404).send({
@@ -100,7 +100,7 @@ export const updateCustomer = (req, res: Response) => {
         }).then(() => {
           io.emit("customerChanged", {id: customer._id, action: "update"});
           res.json({message: "Customer updated"})
-        }, (err) => res.json(err));
+        }, (err) => res.status(500).json(err));
       }
     }
   });
@@ -115,7 +115,7 @@ export const deleteCustomer=(req,res: Response)=>{
   }
   Customer.findByIdAndDelete(req.params.customerId,(err,customer)=>{
     if (err)
-      res.json(err);
+      res.status(500).json(err);
     else {
       if (customer == null) {
         res.status(404).json({
@@ -133,7 +133,7 @@ export const deleteCustomer=(req,res: Response)=>{
         }).then(() => {
           io.emit("customerChanged", {id: customer._id, action: "delete"});
           res.json({message: "Customer deleted"})
-        }, err => res.json(err));
+        }, err => res.status(500).json(err));
       }
     }
   });

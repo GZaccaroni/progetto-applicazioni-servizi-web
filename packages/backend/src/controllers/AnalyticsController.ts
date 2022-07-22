@@ -2,7 +2,7 @@ import { Response} from "express";
 import mongoose from "mongoose";
 import Order from "../model/db_model/Order";
 import {validateRequest} from "../model/request/validation";
-import {GetAnalytics} from "../model/request/type/GetAnalytics";
+import {DataTypeEnum, GetAnalytics} from "../model/request/type/GetAnalytics";
 
 export const getAnalytics = (req, res: Response) => {
   if (!validateRequest<GetAnalytics>("GetAnalytics", req.query)) {
@@ -71,7 +71,7 @@ export const getAnalytics = (req, res: Response) => {
       variantId:1
     }
   };
-  if (req.query.dataType == "price") {
+  if (req.query.dataType == DataTypeEnum.Price) {
     projection["value"] = "$entries.price";
   } else {
     projection["value"] = "$entries.quantity";
@@ -150,7 +150,7 @@ export const getAnalytics = (req, res: Response) => {
     {
       $unset:["_id","product","variant"]
     }
-  ]).then(r => {
-    res.json(r)
-  });
+  ]).then(analytics => {
+    res.json(analytics)
+  }, err=> res.status(500).json(err));
 }

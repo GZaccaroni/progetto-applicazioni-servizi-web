@@ -40,10 +40,9 @@ export const addProduct=(req,res: Response)=>{
       io.emit("productChanged", {id: product._id, action: "create"});
       res.json("Add Product")
     });
-  });
-
-
+  }).catch(err => res.status(500).json(err));
 }
+
 export const getProducts = (req, res: Response) => {
   if (!validateRequest<GetProducts>("GetProducts", req.query)) {
     res.status(400).json({
@@ -57,7 +56,7 @@ export const getProducts = (req, res: Response) => {
     query["$or"] = [{"name":{$regex: req.query.searchName, $options: "i"}},{"kinds.fullName":{$regex:req.query.searchName, $options:"i"}}];
   }
   const options = paginateOptions(query, ProductProjection, {}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
-  Product.paginate(options, err => res.json(err)).then((result) => {
+  Product.paginate(options, err => res.status(500).json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
 }
@@ -80,13 +79,14 @@ export const getProductById = (req: Request, res: Response) => {
     } else {
       res.json(product);
     }
-  }).catch(err=>res.json(err));
+  }).catch(err=>res.status(500).json(err));
 }
 export const updateProduct=(req,res: Response)=>{
   if(!req.user.isAdmin){
     res.status(403).json({
       errCode: "notAuthorized",
       message:"User not authorized"});
+    return;
   }
   if (!validateRequest<UpdateProduct>("UpdateProduct", req.body)
     || !mongoose.isValidObjectId(req.params.productId)) {
@@ -99,7 +99,7 @@ export const updateProduct=(req,res: Response)=>{
   const enrichedProduct=req.body;
   Product.findByIdAndUpdate(req.params.productId, enrichedProduct, {new: true}, (err, product) => {
     if (err)
-      res.json(err);
+      res.status(500).json(err);
     else {
       if (product == null) {
         res.status(404).send({
@@ -117,7 +117,7 @@ export const updateProduct=(req,res: Response)=>{
         }).then(() => {
           io.emit("productChanged", {id: product._id, action: "update"});
           res.json({message: "Product updated"})
-        }, (err) => res.json(err));
+        }, (err) => res.status(500).json(err));
       }
     }
   });
@@ -132,7 +132,7 @@ export const deleteProduct=(req,res: Response)=>{
   }
   Product.findByIdAndDelete(req.params.productId, (err, product) => {
     if (err)
-      res.json(err);
+      res.status(500).json(err);
     else {
       if (product == null) {
         res.status(404).json({
@@ -150,7 +150,7 @@ export const deleteProduct=(req,res: Response)=>{
         }).then(() => {
           io.emit("productChanged", {id:product._id, action:"delete"});
           res.json({message: "Product deleted"})
-        }, err => res.json(err));
+        }, err => res.status(500).json(err));
       }
     }
   });
