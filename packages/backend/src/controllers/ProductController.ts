@@ -7,6 +7,7 @@ import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
+import {GetProducts} from "../model/request/type/GetProducts";
 
 const enrichProduct=(product)=>{
   product.kinds.forEach((k,i,self)=>self[i]["fullName"]=product.name+" "+k.name);
@@ -44,10 +45,11 @@ export const addProduct=(req,res: Response)=>{
 
 }
 export const getProducts = (req, res: Response) => {
-  if (!req.query.limit) {
+  if (!validateRequest<GetProducts>("GetProducts", req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Bad request"});
+      message: "Invalid Input"
+    });
     return;
   }
   const query = {};

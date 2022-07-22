@@ -22,7 +22,6 @@
     },
     "unitOfMeasure": {
       "type": "string",
-      "description": "Order Status",
       "enum": [
         "kilogram",
         "piece"

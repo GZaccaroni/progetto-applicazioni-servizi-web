@@ -19,6 +19,9 @@ import UpdateStore from "./json_schema/UpdateStore.json";
 import User from "./json_schema/User.json";
 import CreateUser from "./json_schema/CreateUser.json";
 import UpdateUser from "./json_schema/UpdateUser.json";
+import PaginateParams from "./json_schema/PaginateParams.json";
+import FilterByName from "./json_schema/FilterByName.json";
+import GetProducts from "./json_schema/GetProducts.json";
 
 export const ajv=new Ajv();
 addFormats(ajv)
@@ -41,6 +44,9 @@ ajv.addSchema(UpdateStore,"UpdateStore");
 ajv.addSchema(User,"User");
 ajv.addSchema(CreateUser, "CreateUser");
 ajv.addSchema(UpdateUser,"UpdateUser");
+ajv.addSchema(PaginateParams,"PaginateParams");
+ajv.addSchema(FilterByName,"FilterByName");
+ajv.addSchema(GetProducts,"GetProducts");
 
 export function validateRequest<T>(key:string, reqBody:string):Promise<T> | boolean{
   const validate= ajv.getSchema<T>(key);
