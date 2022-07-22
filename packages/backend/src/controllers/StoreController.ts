@@ -7,6 +7,7 @@ import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
+import {GetStores} from "../model/request/type/GetStores";
 
 export const addStore=(req,res: Response)=>{
   if(!req.user.isAdmin){
@@ -16,7 +17,10 @@ export const addStore=(req,res: Response)=>{
     return;
   }
   if (!validateRequest<CreateStore>("CreateStore", req.body)) {
-    res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
   Store.create(req.body).then(
@@ -32,17 +36,19 @@ export const addStore=(req,res: Response)=>{
         io.emit("storeChanged", {id: store._id, action: "create"});
         res.json("Add Store")
       });
-    });
-
+    },err=> res.json(err));
 }
 export const getStores = (req, res: Response) => {
-  if (!req.query.limit) {
-    res.status(400).json({errCode: "invalidArgument", message: "Bad request"});
+  if (!validateRequest<GetStores>("GetStores", req.query)) {
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
-  const query={};
-  if(req.query.authorized=="true"){
-    query["authorizations.userId"]=req.user.id;
+  const query = {};
+  if (req.query.authorized == "true") {
+    query["authorizations.userId"] = req.user.id;
   }
   if (req.query.searchName) {
     query["name"] = {$regex: req.query.searchName, $options: "i"};

@@ -26,6 +26,8 @@ import FilterByStore from "./json_schema/FilterByStore.json";
 import GetProducts from "./json_schema/GetProducts.json";
 import GetOrders from "./json_schema/GetOrders.json";
 import GetCustomers from "./json_schema/GetCustomers.json";
+import GetStores from "./json_schema/GetStores.json";
+
 export const ajv=new Ajv();
 addFormats(ajv)
 
@@ -54,6 +56,7 @@ ajv.addSchema(FilterByStore,"FilterByStore");
 ajv.addSchema(GetProducts,"GetProducts");
 ajv.addSchema(GetOrders,"GetOrders");
 ajv.addSchema(GetCustomers,"GetCustomers");
+ajv.addSchema(GetStores,"GetStores");
 
 export function validateRequest<T>(key:string, reqBody:string):Promise<T> | boolean{
   const validate= ajv.getSchema<T>(key);
