@@ -1,10 +1,11 @@
 import { Response} from "express";
 import mongoose from "mongoose";
 import Order from "../model/db_model/Order";
+import {validateRequest} from "../model/request/validation";
+import {GetAnalytics} from "../model/request/type/GetAnalytics";
 
 export const getAnalytics = (req, res: Response) => {
-  console.log(req.query);
-  if (req.query.dataType != "quantity" && req.query.dataType != "price") {
+  if (!validateRequest<GetAnalytics>("GetAnalytics", req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -34,7 +35,6 @@ export const getAnalytics = (req, res: Response) => {
       return;
     }
   }
-  //TODO check correct date format
   if (req.query.fromDate) {
     if(!query["date"]){
       query["date"]={};
@@ -51,12 +51,9 @@ export const getAnalytics = (req, res: Response) => {
   const products=[]
   if (req.query.products?.length) {
       req.query.products.forEach(p => {
-      const productCondition = {};
-      if (!p.productId) {
-        res.status(400).json({message: "Invalid input: missing productId"});
-        return;
-      }
-      productCondition["entries.productId"] = p.productId;
+      const productCondition = {
+        "entries.productId": p.productId
+      };
       if (p.variantId) {
         productCondition["entries.variantId"] = p.variantId;
         productAndVariant.push(productCondition)
