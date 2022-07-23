@@ -8,6 +8,39 @@ import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
 import {GetStores} from "../model/request/type/GetStores";
+import User from "../model/db_model/User";
+import Order from "../model/db_model/Order";
+
+const checkStoreConsistence = async (store) => {
+  const invalidAuthorizationError = {
+    code: 400,
+    error: {errCode: "invalidArgument", message: "Invalid store authorization"}
+  };
+  const userSet= new Set(store.authorizations.map(authorization=>authorization.userId));
+  if(userSet.size!=store.authorizations.length){
+    throw invalidAuthorizationError;
+  }
+  const promises=[];
+  userSet.forEach(userId=> {
+    if (!mongoose.isValidObjectId(userId)) {
+      throw invalidAuthorizationError;
+    }
+    promises.push(User.findById(userId).then(user => {
+      if (!user) {
+        throw invalidAuthorizationError;
+      }
+    }))
+  });
+  promises.push(Store.findOne({name: store.name}).then(store=>{
+    if(store){
+      throw {
+        code:400,
+        error: {errCode: "nameAlreadyinUse", message: "Invalid Store name"}
+      }
+    }
+  }));
+  await Promise.all(promises);
+}
 
 export const addStore=(req,res: Response)=>{
   if(!req.user.isAdmin){
@@ -23,20 +56,28 @@ export const addStore=(req,res: Response)=>{
     });
     return;
   }
-  Store.create(req.body).then(
-    store => {
-      Log.create({
-        username: req.user.username,
-        action: "Create",
-        object: {
-          id: store._id,
-          type: "Store"
-        }
-      }).then(() => {
-        io.emit("storeChanged", {id: store._id, action: "create"});
-        res.json("Add Store")
-      });
-    },err=> res.status(500).json(err));
+  checkStoreConsistence(req.body).then(()=> {
+    Store.create(req.body).then(
+      store => {
+        Log.create({
+          username: req.user.username,
+          action: "Create",
+          object: {
+            id: store._id,
+            type: "Store"
+          }
+        }).then(() => {
+          io.emit("storeChanged", {id: store._id, action: "create"});
+          res.json("Add Store");
+        });
+      })
+  }).catch(err => {
+    if(err.code && err.error){
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
+    }
+  });
 }
 export const getStores = (req, res: Response) => {
   if (!validateRequest<GetStores>("GetStores", req.query)) {
@@ -84,28 +125,39 @@ export const updateStore = (req, res: Response) => {
     res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
-  Store.findByIdAndUpdate(req.params.storeId, req.body, {new: true}, (err, store) => {
-    if (err)
-      res.status(500).json(err);
-    else {
-      if (store == null) {
-        res.status(404).send({
-          errCode: "itemNotFound",
-          message: "Store not found"
-        });
-      } else {
-        Log.create({
-          username: req.user.username,
-          action: "Update",
-          object: {
-            id: store._id,
-            type: "Store"
-          }
-        }).then(() => {
-          io.emit("storeChanged", {id: store._id, action: "update"});
-          res.json({message: "Store Updated"})
-        }, (err) => res.status(500).json(err));
+  checkStoreConsistence(req.body).then(()=> {
+    Store.findByIdAndUpdate(req.params.storeId, req.body, {new: true}, (err, store) => {
+      if (err)
+        throw err;
+      else {
+        if (store == null) {
+          throw {
+            code: 404,
+            error: {
+              errCode: "itemNotFound",
+              message: "Store not found"
+            }
+          };
+        } else {
+          Log.create({
+            username: req.user.username,
+            action: "Update",
+            object: {
+              id: store._id,
+              type: "Store"
+            }
+          }).then(() => {
+            io.emit("storeChanged", {id: store._id, action: "update"});
+            res.json({message: "Store Updated"})
+          });
+        }
       }
+    });
+  }).catch(err => {
+    if(err.code && err.error){
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
     }
   });
 }
@@ -115,25 +167,49 @@ export const deleteStore = (req, res: Response) => {
     res.status(400).send({errCode: "invalidArgument", message: "Invalid ID supplied"});
     return;
   }
-  Store.findByIdAndDelete(req.params.storeId, (err, store) => {
-    if (err)
-      res.status(500).json(err);
-    else {
-      if (store == null) {
-        res.status(404).json({errCode: "itemNotFound", message: "Store not found"});
-      } else {
-        Log.create({
-          username: req.user.username,
-          action: "Delete",
-          object: {
-            id: store._id,
-            type: "Store"
-          }
-        }).then(() => {
-          io.emit("storeChanged", {id: store._id, action: "delete"});
-          res.json({message: "Store deleted"})
-        }, err => res.status(500).json(err));
+  Order.findOne({"store.id": req.params.storeId}).then(order => {
+    if (order) {
+      throw{
+        code: 403,
+        error: {
+          errCode: "cannotDelete",
+          message: "Can't delete: the store has associated orders"
+        }
+      };
+    }
+  }).then(()=>{
+    Store.findByIdAndDelete(req.params.storeId, (err, store) => {
+      if (err)
+        throw err;
+      else {
+        if (store == null) {
+          throw {
+            code: 404,
+            error: {
+              errCode: "itemNotFound",
+              message: "Store not found"
+            }
+          };
+        } else {
+          Log.create({
+            username: req.user.username,
+            action: "Delete",
+            object: {
+              id: store._id,
+              type: "Store"
+            }
+          }).then(() => {
+            io.emit("storeChanged", {id: store._id, action: "delete"});
+            res.json({message: "Store deleted"})
+          });
+        }
       }
+    });
+  }).catch(err => {
+    if(err.code && err.error){
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
     }
   });
 }
