@@ -8,6 +8,7 @@ import UserDb, {UserProjection} from "../model/db_model/User";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import {io} from "../app";
+import Store from "../model/db_model/Store";
 
 export const createUser = (req, res: Response) => {
   if (!validateRequest<CreateUser>("CreateUser", req.body)) {
@@ -21,25 +22,42 @@ export const createUser = (req, res: Response) => {
     res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
     return;
   }
-  UserDb.register(req.body, req.body.password, (err, user) => {
-    if (err) {
-      res.status(400).json({
-        errCode: "invalidArgument",
-        message: "Registration error"
-      });
-      return;
-    }
-    Log.create({
-      username: req.user.username,
-      action: "Create",
-      object: {
-        id: user._id,
-        type: "User"
+  UserDb.findOne({username:req.body.username}).then(user=>{
+    if(user){
+      throw {
+        code:400,
+        error: {errCode: "nameAlreadyinUse", message: "Invalid Username"}
       }
-    }).then(() => {
-      io.emit("userChanged", {id: user._id, action: "create"});
-      res.json({message: "User added"})
-    }, err => res.status(500).json(err));
+    }
+  }).then(()=>{
+    UserDb.register(req.body, req.body.password, (err, user) => {
+      if (err) {
+        throw {
+          code: 400,
+          error: {
+            errCode: "invalidArgument",
+            message: "Registration error"
+          }
+        }
+      }
+      Log.create({
+        username: req.user.username,
+        action: "Create",
+        object: {
+          id: user._id,
+          type: "User"
+        }
+      }).then(() => {
+        io.emit("userChanged", {id: user._id, action: "create"});
+        res.json({message: "User added"})
+      });
+    });
+  }).catch(err => {
+    if(err.code && err.error){
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
+    }
   });
 }
 export const getUsers = (req, res: Response) => {
@@ -154,33 +172,42 @@ export const deleteUser = (req, res: Response) => {
     });
     return;
   }
-  UserDb.findOneAndDelete({username: req.params.username}, (err, user) => {
-    if (err)
-      res.status(500).json(err);
-    else {
-      if (user == null) {
-        res.status(404).json({errCode: "itemNotFound", message: "User not found"});
-      } else {
-        const username= req.user.username;
-        req.logout(function (err) {
-          if (err) {
-            res.status(500).json(err);
-            return;
-          } else {
-            Log.create({
-              username: username,
-              action: "Delete",
-              object: {
-                id: user._id,
-                type: "User"
-              }
-            }).then(() => {
-              io.emit("userChanged", {id: user._id, action: "delete"});
-              res.json({message: "User deleted"})
-            }, err => res.status(500).json(err));
-          }
-        });
+  UserDb.findOne({username: req.params.username}).then(user => {
+    if(user == null){
+      throw {
+        code: 400,
+        error:{errCode: "itemNotFound", message: "User not found"}
       }
+    }
+    Store.updateMany({"authorizations.userId":user._id},{$pullAll:{authorizations:user._id}}).then(()=>{
+      UserDb.deleteOne({_id:user._id}).then(result=>{
+        if(result.deletedCount<1){
+          throw {
+            code: 400,
+            error:{errCode: "itemNotFound", message: "User not found"}
+          }
+        }
+        if (req.user.username == user.username) {
+          req.logout();
+        }
+        Log.create({
+          username: user.username,
+          action: "Delete",
+          object: {
+            id: user._id,
+            type: "User"
+          }
+        }).then(() => {
+          io.emit("userChanged", {id: user._id, action: "delete"});
+          res.json({message: "User deleted"})
+        });
+      })
+    })
+  }).catch(err => {
+    if(err.code && err.error){
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
     }
   });
 }
