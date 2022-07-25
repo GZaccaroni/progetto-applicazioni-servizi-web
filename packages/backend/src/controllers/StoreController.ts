@@ -126,31 +126,27 @@ export const updateStore = (req, res: Response) => {
     return;
   }
   checkStoreConsistence(req.body).then(()=> {
-    Store.findByIdAndUpdate(req.params.storeId, req.body, {new: true}, (err, store) => {
-      if (err)
-        throw err;
-      else {
-        if (store == null) {
-          throw {
-            code: 404,
-            error: {
-              errCode: "itemNotFound",
-              message: "Store not found"
-            }
-          };
-        } else {
-          Log.create({
-            username: req.user.username,
-            action: "Update",
-            object: {
-              id: store._id,
-              type: "Store"
-            }
-          }).then(() => {
-            io.emit("storeChanged", {id: store._id, action: "update"});
-            res.json({message: "Store Updated"})
-          });
-        }
+    Store.findByIdAndUpdate(req.params.storeId, req.body, {new: true}).then(store => {
+      if (store == null) {
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: "Store not found"
+          }
+        };
+      } else {
+        Log.create({
+          username: req.user.username,
+          action: "Update",
+          object: {
+            id: store._id,
+            type: "Store"
+          }
+        }).then(() => {
+          io.emit("storeChanged", {id: store._id, action: "update"});
+          res.json({message: "Store Updated"})
+        });
       }
     });
   }).catch(err => {
@@ -178,31 +174,27 @@ export const deleteStore = (req, res: Response) => {
       };
     }
   }).then(()=>{
-    Store.findByIdAndDelete(req.params.storeId, (err, store) => {
-      if (err)
-        throw err;
-      else {
-        if (store == null) {
-          throw {
-            code: 404,
-            error: {
-              errCode: "itemNotFound",
-              message: "Store not found"
-            }
-          };
-        } else {
-          Log.create({
-            username: req.user.username,
-            action: "Delete",
-            object: {
-              id: store._id,
-              type: "Store"
-            }
-          }).then(() => {
-            io.emit("storeChanged", {id: store._id, action: "delete"});
-            res.json({message: "Store deleted"})
-          });
-        }
+    Store.findByIdAndDelete(req.params.storeId).then(store => {
+      if (store == null) {
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: "Store not found"
+          }
+        };
+      } else {
+        Log.create({
+          username: req.user.username,
+          action: "Delete",
+          object: {
+            id: store._id,
+            type: "Store"
+          }
+        }).then(() => {
+          io.emit("storeChanged", {id: store._id, action: "delete"});
+          res.json({message: "Store deleted"})
+        });
       }
     });
   }).catch(err => {
