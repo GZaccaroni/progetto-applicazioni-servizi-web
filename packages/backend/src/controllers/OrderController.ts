@@ -28,7 +28,7 @@ const enrichOrder = async (order)=>{
         enrichedOrder["store"] = store;
       } else {
         throw {
-          code: 400, error: {errCode: "itemNotFound", message: "Invalid Input"}
+          code: 400, error: {errCode: "itemNotFound", message: "Invalid Input: Store not found"}
         };
       }
     }
@@ -38,7 +38,23 @@ const enrichOrder = async (order)=>{
   order.entries.forEach(entry => {
     entry["price"] = entry.pricePerUnit * entry.quantity;
     entryPromises.push(Product.findById(entry.productId).then(product => {
-      entry["name"] = !entry.variantId ? product.name : product.kinds.find(x => x.id == entry.variantId).fullName;
+      if(product==null){
+        throw {
+          code: 400, error: {errCode: "itemNotFound", message: "Invalid Input: Product not found"}
+        };
+      }
+      if (entry.variantId) {
+        const kind=product.kinds.find(x => x.id == entry.variantId);
+        if(kind){
+          entry["name"] = kind.fullName;
+        } else {
+          throw {
+            code: 400, error: {errCode: "itemNotFound", message: "Invalid Input: Product kind not found"}
+          };
+        }
+      } else {
+        entry["name"] = product.name;
+      }
     }).then(() => enrichedOrder["entries"].push(entry)));
   })
   //compute tot
@@ -50,7 +66,7 @@ const enrichOrder = async (order)=>{
         enrichedOrder["customer"] = customer;
       } else {
         throw {
-          code: 400, error: {errCode: "itemNotFound", message: "Invalid Input"}
+          code: 400, error: {errCode: "itemNotFound", message: "Invalid Input: Customer not found"}
         };
       }
     }));
