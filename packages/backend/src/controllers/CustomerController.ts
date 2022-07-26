@@ -8,6 +8,18 @@ import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
 import {GetCustomers} from "../model/request/type/GetCustomers";
+import Order from "../model/db_model/Order";
+
+const checkCustomerConsistence = async (customer) => {
+  await Customer.findOne({name: customer.name}).then(customer=>{
+    if(customer){
+      throw {
+        code:400,
+        error: {errCode: "nameAlreadyinUse", message: "Invalid Customer name"}
+      }
+    }
+  });
+}
 
 export const addCustomer = (req, res: Response) => {
   if (!validateRequest<CreateCustomer>("CreateCustomer", req.body)) {
@@ -17,20 +29,29 @@ export const addCustomer = (req, res: Response) => {
     });
     return;
   }
-  Customer.create(req.body).then(
-    customer => {
-      Log.create({
-        username: req.user.username,
-        action: "Create",
-        object: {
-          id: customer._id,
-          type: "Customer"
-        }
-      }).then(() => {
-        io.emit("customerChanged", {id: customer._id, action: "create"});
-        res.json("Add Customer")
+  checkCustomerConsistence(req.body).then(()=>{
+    Customer.create(req.body).then(
+      customer => {
+        Log.create({
+          username: req.user.username,
+          action: "Create",
+          object: {
+            id: customer._id,
+            type: "Customer"
+          }
+        }).then(() => {
+          io.emit("customerChanged", {id: customer._id, action: "create"});
+          res.json("Add Customer")
+        });
       });
-    }).catch(err => res.status(500).json(err));
+  }).catch(err => {
+    if(err.code && err.error){
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
+    }
+  });
+
 }
 export const getCustomers=(req,res: Response)=>{
   if (!validateRequest<GetCustomers>("GetCustomers", req.query)) {
@@ -44,7 +65,12 @@ export const getCustomers=(req,res: Response)=>{
   if (req.query.searchName) {
     query["name"] = {$regex: req.query.searchName, $options:"i"};
   }
-  const options = paginateOptions(query, CustomerProjection, {}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
+  const options = paginateOptions(query,
+                                  CustomerProjection,
+                                  {},
+                                  req.query.limit,
+                                  req.query.pagingNext,
+                                  req.query.paginatePrevious);
   Customer.paginate(options, err => res.status(500).json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
@@ -80,15 +106,16 @@ export const updateCustomer = (req, res: Response) => {
     });
     return;
   }
-  Customer.findByIdAndUpdate(req.params.customerId, req.body, {new: true}, (err, customer) => {
-    if (err)
-      res.status(500).json(err);
-    else {
+  checkCustomerConsistence(req.body).then(() => {
+    Customer.findByIdAndUpdate(req.params.customerId, req.body, {new: true}).then(customer => {
       if (customer == null) {
-        res.status(404).send({
-          errCode: "itemNotFound",
-          message: 'Customer not found'
-        });
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: 'Customer not found'
+          }
+        };
       } else {
         Log.create({
           username: req.user.username,
@@ -100,8 +127,14 @@ export const updateCustomer = (req, res: Response) => {
         }).then(() => {
           io.emit("customerChanged", {id: customer._id, action: "update"});
           res.json({message: "Customer updated"})
-        }, (err) => res.status(500).json(err));
+        });
       }
+    });
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
     }
   });
 }
@@ -113,15 +146,26 @@ export const deleteCustomer=(req,res: Response)=>{
     });
     return;
   }
-  Customer.findByIdAndDelete(req.params.customerId,(err,customer)=>{
-    if (err)
-      res.status(500).json(err);
-    else {
+  Order.findOne({"customer.id": req.params.customerId}).then(order=>{
+    if (order) {
+      throw {
+        code: 403,
+        error: {
+          errCode: "cannotDelete",
+          message: "Can't delete customer: the customer has associated orders"
+        }
+      };
+    }
+  }).then(() => {
+    Customer.findByIdAndDelete(req.params.customerId).then(customer => {
       if (customer == null) {
-        res.status(404).json({
-          errCode: "itemNotFound",
-          message: "Customer not found"
-        });
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: "Customer not found"
+          }
+        };
       } else {
         Log.create({
           username: req.user.username,
@@ -133,8 +177,14 @@ export const deleteCustomer=(req,res: Response)=>{
         }).then(() => {
           io.emit("customerChanged", {id: customer._id, action: "delete"});
           res.json({message: "Customer deleted"})
-        }, err => res.status(500).json(err));
+        });
       }
+    });
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
     }
   });
 }
