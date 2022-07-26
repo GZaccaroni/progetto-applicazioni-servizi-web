@@ -23,7 +23,7 @@ const checkProductConsistence = async (product) => {
     if(product){
       throw {
         code:400,
-        error: {errCode: "nameAlreadyinUse", message: "Invalid Store name"}
+        error: {errCode: "nameAlreadyinUse", message: "Invalid Product name"}
       }
     }
   });
