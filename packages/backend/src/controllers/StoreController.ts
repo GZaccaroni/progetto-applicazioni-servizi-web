@@ -14,14 +14,17 @@ import Order from "../model/db_model/Order";
 const checkStoreConsistence = async (store) => {
   const invalidAuthorizationError = {
     code: 400,
-    error: {errCode: "invalidArgument", message: "Invalid store authorization"}
+    error: {
+      errCode: "invalidArgument",
+      message: "Invalid store authorization"
+    }
   };
-  const userSet= new Set(store.authorizations.map(authorization=>authorization.userId));
-  if(userSet.size!=store.authorizations.length){
+  const userSet = new Set(store.authorizations.map(authorization => authorization.userId));
+  if (userSet.size != store.authorizations.length) {
     throw invalidAuthorizationError;
   }
-  const promises=[];
-  userSet.forEach(userId=> {
+  const promises = [];
+  userSet.forEach(userId => {
     if (!mongoose.isValidObjectId(userId)) {
       throw invalidAuthorizationError;
     }
@@ -31,10 +34,10 @@ const checkStoreConsistence = async (store) => {
       }
     }))
   });
-  promises.push(Store.findOne({name: store.name}).then(store=>{
-    if(store){
+  promises.push(Store.findOne({name: store.name}).then(store => {
+    if (store) {
       throw {
-        code:400,
+        code: 400,
         error: {errCode: "nameAlreadyinUse", message: "Invalid Store name"}
       }
     }
@@ -42,11 +45,12 @@ const checkStoreConsistence = async (store) => {
   await Promise.all(promises);
 }
 
-export const addStore=(req,res: Response)=>{
-  if(!req.user.isAdmin){
+export const addStore = (req, res: Response) => {
+  if (!req.user.isAdmin) {
     res.status(403).json({
-      errCode:"notAuthorized",
-      message:"User not authorized"});
+      errCode: "notAuthorized",
+      message: "User not authorized"
+    });
     return;
   }
   if (!validateRequest<CreateStore>("CreateStore", req.body)) {
@@ -56,7 +60,7 @@ export const addStore=(req,res: Response)=>{
     });
     return;
   }
-  checkStoreConsistence(req.body).then(()=> {
+  checkStoreConsistence(req.body).then(() => {
     Store.create(req.body).then(
       store => {
         Log.create({
@@ -72,7 +76,7 @@ export const addStore=(req,res: Response)=>{
         });
       })
   }).catch(err => {
-    if(err.code && err.error){
+    if (err.code && err.error) {
       res.status(err.code).json(err.error)
     } else {
       res.status(500).json(err);
@@ -105,7 +109,6 @@ export const getStoreById = (req: Request, res: Response) => {
     res.status(400).json({errCode: "invalidArgument", message: "Invalid ID supplied"});
     return;
   }
-  //TODO Not authorized
   Store.findById(req.params.storeId, StoreProjection).then(
     store => {
       if (store == null) {
@@ -117,7 +120,7 @@ export const getStoreById = (req: Request, res: Response) => {
   );
 }
 export const updateStore = (req, res: Response) => {
-  if(!req.user.isAdmin) {
+  if (!req.user.isAdmin) {
     res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
   }
   if (!validateRequest<UpdateStore>("UpdateStore", req.body)
@@ -125,7 +128,7 @@ export const updateStore = (req, res: Response) => {
     res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
-  checkStoreConsistence(req.body).then(()=> {
+  checkStoreConsistence(req.body).then(() => {
     Store.findByIdAndUpdate(req.params.storeId, req.body, {new: true}).then(store => {
       if (store == null) {
         throw {
@@ -150,7 +153,7 @@ export const updateStore = (req, res: Response) => {
       }
     });
   }).catch(err => {
-    if(err.code && err.error){
+    if (err.code && err.error) {
       res.status(err.code).json(err.error)
     } else {
       res.status(500).json(err);
@@ -173,7 +176,7 @@ export const deleteStore = (req, res: Response) => {
         }
       };
     }
-  }).then(()=>{
+  }).then(() => {
     Store.findByIdAndDelete(req.params.storeId).then(store => {
       if (store == null) {
         throw {
@@ -198,7 +201,7 @@ export const deleteStore = (req, res: Response) => {
       }
     });
   }).catch(err => {
-    if(err.code && err.error){
+    if (err.code && err.error) {
       res.status(err.code).json(err.error)
     } else {
       res.status(500).json(err);
