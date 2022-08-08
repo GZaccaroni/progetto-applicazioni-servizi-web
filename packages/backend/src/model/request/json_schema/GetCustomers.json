@@ -1,0 +1,10 @@
+{
+  "allOf": [
+    {
+      "$ref": "PaginateParams#"
+    },
+    {
+      "$ref": "FilterByName#"
+    }
+  ]
+}

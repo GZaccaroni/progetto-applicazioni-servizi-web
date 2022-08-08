@@ -5,7 +5,10 @@ import {Customer} from "../request/type/Customer";
 type CustomerDocument = mongoose.Document & Customer;
 
 const CustomerSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    unique: true
+  },
   phoneNumber: String,
   address: String,
   vatNumber: String

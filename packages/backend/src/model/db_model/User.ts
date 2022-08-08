@@ -1,14 +1,17 @@
-import mongoose, {PassportLocalModel} from "mongoose";
+import mongoose, {PassportLocalDocument, PassportLocalModel} from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
 import {mongoosePagination, Pagination} from "mongoose-paginate-ts";
 
-type UserDocument = mongoose.Document & {
+type UserDocument = PassportLocalDocument & {
   username: string,
   isAdmin: boolean
 };
 
 const UserSchema = new mongoose.Schema({
-  username: String,
+  username: {
+    type: String,
+    unique: true
+  },
   isAdmin: Boolean
 });
 

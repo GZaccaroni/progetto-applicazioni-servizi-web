@@ -15,8 +15,8 @@ export const paginateResponse = (result) => {
   }
   return responseBody;
 };
-export const paginateOptions = (query, select, limit, pagingNext, pagingPrevious) => {
-  const options = {limit: limit, select: select};
+export const paginateOptions = (query, select, sort, limit, pagingNext, pagingPrevious) => {
+  const options = {limit: limit, select: select, sort: sort};
   if (query) {
     options["query"] = query;
   }

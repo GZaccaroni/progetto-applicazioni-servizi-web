@@ -4,7 +4,10 @@ import {Store} from "../request/type/Store";
 
 type StoreDocument = mongoose.Document & Store;
 const StoreSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    unique: true
+  },
   authorizations: [{
     userId: String,
     accessLevel: String

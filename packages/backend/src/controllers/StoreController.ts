@@ -7,86 +7,137 @@ import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
+import {GetStores} from "../model/request/type/GetStores";
+import User from "../model/db_model/User";
+import Order from "../model/db_model/Order";
 
-export const addStore=(req,res: Response)=>{
-  if(!req.user.isAdmin){
-    res.status(403).json({message:"User not authorized"});
-    return;
+const checkStoreConsistence = async (store) => {
+  const invalidAuthorizationError = {
+    code: 400,
+    error: {
+      errCode: "invalidArgument",
+      message: "Invalid store authorization"
+    }
+  };
+  const userSet = new Set(store.authorizations.map(authorization => authorization.userId));
+  if (userSet.size != store.authorizations.length) {
+    throw invalidAuthorizationError;
   }
-  if(!validateRequest<CreateStore>("CreateStore",req.body)){
-    res.status(400).json({ message:"Invalid Input"});
-    return;
-  }
-  Store.create(req.body).then(
-    store => {
-      Log.create({
-        username: req.user.username,
-        action: "Create",
-        object: {
-          id: store._id,
-          type: "Store"
-        }
-      }).then(() => {
-        io.emit("storeChanged", {id: store._id, action: "create"});
-        res.json("Add Store")
-      });
+  const promises = [];
+  userSet.forEach(userId => {
+    if (!mongoose.isValidObjectId(userId)) {
+      throw invalidAuthorizationError;
+    }
+    promises.push(User.findById(userId).then(user => {
+      if (!user) {
+        throw invalidAuthorizationError;
+      }
+    }))
+  });
+  promises.push(Store.findOne({name: store.name}).then(store => {
+    if (store) {
+      throw {
+        code: 400,
+        error: {errCode: "nameAlreadyinUse", message: "Invalid Store name"}
+      }
+    }
+  }));
+  await Promise.all(promises);
+}
+
+export const addStore = (req, res: Response) => {
+  if (!req.user.isAdmin) {
+    res.status(403).json({
+      errCode: "notAuthorized",
+      message: "User not authorized"
     });
-
+    return;
+  }
+  if (!validateRequest<CreateStore>("CreateStore", req.body)) {
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
+    return;
+  }
+  checkStoreConsistence(req.body).then(() => {
+    Store.create(req.body).then(
+      store => {
+        Log.create({
+          username: req.user.username,
+          action: "Create",
+          object: {
+            id: store._id,
+            type: "Store"
+          }
+        }).then(() => {
+          io.emit("storeChanged", {id: store._id, action: "create"});
+          res.json("Add Store");
+        });
+      })
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
+    }
+  });
 }
 export const getStores = (req, res: Response) => {
-  if (!req.query.limit) {
-    res.status(400).json({message: "Bad request"});
+  if (!validateRequest<GetStores>("GetStores", req.query)) {
+    res.status(400).json({
+      errCode: "invalidArgument",
+      message: "Invalid Input"
+    });
     return;
   }
-  const query={};
-  if(req.query.authorized=="true"){
-    query["authorizations.userId"]=req.user.id;
+  const query = {};
+  if (req.query.authorized == "true") {
+    query["authorizations.userId"] = req.user.id;
   }
   if (req.query.searchName) {
     query["name"] = {$regex: req.query.searchName, $options: "i"};
   }
-  const options = paginateOptions(query,StoreProjection,
-                                    req.query.limit,
-                                    req.query.pagingNext,
-                                    req.query.paginatePrevious);
-  Store.paginate(options, err => res.json(err)).then((result) => {
+  const options = paginateOptions(query, StoreProjection, {}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
+  Store.paginate(options, err => res.status(500).json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
 }
 
-export const getStoreById=(req:Request,res: Response)=>{
+export const getStoreById = (req: Request, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.storeId)) {
-    res.status(400).json({message: "Invalid ID supplied"});
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid ID supplied"});
     return;
   }
-  //TODO Not authorized
-  Store.findById(req.params.storeId,StoreProjection).then(
-    store=>{
+  Store.findById(req.params.storeId, StoreProjection).then(
+    store => {
       if (store == null) {
         res.status(404).json({message: "Store not found"});
       } else {
         res.json(store);
       }
-    }
+    }, err => res.status(500).json(err)
   );
 }
 export const updateStore = (req, res: Response) => {
-  if(!req.user.isAdmin) {
-    res.status(403).json({message: "User not authorized"});
+  if (!req.user.isAdmin) {
+    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
   }
   if (!validateRequest<UpdateStore>("UpdateStore", req.body)
     || !mongoose.isValidObjectId(req.params.storeId)) {
-    res.status(400).json({message: "Invalid Input"});
+    res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
-  Store.findByIdAndUpdate(req.params.storeId, req.body, {new: true}, (err, store) => {
-    if (err)
-      res.json(err);
-    else {
+  checkStoreConsistence(req.body).then(() => {
+    Store.findByIdAndUpdate(req.params.storeId, req.body, {new: true}).then(store => {
       if (store == null) {
-        res.status(404).send({
-          message: "Store not found"
-        });
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: "Store not found"
+          }
+        };
       } else {
         Log.create({
           username: req.user.username,
@@ -98,23 +149,43 @@ export const updateStore = (req, res: Response) => {
         }).then(() => {
           io.emit("storeChanged", {id: store._id, action: "update"});
           res.json({message: "Store Updated"})
-        }, (err) => res.json(err));
+        });
       }
+    });
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
     }
   });
 }
 
 export const deleteStore = (req, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.storeId)) {
-    res.status(400).send({message: "Invalid ID supplied"});
+    res.status(400).send({errCode: "invalidArgument", message: "Invalid ID supplied"});
     return;
   }
-  Store.findByIdAndDelete(req.params.storeId, (err, store) => {
-    if (err)
-      res.json(err);
-    else {
+  Order.findOne({"store.id": req.params.storeId}).then(order => {
+    if (order) {
+      throw{
+        code: 403,
+        error: {
+          errCode: "cannotDelete",
+          message: "Can't delete: the store has associated orders"
+        }
+      };
+    }
+  }).then(() => {
+    Store.findByIdAndDelete(req.params.storeId).then(store => {
       if (store == null) {
-        res.status(404).json({message: "Store not found"});
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: "Store not found"
+          }
+        };
       } else {
         Log.create({
           username: req.user.username,
@@ -126,8 +197,14 @@ export const deleteStore = (req, res: Response) => {
         }).then(() => {
           io.emit("storeChanged", {id: store._id, action: "delete"});
           res.json({message: "Store deleted"})
-        }, err => res.json(err));
+        });
       }
+    });
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
     }
   });
 }

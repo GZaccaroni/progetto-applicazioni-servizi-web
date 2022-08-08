@@ -7,17 +7,39 @@ import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
+import {GetProducts} from "../model/request/type/GetProducts";
+import Order from "../model/db_model/Order";
 
-const enrichProduct=(product)=>{
-  product.kinds.forEach((k,i,self)=>self[i]["fullName"]=product.name+" "+k.name);
+const checkProductConsistence = async (product) => {
+  const productKindSet = new Set(product.kinds.map(productKind => productKind.name));
+  if (productKindSet.size != product.kinds.length) {
+    throw {
+      code: 400,
+      error: {errCode: "invalidArgument", message: "Invalid product kinds"}
+    }
+  }
+
+  await Product.findOne({name: product.name}).then(product => {
+    if (product) {
+      throw {
+        code: 400,
+        error: {errCode: "nameAlreadyinUse", message: "Invalid Product name"}
+      }
+    }
+  });
+}
+
+const enrichProduct = (product) => {
+  product.kinds.forEach((k, i, self) => self[i]["fullName"] = product.name + " " + k.name);
   return product;
 }
 
-export const addProduct=(req,res: Response)=>{
+export const addProduct = (req, res: Response) => {
   if (!req.user.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",
-      message: "User not authorized"});
+      message: "User not authorized"
+    });
   }
   if (!validateRequest<CreateProduct>("CreateProduct", req.body)) {
     res.status(400).json({
@@ -26,38 +48,51 @@ export const addProduct=(req,res: Response)=>{
     });
     return;
   }
-  const enrichedProduct=enrichProduct(req.body);
-  Product.create(enrichedProduct).then(product=>{
-    Log.create({
-      username: req.user.username,
-      action: "Create",
-      object: {
-        id: product._id,
-        type: "Product"
-      }
-    }).then(() => {
-      io.emit("productChanged", {id: product._id, action: "create"});
-      res.json("Add Product")
-    });
+
+  const enrichedProduct = enrichProduct(req.body);
+  checkProductConsistence(enrichedProduct).then(() => {
+    Product.create(enrichedProduct).then(product => {
+      Log.create({
+        username: req.user.username,
+        action: "Create",
+        object: {
+          id: product._id,
+          type: "Product"
+        }
+      }).then(() => {
+        io.emit("productChanged", {id: product._id, action: "create"});
+        res.json("Add Product")
+      });
+    })
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
+    }
   });
-
-
 }
+
 export const getProducts = (req, res: Response) => {
-  if (!req.query.limit) {
+  if (!validateRequest<GetProducts>("GetProducts", req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Bad request"});
+      message: "Invalid Input"
+    });
     return;
   }
   const query = {};
   if (req.query.searchName) {
-    query["$or"] = [{"name":{$regex: req.query.searchName, $options: "i"}},{"kinds.fullName":{$regex:req.query.searchName, $options:"i"}}];
+    query["$or"] = [{"name": {$regex: req.query.searchName, $options: "i"}},
+                    {"kinds.fullName": {$regex: req.query.searchName, $options: "i"}}];
   }
-  const options = paginateOptions(query, ProductProjection,req.query.limit,
-    req.query.pagingNext,
-    req.query.paginatePrevious);
-  Product.paginate(options, err => res.json(err)).then((result) => {
+  const options = paginateOptions(query,
+                                  ProductProjection,
+                                  {},
+                                  req.query.limit,
+                                  req.query.pagingNext,
+                                  req.query.paginatePrevious);
+  Product.paginate(options, err => res.status(500).json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
 }
@@ -70,58 +105,98 @@ export const getProductById = (req: Request, res: Response) => {
     });
     return;
   }
-  //TODO Not authorized
   Product.findById(req.params.productId, ProductProjection).then(product => {
     if (product == null) {
-      res.status(404).json({
-        errCode: "itemNotFound",
-        message: "Product not found"
-      });
+      throw {
+        code: 404,
+        error: {
+          errCode: "itemNotFound",
+          message: "Product not found"
+        }
+      }
     } else {
       res.json(product);
     }
-  }).catch(err=>res.json(err));
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
+    }
+  });
 }
-export const updateProduct=(req,res: Response)=>{
-  if(!req.user.isAdmin){
+export const updateProduct = (req, res: Response) => {
+  if (!req.user.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",
-      message:"User not authorized"});
+      message: "User not authorized"
+    });
+    return;
   }
   if (!validateRequest<UpdateProduct>("UpdateProduct", req.body)
     || !mongoose.isValidObjectId(req.params.productId)) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message:"Invalid Input"
+      message: "Invalid Input"
     });
     return;
   }
-  const enrichedProduct=req.body;
-  Product.findByIdAndUpdate(req.params.productId, enrichedProduct, {new: true}, (err, product) => {
-    if (err)
-      res.json(err);
-    else {
-      if (product == null) {
-        res.status(404).send({
-          message: 'Product not found'
-        });
-      } else {
-        Log.create({
-          username: req.user.username,
-          action: "Update",
-          object: {
-            id: product._id,
-            type: "Product"
+  const enrichedProduct = enrichProduct(req.body);
+  checkProductConsistence(enrichedProduct).then(() => {
+    Product.findById(req.params.productId).then(product => {
+      const deletedKindId = product.kinds.filter(k => enrichedProduct.kinds.find(x => x.id == k.id) == null).map(k => k.id);
+      Order.findOne({"entries.variantId": deletedKindId}).then(order => {
+        if (order) {
+          throw {
+            code: 403,
+            error: {
+              errCode: "cannotDelete",
+              message: "Can't delete product kind: the product kind has associated orders"
+            }
+          };
+        }
+      }).then(() => {
+        Product.findByIdAndUpdate(req.params.productId, enrichedProduct, {new: true}).then((product) => {
+          if (product == null) {
+            throw {
+              code: 404,
+              error: {
+                errCode: "itemNotFound",
+                message: 'Product not found'
+              }
+            }
+          } else {
+            Log.create({
+              username: req.user.username,
+              action: "Update",
+              object: {
+                id: product._id,
+                type: "Product"
+              }
+            }).then(() => {
+              io.emit("productChanged", {id: product._id, action: "update"});
+              res.json({message: "Product updated"})
+            });
           }
-        }).then(() => {
-          io.emit("productChanged", {id: product._id, action: "update"});
-          res.json({message: "Product updated"})
-        }, (err) => res.json(err));
-      }
+        });
+      })
+    });
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
     }
   });
 }
 export const deleteProduct=(req,res: Response)=>{
+  if (!req.user.isAdmin) {
+    res.status(403).json({
+      errCode: "notAuthorized",
+      message: "User not authorized"
+    });
+    return;
+  }
   if (!mongoose.isValidObjectId(req.params.productId)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -129,15 +204,27 @@ export const deleteProduct=(req,res: Response)=>{
     });
     return;
   }
-  Product.findByIdAndDelete(req.params.productId, (err, product) => {
-    if (err)
-      res.json(err);
-    else {
+
+  Order.findOne({"entries.productId":req.params.productId}).then(order=> {
+    if (order) {
+      throw {
+        code: 403,
+        error: {
+          errCode: "cannotDelete",
+          message: "Can't delete product: the product has associated orders"
+        }
+      };
+    }
+  }).then(()=>{
+    Product.findByIdAndDelete(req.params.productId).then( product => {
       if (product == null) {
-        res.status(404).json({
-          errCode: "itemNotFound",
-          message: "Product not found"
-        });
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: "Product not found"
+          }
+        };
       } else {
         Log.create({
           username: req.user.username,
@@ -147,10 +234,16 @@ export const deleteProduct=(req,res: Response)=>{
             type: "Product"
           }
         }).then(() => {
-          io.emit("productChanged", {id:product._id, action:"delete"});
+          io.emit("productChanged", {id: product._id, action: "delete"});
           res.json({message: "Product deleted"})
-        }, err => res.json(err));
+        });
       }
+    });
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
     }
   });
 }

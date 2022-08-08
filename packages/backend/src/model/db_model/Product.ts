@@ -4,21 +4,25 @@ import {Product, UnitOfMeasureEnum} from "../request/type/Product";
 
 type ProductDocument = mongoose.Document & Product;
 const ProductSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    unique: true
+  },
   pricePerUnit: Number,
   kinds: [{
     id: String,
     name: String,
-    fullName:String,
+    fullName: String,
     pricePerUnit: Number
   }],
   unitOfMeasure: {
-    type:String,
-    enum: [UnitOfMeasureEnum.Kilogram,UnitOfMeasureEnum.Piece]
+    type: String,
+    enum: [UnitOfMeasureEnum.Kilogram, UnitOfMeasureEnum.Piece]
   }
 });
 
-export const ProductProjection= { _id: 0,
+export const ProductProjection = {
+  _id: 0,
   id: '$_id',
   name: 1,
   pricePerUnit: 1,
