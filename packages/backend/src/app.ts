@@ -11,9 +11,9 @@ import * as http from "http";
 const app = express();
 const port = 3000;
 const server= http.createServer(app);
-export const io = new Server(server);
+export const io = new Server(server, { cors: { credentials: true, origin: true }});
 
-app.use(cors());
+app.use(cors({credentials: true, origin: true}));
 
 app.use(express.json());
 app.use(session({
