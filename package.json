@@ -10,5 +10,9 @@
     "lint": "npm run format:check",
     "prepare": "npm run compile"
   },
-  "workspaces": ["packages/*"]
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+  }
 }
