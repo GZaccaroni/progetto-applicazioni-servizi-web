@@ -236,9 +236,23 @@ export const userLogin = (req, res: Response) => {
     });
     return;
   }
-  passport.authenticate('local').then(user=> {
+  passport.authenticate('local', function (err, user) {
+    if (err) {
+      if(err.code && err.error) {
+        res.status(err.code).json(err.error)
+      } else {
+        res.status(500).json(err);
+      }
+      return;
+    }
     if (user) {
-      req.login(user).then(()=>res.json({message: "Logged In"}));
+      req.login(user, function (err) {
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          res.json({message: "Logged In"});
+        }
+      });
     } else {
       throw {
         code:400,
@@ -248,10 +262,8 @@ export const userLogin = (req, res: Response) => {
         }
       }
     }
-  }).catch(err => {
-    if(err.code && err.error){
-      res.status(err.code).json(err.error)
-    } else {
+  })(req, response);
+}
       res.status(500).json(err);
     }
   });
