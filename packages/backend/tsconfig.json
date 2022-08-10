@@ -12,5 +12,8 @@
   },
   "include": ["src/**/*", "src/**/*.json"],
   "lib": ["es2022"],
-  "references": [{ "path": "../common" }]
+  "references": [{ "path": "../common" }],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -1,8 +1,8 @@
 export interface DbChartDataItem {
-  date: Date;
+  productName: string;
   value: number;
-  dataPerItem: Array<{
-    itemName: string;
+  productData: Array<{
+    date: Date;
     value: number;
   }>;
 }

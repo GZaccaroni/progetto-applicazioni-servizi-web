@@ -239,7 +239,11 @@ export const userLogin = (req, res: Response) => {
   }
   passport.authenticate('local', function (err, user) {
     if (err) {
-      res.status(500).json(err);
+      if(err.code && err.error) {
+        res.status(err.code).json(err.error)
+      } else {
+        res.status(500).json(err);
+      }
       return;
     }
     if (user) {
@@ -251,13 +255,22 @@ export const userLogin = (req, res: Response) => {
         }
       });
     } else {
-      res.status(400).json({
-        errCode: "invalidArgument",
-        message: "Invalid username/password supplied"
-      });
+      throw {
+        code:400,
+        error: {
+          errCode: "invalidArgument",
+          message: "Invalid username/password supplied"
+        }
+      }
     }
   })(req, res);
 }
 export const userLogout = (req, res: Response) => {
-  req.logout.then(() => res.json({message: "Logged In"})).catch(err => res.status(500).json(err));
+  req.logout(function (err) {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.json({message: "logout"});
+    }
+  });
 }

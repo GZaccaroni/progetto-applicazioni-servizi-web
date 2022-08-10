@@ -1,0 +1,158 @@
+{
+  "name": "Colture in Cloud",
+  "confirm": {
+    "delete": {
+      "user": {
+        "title": "Elimina utente",
+        "message": "Sei sicuro di voler davvero eliminare {username}?"
+      },
+      "store": {
+        "title": "Elimina punto vendita",
+        "message":
+        "Sei sicuro di voler davvero eliminare il punto vendita {name}?"
+      },
+      "order": {
+        "title": "Elimina ordine",
+        "message":
+        "Sei sicuro di voler davvero eliminare l'ordine?"
+      },
+      "customer": {
+        "title": "Elimina cliente",
+        "message":
+        "Sei sicuro di voler davvero eliminare {name}?"
+      }
+    }
+  },
+  "word": {
+    "create": "Aggiungi",
+    "actions": "Azioni",
+    "confirm": "Ok",
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "login": "Accedi",
+    "save": "Salva",
+    "fromDate": "Da",
+    "toDate": "a",
+    "store": "Punto vendita",
+    "user": "Utente"
+  },
+  "model": {
+    "user": {
+      "username": "Nome utente",
+      "isAdmin": "Amministratore",
+      "password": "Password",
+      "add": "Aggiungi utente",
+      "edit": "Modifica utente",
+      "added": "Utente aggiunto con successo",
+      "edited": "Utente modificato con successo"
+    },
+    "store": {
+      "name": "Nome",
+      "add": "Aggiungi punto vendita",
+      "edit": "Modifica punto vendita",
+      "added": "Punto vendita aggiunto con successo",
+      "edited": "Punto vendita modificato con successo",
+      "authorizations": "Autorizzazioni",
+      "accessLevel": {
+        "name": "Autorizzazione",
+        "salesman": "Commesso",
+        "manager": "Gestore"
+      }
+    },
+    "customer": {
+      "name": "Nome",
+      "address": "Indirizzo",
+      "phoneNumber": "Numero di telefono",
+      "vatNumber": "Partita Iva",
+      "add": "Aggiungi cliente",
+      "edit": "Modifica cliente",
+      "added": "Cliente aggiunto con successo",
+      "edited": "Cliente modificato con successo"
+    },
+    "order": {
+      "date": "Data",
+      "store": "Punto Vendita",
+      "customer": "Cliente",
+      "price": "Importo totale",
+      "pricePerUnit": "Prezzo unitario",
+      "quantity": "Quantità",
+      "product": "Prodotto",
+      "productGrade": "Qualità",
+      "note": "Note",
+      "add": "Aggiungi ordine",
+      "edit": "Modifica ordine",
+      "added": "Ordine aggiunto con successo",
+      "edited": "Ordine modificato con successo"
+    },
+    "product": {
+      "name": "Nome",
+      "pricePerUnit": "Prezzo unitario",
+      "unitOfMeasure": "Unità di misura",
+      "add": "Aggiungi prodotto",
+      "edit": "Modifica prodotto",
+      "added": "Prodotto aggiunto con successo",
+      "edited": "Prodotto modificato con successo"
+    },
+    "productGrade": {
+      "first": "Prima",
+      "second": "Seconda",
+      "mixed": "Mista"
+    },
+    "unitOfMeasure": {
+      "kilogram": "Kg",
+      "piece": "Pezzo"
+    }
+  },
+  "components": {
+    "ListUsersFilter": {
+      "searchPerName": "Cerca per nome"
+    },
+    "ListStoresFilter": {
+      "searchPerName": "Cerca per nome"
+    },
+    "ListProductsFilter": {
+      "searchPerName": "Cerca per nome"
+    },
+    "form": {
+      "user": {
+        "changePassword": "Cambia password"
+      },
+      "userLogin": {
+        "title": "Accedi"
+      }
+    }
+  },
+  "views": {
+    "users": {
+      "title": "Utenti"
+    },
+    "orders": {
+      "title": "Ordini"
+    },
+    "stats": {
+      "title": "Statistiche"
+    },
+    "stores": {
+      "title": "Punti Vendita"
+    },
+    "customers": {
+      "title": "Clienti"
+    },
+    "products": {
+      "title": "Prodotti"
+    },
+    "login": {
+      "title": "Accesso a Colture in Cloud"
+    },
+    "welcome": {
+      "title": "Benvenuto in Colture in Cloud",
+      "subtitle": {
+        "loggedIn": "Che piacere averti qui, {username}",
+        "default": "Accedi per continuare"
+      }
+    }
+  },
+  "error": {
+    "formGeneric": "Compila correttamente tutti i campi"
+  }
+}

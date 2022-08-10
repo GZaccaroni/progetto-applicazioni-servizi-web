@@ -1,18 +1,22 @@
 import { DbCustomer } from "./DbCustomer";
 import { DbIdentifiable } from "./DbIdentifiable";
+import { DbProductGrade } from "@/model/db/DbProduct";
 
 export interface DbOrderEntry {
-  itemId: string;
+  productId: string;
   variantId?: string;
   name: string;
   quantity: number;
   pricePerUnit: number;
   price: number;
+  grade?: DbProductGrade;
 }
 export interface DbOrder extends DbIdentifiable {
   customer?: DbCustomer;
-  storeId: string;
-  storeName: string;
+  store: {
+    id: string;
+    name: string;
+  };
   date: Date;
   entries: DbOrderEntry[];
   price: number;

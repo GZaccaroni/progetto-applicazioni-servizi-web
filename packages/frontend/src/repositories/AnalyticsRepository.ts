@@ -1,6 +1,6 @@
 import Client from "@/repositories/common/AxiosClient";
 import { DbChartData, DbChartDataType} from "@/model/db/DbChartData";
-import { DbItemKindIdentifier } from "@/model/db/DbItem";
+import { DbProductKindIdentifier } from "@/model/db/DbProduct";
 
 const resource = "/analytics";
 
@@ -8,7 +8,7 @@ export interface AnalyticsDataInput {
   dataType: DbChartDataType;
   fromDate?: Date;
   toDate?: Date;
-  items?: DbItemKindIdentifier[];
+  items?: DbProductKindIdentifier[];
   customerId?: string;
 }
 export async function getAnalyticsData(

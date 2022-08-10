@@ -1,0 +1,303 @@
+<template>
+  <form-dialog
+    v-model="isVisible"
+    :submit-button-text="$t('word.save').toString()"
+    :submit-button-loading="submitButtonLoading"
+    :submit-button-enabled="validateForm(formData)"
+    :title="$t(create ? 'model.order.add' : 'model.order.edit').toString()"
+    @submit="saveForm"
+    @close="closeForm"
+  >
+    <v-form ref="form" class="pa-4">
+      <v-row>
+        <async-select
+          v-model="formData.storeId"
+          :label="$t('model.order.store').toString()"
+          :find-items-fn="getSelectStores"
+        />
+      </v-row>
+      <v-row>
+        <async-select
+          v-model="formData.customerId"
+          :label="$t('model.order.customer').toString()"
+          :find-items-fn="getSelectCustomers"
+        />
+      </v-row>
+      <v-row>
+        <text-field-date-picker
+          v-model="formData.date"
+          :show-icon="false"
+          :label="$t('model.order.date').toString()"
+        />
+      </v-row>
+      <v-row class="pt-6 pb-4">
+        <div class="text-h5">Voci</div>
+        <v-spacer />
+        <v-btn @click="addEntry" icon>
+          <v-icon>mdi-plus-circle</v-icon>
+        </v-btn>
+      </v-row>
+      <v-row v-for="(_, index) in formData.entries" :key="index" align="center">
+        <v-col cols="6" md="4" class="py-0">
+          <async-select
+            v-model="selectedProducts[index]"
+            :label="$t('model.order.product').toString()"
+            :find-items-fn="getSelectProductKinds"
+            :return-object="true"
+          />
+        </v-col>
+        <v-col cols="6" md="2" class="py-0">
+          <async-select
+            v-model="formData.entries[index].grade"
+            :label="$t('model.order.productGrade').toString()"
+            :find-items-fn="getSelectProductGrade"
+          />
+        </v-col>
+        <v-col cols="6" md="3" class="py-0">
+          <v-text-field
+            type="number"
+            v-model.number="formData.entries[index].pricePerUnit"
+            :label="$t('model.order.pricePerUnit')"
+            :placeholder="priceHint(index)"
+            :suffix="priceSuffix(index)"
+            :min="0"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="5" md="2" class="py-0">
+          <v-text-field
+            type="number"
+            v-model.number="formData.entries[index].quantity"
+            :label="$t('model.order.quantity')"
+            :suffix="unitOfMeasure(index)"
+            :min="0"
+          ></v-text-field>
+        </v-col>
+        <v-spacer />
+        <v-btn @click="removeEntry(index)" icon>
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+        <v-col v-if="$vuetify.breakpoint.smAndDown" cols="12" class="px-2">
+          <v-divider cols="12" />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-textarea
+            :label="$t('model.order.note')"
+            v-model="formData.note"
+            rows="1"
+            auto-grow
+          ></v-textarea>
+        </v-col>
+      </v-row>
+    </v-form>
+  </form-dialog>
+</template>
+
+<script setup lang="ts">
+import { computed, defineProps, PropType, ref, watch } from "vue";
+import { repositoryErrorHandler } from "@/helpers/errorHandler";
+import { clone } from "lodash";
+import FormDialog, {
+  GenericFormDialogModel,
+} from "@/components/common/FormDialog.vue";
+import TextFieldDatePicker from "@/components/common/TextFieldDatePicker.vue";
+import AsyncSelect from "@/components/common/AsyncSelect.vue";
+import { showMessage } from "@/helpers/snackbar";
+import {
+  getSelectCustomers,
+  getSelectProductGrade,
+  getSelectProductKinds,
+  getSelectStores,
+  PRODUCT_KIND_IDENTIFIER_SEPARATOR,
+  SelectProductKind,
+} from "@/helpers/asyncSelectUtils";
+import { removeBlanks } from "@/helpers/utils";
+import { RecursivePartial } from "@/helpers/types";
+import i18n from "@/i18n";
+import {
+  addOrder,
+  findOrder,
+  updateOrder,
+} from "@/repositories/OrderRepository";
+import { UpdateOrderInput } from "@/model/UpdateOrderInput";
+import { DbOrder } from "@/model/db/DbOrder";
+import { AsyncSelectItem } from "@/components/common/AsyncSelectTypes";
+import { DbProduct } from "@/model/db/DbProduct";
+
+export type OrderFormDialogModel = GenericFormDialogModel<{
+  orderToUpdate?: string;
+}>;
+const props = defineProps({
+  value: {
+    type: Object as PropType<OrderFormDialogModel>,
+    required: true,
+  },
+});
+const emit = defineEmits(["input"]);
+
+const submitButtonLoading = ref(false);
+const formActionsDisabled = ref(false);
+const formData = ref<RecursivePartial<UpdateOrderInput>>({});
+const create = ref(false);
+const dialogLoading = ref(false);
+const isVisible = ref(false);
+const changePassword = ref(false);
+const selectedProducts = ref<
+  (AsyncSelectItem<SelectProductKind> | undefined)[]
+>([]);
+
+watch(
+  selectedProducts,
+  (newValue) => {
+    newValue.forEach((el, index) => {
+      formData.value.entries = formData.value.entries ?? [];
+      formData.value.entries[index].productId = el?.item?.productId;
+      formData.value.entries[index].variantId = el?.item?.variantId;
+    });
+  },
+  { deep: true }
+);
+watch(
+  () => props.value,
+  (el) => {
+    if (el.isVisible) {
+      onBecameVisible(el.orderToUpdate);
+    }
+    isVisible.value = el.isVisible;
+  }
+);
+
+async function onBecameVisible(itemToUpdate?: string) {
+  dialogLoading.value = true;
+  if (itemToUpdate != undefined) {
+    create.value = false;
+    const item = await findOrder(itemToUpdate).catch(repositoryErrorHandler);
+    console.log("Order to update", item);
+    if (item != undefined) {
+      console.log("Order mapped", mapToFormValue(item));
+      formData.value = mapToFormValue(item);
+    }
+  } else {
+    create.value = true;
+    formData.value = defaultValues;
+  }
+  setProductKindsIdentifiers();
+  changePassword.value = create.value;
+  dialogLoading.value = false;
+}
+function setProductKindsIdentifiers() {
+  selectedProducts.value = (formData.value.entries ?? []).map((el) => {
+    const id =
+      el.variantId == undefined
+        ? el.productId
+        : `${el.productId}${PRODUCT_KIND_IDENTIFIER_SEPARATOR}${el.variantId}`;
+    if (id != undefined) {
+      return {
+        id: id,
+        text: "",
+      };
+    } else {
+      return undefined;
+    }
+  });
+}
+function priceSuffix(index: number): string | undefined {
+  const item = selectedProducts.value[index]?.item;
+  if (item != undefined) {
+    let suffix = "€";
+    const unit = unitOfMeasure(index);
+    if (unit == undefined) return suffix;
+    suffix += "/" + unit;
+    return suffix;
+  } else {
+    return undefined;
+  }
+}
+function priceHint(index: number): string | undefined {
+  return selectedProducts.value[index]?.item?.pricePerUnit?.toString();
+}
+function unitOfMeasure(index: number): string | undefined {
+  const item = selectedProducts.value[index]?.item;
+  if (item != undefined) {
+    return i18n.t("model.unitOfMeasure." + item.unitOfMeasure).toString();
+  } else {
+    return undefined;
+  }
+}
+function addEntry() {
+  formData.value.entries?.push({});
+  selectedProducts.value.push();
+}
+function removeEntry(index: number) {
+  selectedProducts.value.splice(index, 1);
+  formData.value.entries?.splice(index, 1);
+}
+async function saveForm() {
+  submitButtonLoading.value = true;
+  formActionsDisabled.value = true;
+  const data = clone(removeBlanks(formData.value));
+  try {
+    if (!validateForm(data)) {
+      showMessage({
+        text: i18n.t("error.formGeneric").toString(),
+        type: "error",
+      });
+      submitButtonLoading.value = false;
+      return;
+    }
+    console.log("Data ", data);
+    if (create.value) {
+      await addOrder(data);
+    } else {
+      await updateOrder(data);
+    }
+    closeForm();
+    const message = create.value
+      ? i18n.t("model.order.added")
+      : i18n.t("model.order.edited");
+    showMessage({
+      type: "success",
+      text: message.toString(),
+    });
+    closeForm();
+  } catch (e) {
+    repositoryErrorHandler(e);
+  }
+  formActionsDisabled.value = false;
+  submitButtonLoading.value = false;
+}
+function closeForm() {
+  emit("input", { isVisible: false });
+}
+function validateForm(
+  form: RecursivePartial<UpdateOrderInput>
+): form is UpdateOrderInput {
+  const data = clone(removeBlanks(form));
+  return data.date != undefined;
+}
+
+// Helpers
+
+function mapToFormValue(item: DbOrder): RecursivePartial<UpdateOrderInput> {
+  return {
+    customerId: item.customer?.id,
+    storeId: item.store.id,
+    date: item.date,
+    entries:
+      item.entries.map((entry) => {
+        return {
+          productId: entry.productId,
+          variantId: entry.variantId,
+          pricePerUnit: entry.pricePerUnit,
+          quantity: entry.quantity,
+          grade: entry.grade,
+        };
+      }) ?? [],
+    note: item.note,
+  };
+}
+const defaultValues: RecursivePartial<UpdateOrderInput> = {
+  entries: [],
+};
+</script>
