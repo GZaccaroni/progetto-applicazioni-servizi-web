@@ -7,8 +7,8 @@ export interface DbChartDataItem {
   }>;
 }
 export enum DbChartDataType {
-  Quantity = "quantity",
-  Revenue = "price",
+  quantity = "quantity",
+  price = "price",
 }
 
 export interface DbChartData {
