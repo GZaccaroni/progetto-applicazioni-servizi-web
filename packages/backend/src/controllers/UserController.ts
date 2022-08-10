@@ -264,10 +264,12 @@ export const userLogin = (req, res: Response) => {
     }
   })(req, response);
 }
+export const userLogout = (req, res: Response) => {
+  req.logout(function (err) {
+    if (err) {
       res.status(500).json(err);
+    } else {
+      res.json({message: "logout"});
     }
   });
-}
-export const userLogout = (req, res: Response) => {
-  req.logout.then(() => res.json({message: "Logged In"})).catch(err => res.status(500).json(err));
 }
