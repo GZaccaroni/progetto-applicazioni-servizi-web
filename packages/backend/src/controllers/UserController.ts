@@ -262,7 +262,7 @@ export const userLogin = (req, res: Response) => {
         }
       }
     }
-  })(req, response);
+  })(req, res);
 }
 export const userLogout = (req, res: Response) => {
   req.logout(function (err) {
