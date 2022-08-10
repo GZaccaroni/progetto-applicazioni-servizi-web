@@ -10,11 +10,11 @@ import {io} from "../app";
 import {GetCustomers} from "../model/request/type/GetCustomers";
 import Order from "../model/db_model/Order";
 
-const checkCustomerConsistence = async (customer) => {
-  await Customer.findOne({name: customer.name}).then(customer=>{
-    if(customer){
+const checkCustomerConsistence = async (customer, customerId?) => {
+  await Customer.findOne({name: customer.name}).then(customer => {
+    if (customer && !(customerId && customer._id == customerId)) {
       throw {
-        code:400,
+        code: 400,
         error: {errCode: "nameAlreadyinUse", message: "Invalid Customer name"}
       }
     }
@@ -106,7 +106,7 @@ export const updateCustomer = (req, res: Response) => {
     });
     return;
   }
-  checkCustomerConsistence(req.body).then(() => {
+  checkCustomerConsistence(req.body,req.params.customerId).then(() => {
     Customer.findByIdAndUpdate(req.params.customerId, req.body, {new: true}).then(customer => {
       if (customer == null) {
         throw {

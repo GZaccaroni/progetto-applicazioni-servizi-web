@@ -10,7 +10,7 @@ import {io} from "../app";
 import {GetProducts} from "../model/request/type/GetProducts";
 import Order from "../model/db_model/Order";
 
-const checkProductConsistence = async (product) => {
+const checkProductConsistence = async (product, productId?) => {
   const productKindSet = new Set(product.kinds.map(productKind => productKind.name));
   if (productKindSet.size != product.kinds.length) {
     throw {
@@ -20,10 +20,10 @@ const checkProductConsistence = async (product) => {
   }
 
   await Product.findOne({name: product.name}).then(product => {
-    if (product) {
+    if (product && !(productId && product._id==productId)) {
       throw {
         code: 400,
-        error: {errCode: "nameAlreadyinUse", message: "Invalid Product name"}
+        error: {errCode: "nameAlreadyInUse", message: "Invalid Product name"}
       }
     }
   });
@@ -84,14 +84,14 @@ export const getProducts = (req, res: Response) => {
   const query = {};
   if (req.query.searchName) {
     query["$or"] = [{"name": {$regex: req.query.searchName, $options: "i"}},
-                    {"kinds.fullName": {$regex: req.query.searchName, $options: "i"}}];
+      {"kinds.fullName": {$regex: req.query.searchName, $options: "i"}}];
   }
   const options = paginateOptions(query,
-                                  ProductProjection,
-                                  {},
-                                  req.query.limit,
-                                  req.query.pagingNext,
-                                  req.query.paginatePrevious);
+    ProductProjection,
+    {},
+    req.query.limit,
+    req.query.pagingNext,
+    req.query.paginatePrevious);
   Product.paginate(options, err => res.status(500).json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
@@ -142,7 +142,7 @@ export const updateProduct = (req, res: Response) => {
     return;
   }
   const enrichedProduct = enrichProduct(req.body);
-  checkProductConsistence(enrichedProduct).then(() => {
+  checkProductConsistence(enrichedProduct, req.params.productId).then(() => {
     Product.findById(req.params.productId).then(product => {
       const deletedKindId = product.kinds.filter(k => enrichedProduct.kinds.find(x => x.id == k.id) == null).map(k => k.id);
       Order.findOne({"entries.variantId": deletedKindId}).then(order => {
@@ -189,7 +189,7 @@ export const updateProduct = (req, res: Response) => {
     }
   });
 }
-export const deleteProduct=(req,res: Response)=>{
+export const deleteProduct = (req, res: Response) => {
   if (!req.user.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",
@@ -205,7 +205,7 @@ export const deleteProduct=(req,res: Response)=>{
     return;
   }
 
-  Order.findOne({"entries.productId":req.params.productId}).then(order=> {
+  Order.findOne({"entries.productId": req.params.productId}).then(order => {
     if (order) {
       throw {
         code: 403,
@@ -215,8 +215,8 @@ export const deleteProduct=(req,res: Response)=>{
         }
       };
     }
-  }).then(()=>{
-    Product.findByIdAndDelete(req.params.productId).then( product => {
+  }).then(() => {
+    Product.findByIdAndDelete(req.params.productId).then(product => {
       if (product == null) {
         throw {
           code: 404,
