@@ -67,6 +67,16 @@ const routes: Array<RouteConfig> = [
     },
   },
   {
+    path: "/stats",
+    name: "stats",
+    component: () =>
+      import(/* webpackChunkName: "stats" */ "../views/stats/StatsView.vue"),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
     path: "*",
     redirect: "/",
   },
