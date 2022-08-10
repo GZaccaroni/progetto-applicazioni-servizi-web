@@ -1,3 +1,6 @@
+/* eslint:disable no-var-requires */
+import sourceMapSupport = require('source-map-support');
+sourceMapSupport.install();
 import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
