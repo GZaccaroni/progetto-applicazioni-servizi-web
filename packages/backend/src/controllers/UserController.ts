@@ -9,6 +9,7 @@ import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import {io} from "../app";
 import Store from "../model/db_model/Store";
+import {GetUsers} from "../model/request/type/GetUsers";
 
 export const createUser = (req, res: Response) => {
   if (!validateRequest<CreateUser>("CreateUser", req.body)) {
@@ -66,7 +67,7 @@ export const getUsers = (req, res: Response) => {
     res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
     return;
   }
-  if (!validateRequest<CreateUser>("CreateUser", req.body)) {
+  if (!validateRequest<GetUsers>("GetUsers", req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -236,25 +237,26 @@ export const userLogin = (req, res: Response) => {
     });
     return;
   }
-  passport.authenticate('local').then(user=> {
-    if (user) {
-      req.login(user).then(()=>res.json({message: "Logged In"}));
-    } else {
-      throw {
-        code:400,
-        error: {
-          errCode: "invalidArgument",
-          message: "Invalid username/password supplied"
-        }
-      }
-    }
-  }).catch(err => {
-    if(err.code && err.error){
-      res.status(err.code).json(err.error)
-    } else {
+  passport.authenticate('local', function (err, user) {
+    if (err) {
       res.status(500).json(err);
+      return;
     }
-  });
+    if (user) {
+      req.login(user, function (err) {
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          res.json({message: "Logged In"});
+        }
+      });
+    } else {
+      res.status(400).json({
+        errCode: "invalidArgument",
+        message: "Invalid username/password supplied"
+      });
+    }
+  })(req, res);
 }
 export const userLogout = (req, res: Response) => {
   req.logout.then(() => res.json({message: "Logged In"})).catch(err => res.status(500).json(err));
