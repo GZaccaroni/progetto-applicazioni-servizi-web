@@ -29,8 +29,11 @@ export const createUser = (req, res: Response) => {
   UserDb.findOne({username:req.body.username}).then(user=>{
     if(user){
       throw {
-        code:400,
-        error: {errCode: "nameAlreadyinUse", message: "Invalid Username"}
+        code: 400,
+        error: {
+          errCode: "nameAlreadyInUse",
+          message: "Invalid Username"
+        }
       }
     }
   }).then(()=>{
@@ -190,7 +193,10 @@ export const deleteUser = (req, res: Response) => {
     if(user == null){
       throw {
         code: 400,
-        error:{errCode: "itemNotFound", message: "User not found"}
+        error: {
+          errCode: "itemNotFound",
+          message: "User not found"
+        }
       }
     }
     Store.updateMany({"authorizations.userId": user._id}, {$pullAll: {authorizations: user._id}}).then(() => {
@@ -198,7 +204,10 @@ export const deleteUser = (req, res: Response) => {
         if (result.deletedCount < 1) {
           throw {
             code: 400,
-            error: {errCode: "itemNotFound", message: "User not found"}
+            error: {
+              errCode: "itemNotFound",
+              message: "User not found"
+            }
           }
         }
         if (req.user.username == user.username) {
