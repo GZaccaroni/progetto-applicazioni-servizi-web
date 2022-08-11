@@ -9,6 +9,7 @@ import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import {io} from "../app";
 import Store from "../model/db_model/Store";
+import {GetUsers} from "../model/request/type/GetUsers";
 
 export const createUser = (req, res: Response) => {
   if (!validateRequest<CreateUser>("CreateUser", req.body)) {
@@ -66,7 +67,7 @@ export const getUsers = (req, res: Response) => {
     res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
     return;
   }
-  if (!validateRequest<CreateUser>("CreateUser", req.body)) {
+  if (!validateRequest<GetUsers>("GetUsers", req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"

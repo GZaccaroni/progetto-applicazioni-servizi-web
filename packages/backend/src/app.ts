@@ -10,6 +10,7 @@ import routes from "./routes/Routes";
 import mongoose from "mongoose";
 import {Server} from "socket.io";
 import * as http from "http";
+import {queryParser} from "express-query-parser";
 
 const app = express();
 const port = 3000;
@@ -19,6 +20,15 @@ export const io = new Server(server, { cors: { credentials: true, origin: true }
 app.use(cors({credentials: true, origin: true}));
 
 app.use(express.json());
+app.use(
+  queryParser({
+    parseNull: true,
+    parseUndefined: true,
+    parseBoolean: true,
+    parseNumber: true
+  })
+)
+
 app.use(session({
   secret: 'r8q,+&1LM3)CD*zAGpx1xm{Pusadnstrc;#',
   resave: false,

@@ -11,7 +11,7 @@ import {GetStores} from "../model/request/type/GetStores";
 import User from "../model/db_model/User";
 import Order from "../model/db_model/Order";
 
-const checkStoreConsistence = async (store) => {
+const checkStoreConsistence = async (store, storeId?) => {
   const invalidAuthorizationError = {
     code: 400,
     error: {
@@ -35,10 +35,10 @@ const checkStoreConsistence = async (store) => {
     }))
   });
   promises.push(Store.findOne({name: store.name}).then(store => {
-    if (store) {
+    if (store && !(storeId && store._id==storeId)) {
       throw {
         code: 400,
-        error: {errCode: "nameAlreadyinUse", message: "Invalid Store name"}
+        error: {errCode: "nameAlreadyInUse", message: "Invalid Store name"}
       }
     }
   }));
@@ -128,7 +128,7 @@ export const updateStore = (req, res: Response) => {
     res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
-  checkStoreConsistence(req.body).then(() => {
+  checkStoreConsistence(req.body,req.params.storeId).then(() => {
     Store.findByIdAndUpdate(req.params.storeId, req.body, {new: true}).then(store => {
       if (store == null) {
         throw {
