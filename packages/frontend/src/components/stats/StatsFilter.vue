@@ -1,58 +1,64 @@
 <template>
   <v-form class="pa-4" @submit.prevent>
     <v-container fluid>
-      <v-row no-gutters>
-        <v-col cols="4">
-          <async-select
-            v-model="form.dataType"
-            :label="$t('word.chartDataType').toString()"
-            :find-items-fn="getSelectChartDataType"
-            :lazy="false"
-          />
+      <v-row>
+        <v-col cols="12" md="8">
+          <v-row>
+            <v-col cols="6" sm="3" md="2">
+              <async-select
+                v-model="form.dataType"
+                :label="$t('word.chartDataType').toString()"
+                :find-items-fn="getSelectChartDataType"
+                :lazy="false"
+              />
+            </v-col>
+            <v-col cols="6" sm="3" md="3">
+              <async-select
+                v-model="form.storeId"
+                :label="$t('word.store').toString()"
+                :find-items-fn="getSelectStores"
+                :clearable="true"
+              />
+            </v-col>
+            <v-col cols="6" sm="3" md="3">
+              <async-select
+                v-model="form.customerId"
+                :label="$t('word.customer').toString()"
+                :find-items-fn="getSelectCustomers"
+                :clearable="true"
+              />
+            </v-col>
+            <v-col cols="6" sm="3" md="3">
+              <async-select
+                v-model="productsKinds"
+                :label="$t('model.order.product').toString()"
+                :find-items-fn="getSelectProductKinds"
+                :multiple="true"
+                :clearable="true"
+              />
+            </v-col>
+          </v-row>
         </v-col>
-        <v-spacer />
-        <v-col cols="4">
-          <text-field-date-picker
-            v-model="form.fromDate"
-            :max="form.toDate"
-            :label="$t('word.fromDate').toString()"
-            :clearable="true"
-          />
-        </v-col>
-        <v-col cols="4">
-          <text-field-date-picker
-            v-model="form.toDate"
-            :min="form.fromDate"
-            :label="$t('word.toDate').toString()"
-            :clearable="true"
-          />
-        </v-col>
-      </v-row>
-      <v-row no-gutters>
-        <v-col cols="4">
-          <async-select
-            v-model="form.storeId"
-            :label="$t('word.stores').toString()"
-            :find-items-fn="getSelectStores"
-            :clearable="true"
-          />
-        </v-col>
-        <v-col cols="4">
-          <async-select
-            v-model="form.customerId"
-            :label="$t('word.customer').toString()"
-            :find-items-fn="getSelectCustomers"
-            :clearable="true"
-          />
-        </v-col>
-        <v-col cols="4" md="4" class="py-0">
-          <async-select
-            v-model="productsKinds"
-            :label="$t('model.order.product').toString()"
-            :find-items-fn="getSelectProductKinds"
-            :multiple="true"
-            :clearable="true"
-          />
+        <v-col cols="12" md="4">
+          <v-spacer />
+          <v-row>
+            <v-col cols="6">
+              <text-field-date-picker
+                v-model="form.fromDate"
+                :max="form.toDate"
+                :label="$t('word.fromDate').toString()"
+                :clearable="true"
+              />
+            </v-col>
+            <v-col cols="6">
+              <text-field-date-picker
+                v-model="form.toDate"
+                :min="form.fromDate"
+                :label="$t('word.toDate').toString()"
+                :clearable="true"
+              />
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
     </v-container>
