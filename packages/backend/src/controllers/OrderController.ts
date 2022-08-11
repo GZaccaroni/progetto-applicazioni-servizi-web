@@ -102,8 +102,8 @@ export const addOrder = (req, res: Response) => {
     });
     return;
   }
-  getUserStoreRole(req.user._id, req.body.storeId).then(storeRole=>{
-    if ((storeRole != AccessLevel.Salesman || storeRole!= AccessLevel.Manager) && !req.user.isAdmin) {
+  getUserStoreRole(req.user._id, req.body.storeId).then(userRole=>{
+    if ((userRole != AccessLevel.Salesman || userRole!= AccessLevel.Manager) && !req.user.isAdmin) {
       throw {
         code: 403,
         error: {
@@ -149,8 +149,8 @@ export const getOrders = (req, res: Response) => {
       message: "Bad request"
     });
   }
-  getUserStoreRole(req.user._id, req.body.storeId).then(storeRole => {
-    if ((storeRole != AccessLevel.Salesman || storeRole != AccessLevel.Manager) && !req.user.isAdmin) {
+  getUserStoreRole(req.user._id, req.body.storeId).then(userRole => {
+    if ((userRole != AccessLevel.Salesman || userRole != AccessLevel.Manager) && !req.user.isAdmin) {
       throw {
         code: 403,
         error: {
@@ -202,8 +202,8 @@ export const getOrderById = (req, res: Response) => {
           }
         }
       } else {
-        getUserStoreRole(req.user._id, order.storeId).then(storeRole => {
-          if ((storeRole != AccessLevel.Salesman || storeRole != AccessLevel.Manager) && !req.user.isAdmin) {
+        getUserStoreRole(req.user._id, order.storeId).then(userRole => {
+          if ((userRole != AccessLevel.Salesman || userRole != AccessLevel.Manager) && !req.user.isAdmin) {
             throw {
               code: 403,
               error: {
@@ -239,8 +239,8 @@ export const updateOrder = (req, res: Response) => {
         }
       }
     } else {
-      getUserStoreRole(req.user._id, order.storeId).then(storeRole => {
-        if (!(storeRole == AccessLevel.Salesman && order.createdBy == req.user._id) && storeRole != AccessLevel.Manager && !req.user.isAdmin) {
+      getUserStoreRole(req.user._id, order.storeId).then(userRole => {
+        if (!(userRole == AccessLevel.Salesman && order.createdBy == req.user._id) && userRole != AccessLevel.Manager && !req.user.isAdmin) {
           throw {
             code: 403,
             error: {
@@ -291,8 +291,8 @@ export const deleteOrder=(req,res: Response)=>{
         }
       }
     } else {
-      getUserStoreRole(req.user._id, order.storeId).then(storeRole => {
-        if (!(storeRole == AccessLevel.Salesman && order.createdBy == req.user._id) && storeRole != AccessLevel.Manager && !req.user.isAdmin) {
+      getUserStoreRole(req.user._id, order.storeId).then(userRole => {
+        if (!(userRole == AccessLevel.Salesman && order.createdBy == req.user._id) && userRole != AccessLevel.Manager && !req.user.isAdmin) {
           throw {
             code: 403,
             error: {
