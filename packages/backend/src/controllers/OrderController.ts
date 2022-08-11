@@ -12,6 +12,7 @@ import mongoose from "mongoose";
 import {io} from "../app";
 import {GetOrders} from "../model/request/type/GetOrders";
 import {AccessLevel} from "../model/request/type/StoreAuthorization";
+import {getStoreRole} from "./StoreController";
 
 const enrichOrder = async (order, creatorId) => {
   const enrichedOrder = {
@@ -92,26 +93,6 @@ const enrichOrder = async (order, creatorId) => {
   await Promise.all(promises);
   return enrichedOrder;
 }
-
-const getStoreRole = async (userId, storeId) => {
-  const store = await Store.findById(storeId, {});
-  if (!store) {
-    throw {
-      code: 400,
-      error: {
-        errCode: "itemNotFound",
-        message: "Invalid Input: Store not found"
-      }
-    }
-  }
-  const userAuthorization = store.authorizations.find(x => x.userId.toString() == userId);
-  if (userAuthorization) {
-    return userAuthorization.accessLevel;
-  } else {
-    return undefined;
-  }
-}
-
 
 export const addOrder = (req, res: Response) => {
   if (!validateRequest<CreateOrder>("CreateOrder", req.body)) {

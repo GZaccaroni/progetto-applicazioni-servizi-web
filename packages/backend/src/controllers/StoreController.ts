@@ -45,6 +45,25 @@ const checkStoreConsistence = async (store, storeId?) => {
   await Promise.all(promises);
 }
 
+export const getStoreRole = async (userId, storeId) => {
+  const store = await Store.findById(storeId, {});
+  if (!store) {
+    throw {
+      code: 400,
+      error: {
+        errCode: "itemNotFound",
+        message: "Invalid Input: Store not found"
+      }
+    }
+  }
+  const userAuthorization = store.authorizations.find(x => x.userId.toString() == userId);
+  if (userAuthorization) {
+    return userAuthorization.accessLevel;
+  } else {
+    return undefined;
+  }
+}
+
 export const addStore = (req, res: Response) => {
   if (!req.user.isAdmin) {
     res.status(403).json({
