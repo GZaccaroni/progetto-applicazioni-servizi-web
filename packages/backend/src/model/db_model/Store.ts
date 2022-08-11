@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import {mongoosePagination, Pagination} from "mongoose-paginate-ts";
 import {Store} from "../request/type/Store";
+import {AccessLevel} from "../request/type/StoreAuthorization";
 
 type StoreDocument = mongoose.Document & Store;
 const StoreSchema = new mongoose.Schema({
@@ -10,7 +11,10 @@ const StoreSchema = new mongoose.Schema({
   },
   authorizations: [{
     userId: String,
-    accessLevel: String
+    accessLevel: {
+      type: String,
+      enum: [AccessLevel.Salesman, AccessLevel.Manager]
+    }
   }]
 });
 
