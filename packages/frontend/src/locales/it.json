@@ -34,7 +34,10 @@
     "fromDate": "Da",
     "toDate": "a",
     "store": "Punto vendita",
-    "user": "Utente"
+    "stores": "Punti vendita",
+    "user": "Utente",
+    "customer": "Cliente",
+    "chartDataType": "Dato da visualizzare"
   },
   "model": {
     "user": {
@@ -97,6 +100,12 @@
       "first": "Prima",
       "second": "Seconda",
       "mixed": "Mista"
+    },
+    "chartDataType": {
+      "quantity": "Quantità",
+      "price": "Prezzo",
+      "quantityUnit": "unità",
+      "priceUnit": "€"
     },
     "unitOfMeasure": {
       "kilogram": "Kg",

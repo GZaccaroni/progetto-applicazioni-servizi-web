@@ -10,7 +10,6 @@
     item-text="text"
     :loading="isLoading"
     :multiple="multiple"
-    :small-chips="multiple"
     :clearable="clearable"
     :return-object="returnObject"
   >
@@ -135,7 +134,6 @@ export default defineComponent({
       this.updateItems();
     },
     items(newItems: AsyncSelectItem<unknown>[]) {
-      console.log("Updated items");
       const valueState = this.valueState;
       if (valueState == undefined || typeof valueState == "string") return;
       if (Array.isArray(valueState)) {

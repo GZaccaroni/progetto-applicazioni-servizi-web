@@ -2,7 +2,7 @@
   <v-form class="pa-4" @submit.prevent>
     <v-container fluid>
       <v-row no-gutters>
-        <v-col cols="4">
+        <v-col cols="4" md="3" lg="2">
           <async-select
             v-model="form.storeId"
             :label="$t('word.store').toString()"
@@ -11,7 +11,7 @@
           />
         </v-col>
         <v-spacer />
-        <v-col cols="4">
+        <v-col cols="4" md="3" lg="2">
           <text-field-date-picker
             v-model="form.fromDate"
             :max="form.toDate"
@@ -19,7 +19,7 @@
             :clearable="true"
           />
         </v-col>
-        <v-col cols="4">
+        <v-col cols="4" md="3" lg="2">
           <text-field-date-picker
             v-model="form.toDate"
             :min="form.fromDate"
