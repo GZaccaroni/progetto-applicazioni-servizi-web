@@ -45,7 +45,7 @@ const checkStoreConsistence = async (store, storeId?) => {
   await Promise.all(promises);
 }
 
-export const getStoreRole = async (userId, storeId) => {
+export const getUserStoreRole = async (userId, storeId) => {
   const store = await Store.findById(storeId, {});
   if (!store) {
     throw {

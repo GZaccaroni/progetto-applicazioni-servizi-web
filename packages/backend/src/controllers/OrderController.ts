@@ -12,7 +12,7 @@ import mongoose from "mongoose";
 import {io} from "../app";
 import {GetOrders} from "../model/request/type/GetOrders";
 import {AccessLevel} from "../model/request/type/StoreAuthorization";
-import {getStoreRole} from "./StoreController";
+import {getUserStoreRole} from "./StoreController";
 
 const enrichOrder = async (order, creatorId) => {
   const enrichedOrder = {
@@ -102,7 +102,7 @@ export const addOrder = (req, res: Response) => {
     });
     return;
   }
-  getStoreRole(req.user._id, req.body.storeId).then(storeRole=>{
+  getUserStoreRole(req.user._id, req.body.storeId).then(storeRole=>{
     if ((storeRole != AccessLevel.Salesman || storeRole!= AccessLevel.Manager) && !req.user.isAdmin) {
       throw {
         code: 403,
@@ -149,7 +149,7 @@ export const getOrders = (req, res: Response) => {
       message: "Bad request"
     });
   }
-  getStoreRole(req.user._id, req.body.storeId).then(storeRole => {
+  getUserStoreRole(req.user._id, req.body.storeId).then(storeRole => {
     if ((storeRole != AccessLevel.Salesman || storeRole != AccessLevel.Manager) && !req.user.isAdmin) {
       throw {
         code: 403,
@@ -202,7 +202,7 @@ export const getOrderById = (req, res: Response) => {
           }
         }
       } else {
-        getStoreRole(req.user._id, order.storeId).then(storeRole => {
+        getUserStoreRole(req.user._id, order.storeId).then(storeRole => {
           if ((storeRole != AccessLevel.Salesman || storeRole != AccessLevel.Manager) && !req.user.isAdmin) {
             throw {
               code: 403,
@@ -239,7 +239,7 @@ export const updateOrder = (req, res: Response) => {
         }
       }
     } else {
-      getStoreRole(req.user._id, order.storeId).then(storeRole => {
+      getUserStoreRole(req.user._id, order.storeId).then(storeRole => {
         if (!(storeRole == AccessLevel.Salesman && order.createdBy == req.user._id) && storeRole != AccessLevel.Manager && !req.user.isAdmin) {
           throw {
             code: 403,
@@ -291,7 +291,7 @@ export const deleteOrder=(req,res: Response)=>{
         }
       }
     } else {
-      getStoreRole(req.user._id, order.storeId).then(storeRole => {
+      getUserStoreRole(req.user._id, order.storeId).then(storeRole => {
         if (!(storeRole == AccessLevel.Salesman && order.createdBy == req.user._id) && storeRole != AccessLevel.Manager && !req.user.isAdmin) {
           throw {
             code: 403,
