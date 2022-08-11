@@ -11,16 +11,18 @@ import Customer, {CustomerProjection} from "../model/db_model/Customer";
 import mongoose from "mongoose";
 import {io} from "../app";
 import {GetOrders} from "../model/request/type/GetOrders";
+import {AccessLevel} from "../model/request/type/StoreAuthorization";
 
-const enrichOrder = async (order)=>{
-  const enrichedOrder={
+const enrichOrder = async (order, creatorId) => {
+  const enrichedOrder = {
     date: order.date,
-    entries:[]
+    entries: [],
+    createdBy: creatorId
   }
-  if(order.note){
-    enrichedOrder["note"]=order.note;
+  if (order.note) {
+    enrichedOrder["note"] = order.note;
   }
-  const promises=[]
+  const promises = []
   //get Store data
   promises.push(Store.findById(order.storeId, {id: "$_id", name: 1}).then(
     store => {
@@ -28,7 +30,11 @@ const enrichOrder = async (order)=>{
         enrichedOrder["store"] = store;
       } else {
         throw {
-          code: 400, error: {errCode: "itemNotFound", message: "Invalid Input: Store not found"}
+          code: 400,
+          error: {
+            errCode: "itemNotFound",
+            message: "Invalid Input: Store not found"
+          }
         };
       }
     }
@@ -38,18 +44,26 @@ const enrichOrder = async (order)=>{
   order.entries.forEach(entry => {
     entry["price"] = entry.pricePerUnit * entry.quantity;
     entryPromises.push(Product.findById(entry.productId).then(product => {
-      if(product==null){
+      if (product == null) {
         throw {
-          code: 400, error: {errCode: "itemNotFound", message: "Invalid Input: Product not found"}
+          code: 400,
+          error: {
+            errCode: "itemNotFound",
+            message: "Invalid Input: Product not found"
+          }
         };
       }
       if (entry.variantId) {
-        const kind=product.kinds.find(x => x.id == entry.variantId);
-        if(kind){
+        const kind = product.kinds.find(x => x.id == entry.variantId);
+        if (kind) {
           entry["name"] = kind.fullName;
         } else {
           throw {
-            code: 400, error: {errCode: "itemNotFound", message: "Invalid Input: Product kind not found"}
+            code: 400,
+            error: {
+              errCode: "itemNotFound",
+              message: "Invalid Input: Product kind not found"
+            }
           };
         }
       } else {
@@ -66,7 +80,11 @@ const enrichOrder = async (order)=>{
         enrichedOrder["customer"] = customer;
       } else {
         throw {
-          code: 400, error: {errCode: "itemNotFound", message: "Invalid Input: Customer not found"}
+          code: 400,
+          error: {
+            errCode: "itemNotFound",
+            message: "Invalid Input: Customer not found"
+          }
         };
       }
     }));
@@ -75,28 +93,58 @@ const enrichOrder = async (order)=>{
   return enrichedOrder;
 }
 
-export const addOrder=(req,res: Response)=>{
-  if(!validateRequest<CreateOrder>("CreateOrder",req.body)){
+const getStoreRole = async (userId, storeId) => {
+  const store = await Store.findById(storeId, {});
+  if (!store) {
+    throw {
+      code: 400,
+      error: {
+        errCode: "itemNotFound",
+        message: "Invalid Input: Store not found"
+      }
+    }
+  }
+  const userAuthorization = store.authorizations.find(x => x.userId.toString() == userId);
+  if (userAuthorization) {
+    return userAuthorization.accessLevel;
+  } else {
+    return undefined;
+  }
+}
+
+
+export const addOrder = (req, res: Response) => {
+  if (!validateRequest<CreateOrder>("CreateOrder", req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
     });
     return;
   }
-  //TODO Not authorized
-  enrichOrder(req.body).then(newOrder => {
-    Order.create(newOrder).then(order => {
-      Log.create({
-        username: req.user.username,
-        action: "Create",
-        object: {
-          id: order._id,
-          type: "Order"
+  getStoreRole(req.user._id, req.body.storeId).then(storeRole=>{
+    if ((storeRole != AccessLevel.Salesman || storeRole!= AccessLevel.Manager) && !req.user.isAdmin) {
+      throw {
+        code: 403,
+        error: {
+          errCode: "notAuthorized",
+          message: "User not authorized"
         }
-      }).then(() => {
-        io.emit("orderChanged", {id: order._id, action: "create"});
-        res.json("Add Order");
-      });
+      }
+    }
+    enrichOrder(req.body,req.user._id).then(newOrder => {
+      Order.create(newOrder).then(order => {
+        Log.create({
+          username: req.user.username,
+          action: "Create",
+          object: {
+            id: order._id,
+            type: "Order"
+          }
+        }).then(() => {
+          io.emit("orderChanged", {id: order._id, action: "create"});
+          res.json("Add Order");
+        });
+      })
     })
   }).catch(err => {
     if(err.code && err.error){
@@ -114,33 +162,48 @@ export const getOrders = (req, res: Response) => {
     });
     return;
   }
-  const query={};
-  if(mongoose.isValidObjectId(req.query.storeId)) {
-    query["store.id"] = req.query.storeId;
-  } else {
+  if(!mongoose.isValidObjectId(req.query.storeId)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Bad request"
     });
   }
-  if (req.query.fromDate) {
-    if(!query["date"]){
-      query["date"]={};
+  getStoreRole(req.user._id, req.body.storeId).then(storeRole => {
+    if ((storeRole != AccessLevel.Salesman || storeRole != AccessLevel.Manager) && !req.user.isAdmin) {
+      throw {
+        code: 403,
+        error: {
+          errCode: "notAuthorized",
+          message: "User not authorized"
+        }
+      }
     }
-    query["date"]["$gte"] = new Date(req.query.fromDate);
-  }
-  if (req.query.toDate) {
-    if(!query["date"]){
-      query["date"]={};
+    const query = {"store.id": req.query.storeId};
+    if (req.query.fromDate) {
+      if (!query["date"]) {
+        query["date"] = {};
+      }
+      query["date"]["$gte"] = new Date(req.query.fromDate);
     }
-    query["date"]["$lte"] = new Date(req.query.toDate);
-  }
-  const options = paginateOptions(query, OrderProjection, {date: -1}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
-  Order.paginate(options, err => res.status(500).json(err)).then((result) => {
-    res.json(paginateResponse(result));
+    if (req.query.toDate) {
+      if (!query["date"]) {
+        query["date"] = {};
+      }
+      query["date"]["$lte"] = new Date(req.query.toDate);
+    }
+    const options = paginateOptions(query, OrderProjection, {date: -1}, req.query.limit, req.query.pagingNext, req.query.paginatePrevious);
+    Order.paginate(options).then((result) => {
+      res.json(paginateResponse(result));
+    });
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
+    }
   });
 }
-export const getOrderById = (req: Request, res: Response) => {
+export const getOrderById = (req, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.orderId)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -148,18 +211,34 @@ export const getOrderById = (req: Request, res: Response) => {
     });
     return;
   }
-  //TODO Not authorized
-  Order.findById(req.params.orderId,OrderProjection,(err,order)=>{
-    if (err) {
-      res.status(500).json(err);
-    } else {
-      if(order==null){
-        res.status(404).json({
-          errCode: "itemNotFound",
-          message: "Order not found"});
+  Order.findById(req.params.orderId,OrderProjection).then(order=>{
+      if (order == null) {
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: "Order not found"
+          }
+        }
       } else {
-        res.json(order);
+        getStoreRole(req.user._id, order.storeId).then(storeRole => {
+          if ((storeRole != AccessLevel.Salesman || storeRole != AccessLevel.Manager) && !req.user.isAdmin) {
+            throw {
+              code: 403,
+              error: {
+                errCode: "notAuthorized",
+                message: "User not authorized"
+              }
+            }
+          }
+          res.json(order);
+        })
       }
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error)
+    } else {
+      res.status(500).json(err);
     }
   });
 }
@@ -169,28 +248,50 @@ export const updateOrder = (req, res: Response) => {
     res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
   }
-  enrichOrder(req.body).then( newOrder => {
-    Order.findOneAndReplace({_id:req.params.orderId},newOrder).then(order => {
-      Log.create({
-        username: req.user.username,
-        action: "Update",
-        object: {
-          id: order._id,
-          type: "Order"
+  Order.findById(req.params.orderId, OrderProjection).then(order => {
+    if (order == null) {
+      throw {
+        code: 404,
+        error: {
+          errCode: "itemNotFound",
+          message: "Order not found"
         }
-      }).then(() => {
-        io.emit("orderChanged", {id: order._id, action: "update"});
-        res.json("Order Updated");
-      });
-    })
+      }
+    } else {
+      getStoreRole(req.user._id, order.storeId).then(storeRole => {
+        if (!(storeRole == AccessLevel.Salesman && order.createdBy == req.user._id) && storeRole != AccessLevel.Manager && !req.user.isAdmin) {
+          throw {
+            code: 403,
+            error: {
+              errCode: "notAuthorized",
+              message: "User not authorized"
+            }
+          }
+        }
+        enrichOrder(req.body, order.createdBy).then(newOrder => {
+          Order.findOneAndReplace({_id: req.params.orderId}, newOrder).then(order => {
+            Log.create({
+              username: req.user.username,
+              action: "Update",
+              object: {
+                id: order._id,
+                type: "Order"
+              }
+            }).then(() => {
+              io.emit("orderChanged", {id: order._id, action: "update"});
+              res.json("Order Updated");
+            });
+          })
+        })
+      })
+    }
   }).catch(err => {
-    if(err.code && err.error){
+    if (err.code && err.error) {
       res.status(err.code).json(err.error);
     } else {
       res.status(500).json(err);
     }
   });
-
 }
 export const deleteOrder=(req,res: Response)=>{
   if (!mongoose.isValidObjectId(req.params.orderId)) {
@@ -199,28 +300,46 @@ export const deleteOrder=(req,res: Response)=>{
       message: "Invalid ID supplied"});
     return;
   }
-  //TODO not authorized
-  Order.findByIdAndDelete(req.params.orderId,(err,order)=>{
-    if (err)
-      res.status(500).json(err);
-    else {
-      if (order == null) {
-        res.status(404).json({
+  Order.findById(req.params.orderId, OrderProjection).then(order => {
+    if (order == null) {
+      throw {
+        code: 404,
+        error: {
           errCode: "itemNotFound",
-          message: "Order not found"});
-      } else {
-        Log.create({
-          username: req.user.username,
-          action: "Delete",
-          object: {
-            id: order._id,
-            type: "Order"
-          }
-        }).then(() => {
-          io.emit("orderChanged", {id: order._id, action: "delete"});
-          res.json({message: "Order deleted"})
-        }, err => res.status(500).json(err));
+          message: "Order not found"
+        }
       }
+    } else {
+      getStoreRole(req.user._id, order.storeId).then(storeRole => {
+        if (!(storeRole == AccessLevel.Salesman && order.createdBy == req.user._id) && storeRole != AccessLevel.Manager && !req.user.isAdmin) {
+          throw {
+            code: 403,
+            error: {
+              errCode: "notAuthorized",
+              message: "User not authorized"
+            }
+          }
+        }
+        Order.findByIdAndDelete(req.params.orderId).then(order => {
+          Log.create({
+            username: req.user.username,
+            action: "Delete",
+            object: {
+              id: order._id,
+              type: "Order"
+            }
+          }).then(() => {
+            io.emit("orderChanged", {id: order._id, action: "delete"});
+            res.json({message: "Order deleted"})
+          });
+        })
+      })
     }
-  })
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error);
+    } else {
+      res.status(500).json(err);
+    }
+  });
 }

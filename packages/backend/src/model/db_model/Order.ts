@@ -20,6 +20,7 @@ type OrderDocument = mongoose.Document & {
   }];
   price: number;
   note?: string;
+  createdBy: string;
 };
 
 const OrderSchema = new mongoose.Schema({
@@ -48,7 +49,8 @@ const OrderSchema = new mongoose.Schema({
     price: Number
   }],
   price: Number,
-  note: String
+  note: String,
+  createdBy: String
 });
 
 OrderSchema.plugin(mongoosePagination);
