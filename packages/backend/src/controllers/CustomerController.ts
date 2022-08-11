@@ -15,7 +15,7 @@ const checkCustomerConsistence = async (customer, customerId?) => {
     if (customer && !(customerId && customer._id == customerId)) {
       throw {
         code: 400,
-        error: {errCode: "nameAlreadyinUse", message: "Invalid Customer name"}
+        error: {errCode: "nameAlreadyInUse", message: "Invalid Customer name"}
       }
     }
   });
@@ -84,7 +84,6 @@ export const getCustomerById=(req:Request,res: Response)=>{
     });
     return;
   }
-  //TODO Not authorized
   Customer.findById(req.params.customerId, CustomerProjection).then(customer => {
     if (customer == null) {
       res.status(404).json({
