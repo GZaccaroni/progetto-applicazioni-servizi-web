@@ -13,6 +13,7 @@ import { DbCustomer } from "@/model/db/DbCustomer";
 import { DbUser } from "@/model/db/DbUser";
 import { findUser, findUsers } from "@/repositories/UserRepository";
 import { DbProduct, DbProductGrade } from "@/model/db/DbProduct";
+import { DbChartDataType } from "@/model/db/DbChartData";
 
 const selectMaxItems = 10;
 export const PRODUCT_KIND_IDENTIFIER_SEPARATOR = "_$_";
@@ -165,6 +166,17 @@ export async function getSelectProductGrade(): Promise<
     return {
       id: elKey,
       text: i18n.t("model.productGrade." + DbProductGrade[elKey]).toString(),
+      item: elKey,
+    };
+  });
+}
+export async function getSelectChartDataType(): Promise<
+  AsyncSelectItem<DbChartDataType>[]
+> {
+  return Object.values(DbChartDataType).map((elKey) => {
+    return {
+      id: elKey,
+      text: i18n.t("model.chartDataType." + DbChartDataType[elKey]).toString(),
       item: elKey,
     };
   });

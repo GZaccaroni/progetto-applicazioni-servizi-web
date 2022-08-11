@@ -1,10 +1,11 @@
 import Client from "@/repositories/common/AxiosClient";
-import { DbChartData, DbChartDataType} from "@/model/db/DbChartData";
+import { DbChartData, DbChartDataType } from "@/model/db/DbChartData";
 import { DbProductKindIdentifier } from "@/model/db/DbProduct";
 
 const resource = "/analytics";
 
 export interface AnalyticsDataInput {
+  storeId?: string;
   dataType: DbChartDataType;
   fromDate?: Date;
   toDate?: Date;
