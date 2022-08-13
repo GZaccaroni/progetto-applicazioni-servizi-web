@@ -1,5 +1,5 @@
 <template>
-  <v-form class="pa-4" @submit.prevent>
+  <v-form class="pa-4" @submit.prevent role="search">
     <v-text-field
       v-model="form.searchName"
       :label="$t('components.ListStoresFilter.searchPerName')"

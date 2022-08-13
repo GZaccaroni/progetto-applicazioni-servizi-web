@@ -1,5 +1,5 @@
 <template>
-  <v-form class="pa-4" @submit.prevent>
+  <v-form class="pa-4" @submit.prevent role="search">
     <v-container fluid>
       <v-row no-gutters>
         <v-col cols="4" md="3" lg="2">
