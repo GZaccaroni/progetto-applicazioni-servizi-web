@@ -38,6 +38,11 @@
     "stores": "Punti vendita",
     "user": "Utente",
     "customer": "Cliente",
+    "productKind": "Varietà",
+    "productKinds": "Varietà",
+    "storeAuthorizedUsers": "Utenti autorizzati",
+    "orderEntry": "Voce",
+    "orderEntries": "Voci",
     "chartDataType": "Dato da visualizzare",
     "mainMenu": "Menù principale",
     "userMenu": "Menù utente"

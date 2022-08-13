@@ -16,7 +16,7 @@
     </v-row>
     <div role="grid">
       <v-row class="pt-6 pb-4">
-        <div class="text-h5">Utenti</div>
+        <div class="text-h5">{{ $t("word.storeAuthorizedUsers") }}</div>
         <v-spacer />
         <v-btn
           @click="addAuthorizedUser"
@@ -118,7 +118,6 @@ async function onBecameVisible(itemToUpdate?: string) {
   if (itemToUpdate != undefined) {
     create.value = false;
     const item = await findStore(itemToUpdate).catch(repositoryErrorHandler);
-    console.log("Caricamento?? ", item);
     if (item != undefined) {
       formData.value = mapToFormValue(item);
     }

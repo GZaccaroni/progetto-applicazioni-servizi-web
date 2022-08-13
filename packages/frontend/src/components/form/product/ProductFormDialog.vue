@@ -36,7 +36,7 @@
     </v-row>
     <div role="grid">
       <v-row class="pt-6 pb-4">
-        <div class="text-h5">Varietà</div>
+        <div class="text-h5">{{ $t("word.productKinds") }}</div>
         <v-spacer />
         <v-btn
           @click="addKind"

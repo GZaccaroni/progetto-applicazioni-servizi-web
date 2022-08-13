@@ -31,7 +31,7 @@
     </v-row>
     <div role="grid">
       <v-row class="pt-6 pb-4">
-        <div class="text-h5">Voci</div>
+        <div class="text-h5">{{ $t("word.orderEntries") }}</div>
         <v-spacer />
         <v-btn
           @click="addEntry"
