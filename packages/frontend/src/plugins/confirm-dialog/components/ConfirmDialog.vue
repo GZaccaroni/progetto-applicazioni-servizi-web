@@ -1,5 +1,6 @@
 <template>
   <v-dialog
+    v-if="dialogVisible"
     v-model="dialogVisible"
     :max-width="options.width"
     :style="{ zIndex: options.zIndex }"
