@@ -17,6 +17,9 @@
             :max="form.toDate"
             :label="$t('word.fromDate').toString()"
             :clearable="true"
+            :button-aria-label="
+              $t('components.ListOrdersFilter.fromDateAria').toString()
+            "
           />
         </v-col>
         <v-col cols="4" md="3" lg="2">
@@ -25,6 +28,9 @@
             :min="form.fromDate"
             :label="$t('word.toDate').toString()"
             :clearable="true"
+            :button-aria-label="
+              $t('components.ListOrdersFilter.toDateAria').toString()
+            "
           />
         </v-col>
       </v-row>

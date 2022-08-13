@@ -15,6 +15,7 @@
         v-bind="attrs"
         v-on="on"
         :clearable="clearable"
+        :aria-label="buttonAriaLabel"
       ></v-text-field>
     </template>
     <v-date-picker
@@ -50,6 +51,9 @@ export default defineComponent({
     showIcon: {
       type: Boolean,
       default: true,
+    },
+    buttonAriaLabel: {
+      type: String,
     },
   },
   setup(props, { emit }) {

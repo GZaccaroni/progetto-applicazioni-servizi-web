@@ -124,6 +124,14 @@
     "ListProductsFilter": {
       "searchPerName": "Cerca per nome"
     },
+    "ListOrdersFilter": {
+      "fromDateAria": "Filtra ordini fatti dalla data",
+      "toDateAria": "Filtra ordini fatti fino alla data"
+    },
+    "StatsFilter": {
+      "fromDateAria": "Filtra dati dalla data",
+      "toDateAria": "Filtra dati fino alla data"
+    },
     "ActionsTable": {
       "actions": {
         "edit": "Modifica",
