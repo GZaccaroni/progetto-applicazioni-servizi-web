@@ -38,7 +38,7 @@
     "user": "Utente",
     "customer": "Cliente",
     "chartDataType": "Dato da visualizzare",
-    "mainMenu": "Menù",
+    "mainMenu": "Menù principale",
     "userMenu": "Menù utente"
   },
   "model": {
@@ -132,7 +132,8 @@
     },
     "PaginatedTableBuilder": {
       "nextPage": "Pagina successiva",
-      "previousPage": "Pagina precedente"
+      "previousPage": "Pagina precedente",
+      "pagination": "Navigazione tra le pagine"
     },
     "form": {
       "user": {
@@ -140,6 +141,18 @@
       },
       "userLogin": {
         "title": "Accedi"
+      },
+      "product": {
+        "addKind": "Aggiungi varietà al prodotto",
+        "removeKind": "Rimuovi varietà dal prodotto"
+      },
+      "store": {
+        "addUser": "Aggiungi utente al punto vendita",
+        "removeUser": "Rimuovi utente dal punto vendita"
+      },
+      "order": {
+        "addEntry": "Aggiungi voce all'ordine",
+        "removeEntry": "Rimuovi voce dall'ordine"
       }
     }
   },

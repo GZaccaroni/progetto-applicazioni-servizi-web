@@ -37,7 +37,11 @@
     <v-row class="pt-6 pb-4">
       <div class="text-h5">Varietà</div>
       <v-spacer />
-      <v-btn @click="addKind" icon>
+      <v-btn
+        @click="addKind"
+        icon
+        :aria-label="$t('components.form.product.addKind')"
+      >
         <v-icon>mdi-plus-circle</v-icon>
       </v-btn>
     </v-row>
@@ -62,7 +66,11 @@
         ></v-text-field>
       </v-col>
       <v-spacer />
-      <v-btn @click="removeKind(index)" icon>
+      <v-btn
+        @click="removeKind(index)"
+        icon
+        :aria-label="$t('components.form.product.removeKind')"
+      >
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-row>

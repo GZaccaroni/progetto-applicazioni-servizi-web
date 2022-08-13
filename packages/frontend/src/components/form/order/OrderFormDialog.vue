@@ -32,7 +32,11 @@
     <v-row class="pt-6 pb-4">
       <div class="text-h5">Voci</div>
       <v-spacer />
-      <v-btn @click="addEntry" icon>
+      <v-btn
+        @click="addEntry"
+        icon
+        :aria-label="$t('components.form.order.addEntry')"
+      >
         <v-icon>mdi-plus-circle</v-icon>
       </v-btn>
     </v-row>
@@ -72,7 +76,11 @@
         ></v-text-field>
       </v-col>
       <v-spacer />
-      <v-btn @click="removeEntry(index)" icon>
+      <v-btn
+        @click="removeEntry(index)"
+        icon
+        :aria-label="$t('components.form.order.removeEntry')"
+      >
         <v-icon>mdi-delete</v-icon>
       </v-btn>
       <v-col v-if="$vuetify.breakpoint.smAndDown" cols="12" class="px-2">

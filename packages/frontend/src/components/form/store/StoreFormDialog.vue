@@ -17,7 +17,11 @@
     <v-row class="pt-6 pb-4">
       <div class="text-h5">Utenti</div>
       <v-spacer />
-      <v-btn @click="addAuthorizedUser" icon>
+      <v-btn
+        @click="addAuthorizedUser"
+        icon
+        :aria-label="$t('components.form.store.addUser')"
+      >
         <v-icon>mdi-plus-circle</v-icon>
       </v-btn>
     </v-row>
@@ -42,7 +46,11 @@
         />
       </v-col>
       <v-spacer />
-      <v-btn @click="removeAuthorizedUser(index)" icon>
+      <v-btn
+        @click="removeAuthorizedUser(index)"
+        icon
+        :aria-label="$t('components.form.store.removeUser')"
+      >
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-row>
