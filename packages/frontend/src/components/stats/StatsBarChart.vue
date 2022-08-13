@@ -17,7 +17,7 @@ import {
   CategoryScale,
   LinearScale,
 } from "chart.js";
-import { computed, defineProps, PropType } from "vue";
+import { computed, PropType } from "vue";
 import { DbChartData } from "@/model/db/DbChartData";
 import { stringToColor } from "@/helpers/utils";
 

@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, PropType, ref, watch } from "vue";
+import { PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import FormDialog, {

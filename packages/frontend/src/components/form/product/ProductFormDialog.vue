@@ -80,7 +80,7 @@
   </form-dialog>
 </template>
 <script setup lang="ts">
-import { computed, defineProps, PropType, ref, watch } from "vue";
+import { computed, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import FormDialog, {
