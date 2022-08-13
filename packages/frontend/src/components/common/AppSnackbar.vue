@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-snackbar top v-model="isVisible" :color="message?.color">
+    <v-snackbar top v-model="isVisible" :color="message?.color" role="alert">
       {{ message?.text }}
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="hideSnackbar">
