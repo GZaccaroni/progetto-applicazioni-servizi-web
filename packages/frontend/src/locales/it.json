@@ -133,7 +133,9 @@
     "PaginatedTableBuilder": {
       "nextPage": "Pagina successiva",
       "previousPage": "Pagina precedente",
-      "pagination": "Navigazione tra le pagine"
+      "pagination": "Navigazione tra le pagine",
+      "expandRow": "Espandi riga",
+      "collapseRow": "Riduci riga"
     },
     "form": {
       "user": {
@@ -161,9 +163,7 @@
       "title": "Utenti"
     },
     "orders": {
-      "title": "Ordini",
-      "expand": "Espandi ordine",
-      "collapse": "Riduci ordine"
+      "title": "Ordini"
     },
     "stats": {
       "title": "Statistiche"

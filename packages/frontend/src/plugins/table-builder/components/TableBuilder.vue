@@ -29,7 +29,22 @@
             >
               <slot :name="name" v-bind="slotData" />
             </template>
-
+            <template
+              v-slot:[`item.data-table-expand`]="{ isExpanded, expand }"
+            >
+              <v-icon
+                @click="expand(!isExpanded)"
+                :aria-label="
+                  $t(
+                    'components.PaginatedTableBuilder.' +
+                      (isExpanded ? 'collapse' : 'expand') +
+                      'Row'
+                  )
+                "
+              >
+                {{ isExpanded ? "mdi-chevron-up" : "mdi-chevron-down" }}
+              </v-icon>
+            </template>
             <template v-slot:[`item.actions`]="{ item }">
               <actions-table @onClickAction="clickAction" :item="item" />
             </template>
