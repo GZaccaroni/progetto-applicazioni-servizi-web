@@ -29,64 +29,71 @@
         :label="$t('model.order.date').toString()"
       />
     </v-row>
-    <v-row class="pt-6 pb-4">
-      <div class="text-h5">Voci</div>
-      <v-spacer />
-      <v-btn
-        @click="addEntry"
-        icon
-        :aria-label="$t('components.form.order.addEntry')"
+    <div role="grid">
+      <v-row class="pt-6 pb-4">
+        <div class="text-h5">Voci</div>
+        <v-spacer />
+        <v-btn
+          @click="addEntry"
+          icon
+          :aria-label="$t('components.form.order.addEntry')"
+        >
+          <v-icon>mdi-plus-circle</v-icon>
+        </v-btn>
+      </v-row>
+      <v-row
+        v-for="(_, index) in formData.entries"
+        :key="index"
+        align="center"
+        role="row"
       >
-        <v-icon>mdi-plus-circle</v-icon>
-      </v-btn>
-    </v-row>
-    <v-row v-for="(_, index) in formData.entries" :key="index" align="center">
-      <v-col cols="6" md="4" class="py-0">
-        <async-select
-          v-model="selectedProducts[index]"
-          :label="$t('model.order.product').toString()"
-          :find-items-fn="getSelectProductKinds"
-          :return-object="true"
-        />
-      </v-col>
-      <v-col cols="6" md="2" class="py-0">
-        <async-select
-          v-model="formData.entries[index].grade"
-          :label="$t('model.order.productGrade').toString()"
-          :find-items-fn="getSelectProductGrade"
-        />
-      </v-col>
-      <v-col cols="6" md="3" class="py-0">
-        <v-text-field
-          type="number"
-          v-model.number="formData.entries[index].pricePerUnit"
-          :label="$t('model.order.pricePerUnit')"
-          :placeholder="priceHint(index)"
-          :suffix="priceSuffix(index)"
-          :min="0"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="5" md="2" class="py-0">
-        <v-text-field
-          type="number"
-          v-model.number="formData.entries[index].quantity"
-          :label="$t('model.order.quantity')"
-          :suffix="unitOfMeasure(index)"
-          :min="0"
-        ></v-text-field>
-      </v-col>
-      <v-spacer />
-      <v-btn
-        @click="removeEntry(index)"
-        icon
-        :aria-label="$t('components.form.order.removeEntry')"
-      >
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
-      <v-col v-if="$vuetify.breakpoint.smAndDown" cols="12" class="px-2">
-        <v-divider cols="12" />
-      </v-col>
-    </v-row>
+        <v-col cols="6" md="4" class="py-0" role="gridcell">
+          <async-select
+            v-model="selectedProducts[index]"
+            :label="$t('model.order.product').toString()"
+            :find-items-fn="getSelectProductKinds"
+            :return-object="true"
+          />
+        </v-col>
+        <v-col cols="6" md="2" class="py-0" role="gridcell">
+          <async-select
+            v-model="formData.entries[index].grade"
+            :label="$t('model.order.productGrade').toString()"
+            :find-items-fn="getSelectProductGrade"
+          />
+        </v-col>
+        <v-col cols="6" md="3" class="py-0" role="gridcell">
+          <v-text-field
+            type="number"
+            v-model.number="formData.entries[index].pricePerUnit"
+            :label="$t('model.order.pricePerUnit')"
+            :placeholder="priceHint(index)"
+            :suffix="priceSuffix(index)"
+            :min="0"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="5" md="2" class="py-0" role="gridcell">
+          <v-text-field
+            type="number"
+            v-model.number="formData.entries[index].quantity"
+            :label="$t('model.order.quantity')"
+            :suffix="unitOfMeasure(index)"
+            :min="0"
+          ></v-text-field>
+        </v-col>
+        <v-spacer />
+        <v-btn
+          @click="removeEntry(index)"
+          icon
+          :aria-label="$t('components.form.order.removeEntry')"
+        >
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+        <v-col v-if="$vuetify.breakpoint.smAndDown" cols="12" class="px-2">
+          <v-divider cols="12" />
+        </v-col>
+      </v-row>
+    </div>
     <v-row>
       <v-col>
         <v-textarea

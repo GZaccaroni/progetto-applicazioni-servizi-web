@@ -34,46 +34,49 @@
         />
       </v-col>
     </v-row>
-    <v-row class="pt-6 pb-4">
-      <div class="text-h5">Varietà</div>
-      <v-spacer />
-      <v-btn
-        @click="addKind"
-        icon
-        :aria-label="$t('components.form.product.addKind')"
+    <div role="grid">
+      <v-row class="pt-6 pb-4">
+        <div class="text-h5">Varietà</div>
+        <v-spacer />
+        <v-btn
+          @click="addKind"
+          icon
+          :aria-label="$t('components.form.product.addKind')"
+        >
+          <v-icon>mdi-plus-circle</v-icon>
+        </v-btn>
+      </v-row>
+      <v-row
+        v-for="(_, index) in formData.kinds"
+        :key="formData.kinds[index].id"
+        align="center"
+        role="row"
       >
-        <v-icon>mdi-plus-circle</v-icon>
-      </v-btn>
-    </v-row>
-    <v-row
-      v-for="(_, index) in formData.kinds"
-      :key="formData.kinds[index].id"
-      align="center"
-    >
-      <v-col cols="6">
-        <v-text-field
-          v-model="formData.kinds[index].name"
-          :label="$t('model.product.name')"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          type="number"
-          v-model.number="formData.kinds[index].pricePerUnit"
-          :label="$t('model.product.pricePerUnit')"
-          :suffix="priceSuffix"
-          :min="0"
-        ></v-text-field>
-      </v-col>
-      <v-spacer />
-      <v-btn
-        @click="removeKind(index)"
-        icon
-        :aria-label="$t('components.form.product.removeKind')"
-      >
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
-    </v-row>
+        <v-col cols="6" role="gridcell">
+          <v-text-field
+            v-model="formData.kinds[index].name"
+            :label="$t('model.product.name')"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="4" role="gridcell">
+          <v-text-field
+            type="number"
+            v-model.number="formData.kinds[index].pricePerUnit"
+            :label="$t('model.product.pricePerUnit')"
+            :suffix="priceSuffix"
+            :min="0"
+          ></v-text-field>
+        </v-col>
+        <v-spacer />
+        <v-btn
+          @click="removeKind(index)"
+          icon
+          :aria-label="$t('components.form.product.removeKind')"
+        >
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </v-row>
+    </div>
   </form-dialog>
 </template>
 <script setup lang="ts">
