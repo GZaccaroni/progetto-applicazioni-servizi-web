@@ -5,6 +5,7 @@
     :style="{ zIndex: options.zIndex }"
     @click:outside="cancel"
     @keydown.esc="cancel"
+    role="alertdialog"
   >
     <v-card>
       <v-toolbar dark color="primary" dense flat>
