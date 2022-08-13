@@ -41,6 +41,7 @@
                       'Row'
                   )
                 "
+                role="button"
               >
                 {{ isExpanded ? "mdi-chevron-up" : "mdi-chevron-down" }}
               </v-icon>
