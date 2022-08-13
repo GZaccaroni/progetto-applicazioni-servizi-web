@@ -136,7 +136,6 @@ import {
 import { UpdateOrderInput } from "@/model/UpdateOrderInput";
 import { DbOrder } from "@/model/db/DbOrder";
 import { AsyncSelectItem } from "@/components/common/AsyncSelectTypes";
-import { DbProduct } from "@/model/db/DbProduct";
 
 export type OrderFormDialogModel = GenericFormDialogModel<{
   orderToUpdate?: string;

@@ -15,7 +15,7 @@
   </v-data-table>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, ref } from "vue";
+import { defineComponent, PropType } from "vue";
 import { DbOrderEntry } from "@/model/db/DbOrder";
 
 export default defineComponent({

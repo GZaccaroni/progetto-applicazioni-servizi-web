@@ -28,7 +28,6 @@ export function observePaginatedResult<Input, Item extends DbIdentifiable>(
   let currentResult: PaginatedResult<Item> | undefined = undefined;
   let isLoading = false;
   const listener = (data?: ServerEventData) => {
-    console.log("Event received", data);
     if (isLoading) return;
     if (
       data == undefined ||

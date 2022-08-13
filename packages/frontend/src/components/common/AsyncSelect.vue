@@ -18,7 +18,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref } from "vue";
 import { passthroughVModel } from "@/helpers/passthroughVModel";
-import { debounce, values } from "lodash";
+import { debounce } from "lodash";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import {
   AsyncSelectItem,

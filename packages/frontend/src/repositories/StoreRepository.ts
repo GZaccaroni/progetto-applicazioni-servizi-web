@@ -7,7 +7,6 @@ import { omit } from "lodash";
 import { DbStore } from "@/model/db/DbStore";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { DbIdentifiable } from "@/model/db/DbIdentifiable";
 import { CreateStoreInput } from "@/model/CreateStoreInput";
 import { UpdateStoreInput } from "@/model/UpdateStoreInput";
 
