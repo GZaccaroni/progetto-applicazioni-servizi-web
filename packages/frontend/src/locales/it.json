@@ -157,6 +157,9 @@
       "expandRow": "Espandi riga",
       "collapseRow": "Riduci riga"
     },
+    "TableBuilder": {
+      "noData": "Non c'è ancora niente qui."
+    },
     "HeaderView": {
       "goBack": "Torna indietro"
     },
@@ -212,6 +215,12 @@
     }
   },
   "error": {
-    "formGeneric": "Compila correttamente tutti i campi"
+    "formGeneric": "Compila correttamente tutti i campi",
+    "invalidUsernameOrPassword": "Nome utente/ Password non validi.",
+    "requestFailed": "La richiesta è fallita.",
+    "itemNotFound": "Elemento non trovato.",
+    "userNotLoggedIn": "Devi effettuare l'accesso per continuare",
+    "unauthorized": "Non hai permessi sufficienti per eseguire questa azione.",
+    "unknown": "Errore sconosciuto"
   }
 }

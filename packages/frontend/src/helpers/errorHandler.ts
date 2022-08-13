@@ -2,6 +2,7 @@ import { showMessage } from "./snackbar";
 import { AxiosError } from "axios";
 import store from "@/store";
 import router from "@/router";
+import i18n from "@/i18n";
 
 export function repositoryErrorHandler(reason: unknown, isLogin = false) {
   let errorMessage: string;
@@ -10,22 +11,21 @@ export function repositoryErrorHandler(reason: unknown, isLogin = false) {
     switch (reason.response?.status) {
       case 400:
         if (isLogin) {
-          errorMessage = "Nome utente/ Password non validi.";
+          errorMessage = i18n.t("error.invalidUsernameOrPassword").toString();
         } else {
-          errorMessage = "La richiesta è fallita.";
+          errorMessage = i18n.t("error.requestFailed").toString();
         }
         break;
       case 404:
-        errorMessage = "Elemento non trovato.";
+        errorMessage = i18n.t("error.itemNotFound").toString();
         break;
       case 401:
         store.dispatch("user/logout");
         router.push("/");
-        errorMessage = "Utente non autenticato.";
+        errorMessage = i18n.t("error.userNotLoggedIn").toString();
         break;
       case 403:
-        errorMessage =
-          "Non hai i permessi sufficienti per eseguire questa azione.";
+        errorMessage = i18n.t("error.unauthorized").toString();
         break;
       default:
         errorMessage = reason.message;
@@ -33,7 +33,7 @@ export function repositoryErrorHandler(reason: unknown, isLogin = false) {
   } else if (typeof reason == "string") {
     errorMessage = reason;
   } else {
-    errorMessage = "Unknown error";
+    errorMessage = i18n.t("error.unknown").toString();
   }
   showMessage({
     text: errorMessage,

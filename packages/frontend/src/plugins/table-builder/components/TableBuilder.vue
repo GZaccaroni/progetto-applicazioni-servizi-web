@@ -16,7 +16,7 @@
               hideDefaultFooter || showCustomFooterPagination
             "
             :items-per-page="numberOfItemsPerPage"
-            no-data-text="No items"
+            :no-data-text="$t('components.TableBuilder.noData')"
             class="elevation-0"
             style="border-bottom-left-radius: 0; border-bottom-right-radius: 0"
             :loading="loading"
