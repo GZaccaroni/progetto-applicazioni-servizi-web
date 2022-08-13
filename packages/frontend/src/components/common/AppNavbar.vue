@@ -23,10 +23,12 @@
 
       <v-menu offset-y v-if="isLoggedIn">
         <template v-slot:activator="{ on, attrs }">
-          <v-avatar v-bind="attrs" v-on="on" :aria-label="$t('word.userMenu')">
-            <v-icon large>mdi-account-circle</v-icon>
-          </v-avatar>
-          {{ userProfile.username }}
+          <div v-bind="attrs" v-on="on" :aria-label="$t('word.userMenu')">
+            {{ userProfile.username }}
+            <v-avatar>
+              <v-icon large>mdi-account-circle</v-icon>
+            </v-avatar>
+          </div>
         </template>
         <v-list>
           <v-list-item @click="logout">
@@ -39,7 +41,13 @@
         <v-icon>mdi-login</v-icon>
       </v-btn>
     </v-app-bar>
-    <v-navigation-drawer v-if="isLoggedIn" app v-model="drawer" temporary>
+    <v-navigation-drawer
+      v-if="isLoggedIn"
+      app
+      v-model="drawer"
+      temporary
+      :aria-label="$t('word.mainMenu')"
+    >
       <app-navigation-drawer />
     </v-navigation-drawer>
   </v-container>
