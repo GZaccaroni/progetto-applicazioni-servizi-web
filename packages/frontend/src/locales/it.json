@@ -37,7 +37,9 @@
     "stores": "Punti vendita",
     "user": "Utente",
     "customer": "Cliente",
-    "chartDataType": "Dato da visualizzare"
+    "chartDataType": "Dato da visualizzare",
+    "mainMenu": "Menù",
+    "userMenu": "Menù utente"
   },
   "model": {
     "user": {
@@ -122,6 +124,16 @@
     "ListProductsFilter": {
       "searchPerName": "Cerca per nome"
     },
+    "ActionsTable": {
+      "actions": {
+        "edit": "Modifica",
+        "delete": "Elimina"
+      }
+    },
+    "PaginatedTableBuilder": {
+      "nextPage": "Pagina successiva",
+      "previousPage": "Pagina precedente"
+    },
     "form": {
       "user": {
         "changePassword": "Cambia password"
@@ -136,7 +148,9 @@
       "title": "Utenti"
     },
     "orders": {
-      "title": "Ordini"
+      "title": "Ordini",
+      "expand": "Espandi ordine",
+      "collapse": "Riduci ordine"
     },
     "stats": {
       "title": "Statistiche"

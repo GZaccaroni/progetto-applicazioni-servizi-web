@@ -2,7 +2,11 @@
   <v-container>
     <user-login-dialog v-model="loginDialogVisible" />
     <v-app-bar app color="white" elevate-on-scroll>
-      <v-app-bar-nav-icon v-if="isLoggedIn" @click.stop="drawer = !drawer" />
+      <v-app-bar-nav-icon
+        v-if="isLoggedIn"
+        :aria-label="$t('word.mainMenu')"
+        @click.stop="drawer = !drawer"
+      />
       <div class="d-flex align-center">
         <v-img
           alt="Colture in Cloud Logo"
@@ -19,7 +23,7 @@
 
       <v-menu offset-y v-if="isLoggedIn">
         <template v-slot:activator="{ on, attrs }">
-          <v-avatar v-bind="attrs" v-on="on">
+          <v-avatar v-bind="attrs" v-on="on" :aria-label="$t('word.userMenu')">
             <v-icon large>mdi-account-circle</v-icon>
           </v-avatar>
           {{ userProfile.username }}

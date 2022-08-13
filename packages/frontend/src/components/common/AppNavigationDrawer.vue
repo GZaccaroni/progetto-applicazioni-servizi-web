@@ -2,7 +2,9 @@
   <div>
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title class="title"> Menu</v-list-item-title>
+        <v-list-item-title class="title">
+          {{ $t("word.mainMenu") }}
+        </v-list-item-title>
         <v-list-item-subtitle>
           {{ userProfile.username }}
         </v-list-item-subtitle>

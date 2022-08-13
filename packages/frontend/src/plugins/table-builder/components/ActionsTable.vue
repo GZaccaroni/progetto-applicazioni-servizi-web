@@ -6,6 +6,7 @@
       @click="clickAction(action.event)"
       small
       class="mr-2"
+      :aria-label="$t('components.ActionsTable.actions.' + action.name)"
     >
       {{ action.ico }}
     </v-icon>

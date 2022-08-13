@@ -26,10 +26,17 @@
         @click="loadItems('previous')"
         text
         normal
+        :aria-label="$t('components.PaginatedTableBuilder.previousPage')"
       >
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
-      <v-btn :disabled="!hasNextPage" @click="loadItems('next')" text normal>
+      <v-btn
+        :disabled="!hasNextPage"
+        @click="loadItems('next')"
+        text
+        normal
+        :aria-label="$t('components.PaginatedTableBuilder.nextPage')"
+      >
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
     </template>
