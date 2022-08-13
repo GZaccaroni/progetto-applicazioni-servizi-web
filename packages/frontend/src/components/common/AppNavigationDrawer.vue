@@ -16,7 +16,7 @@
     <v-list dense nav>
       <template v-for="group in menuItems">
         <v-subheader :key="group.title" v-if="group.title !== undefined">
-          {{ group.title }}
+          {{ $t(group.title) }}
         </v-subheader>
         <v-list-item
           v-for="item in group.items"
@@ -81,7 +81,7 @@ const menuItems: MenuGroup[] = [
     ],
   },
   {
-    title: "Amministrazione",
+    title: "components.AppNavigationDrawer.sections.admin",
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
@@ -112,7 +112,6 @@ export default defineComponent({
     }),
     menuItems() {
       const userHasAccess = (group: MenuGroup) => {
-        console.log("User profile", this.userProfile);
         if (group.meta.requiresAuth) {
           if (this.userProfile == undefined) return false;
         }

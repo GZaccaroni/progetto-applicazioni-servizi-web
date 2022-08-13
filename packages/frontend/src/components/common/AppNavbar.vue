@@ -32,12 +32,12 @@
         </template>
         <v-list>
           <v-list-item @click="logout">
-            <v-list-item-title>Logout</v-list-item-title>
+            <v-list-item-title>{{ $t("word.logout") }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
       <v-btn v-if="!isLoggedIn" target="_blank" text @click="login">
-        <span class="mr-2">Accedi</span>
+        <span class="mr-2">{{ $t("word.login") }}</span>
         <v-icon>mdi-login</v-icon>
       </v-btn>
     </v-app-bar>

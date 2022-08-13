@@ -30,6 +30,7 @@
     "cancel": "Annulla",
     "close": "Chiudi",
     "login": "Accedi",
+    "logout": "Disconnessione",
     "save": "Salva",
     "fromDate": "Da",
     "toDate": "a",
@@ -138,12 +139,20 @@
         "delete": "Elimina"
       }
     },
+    "AppNavigationDrawer": {
+      "sections": {
+        "admin": "Amministrazione"
+      }
+    },
     "PaginatedTableBuilder": {
       "nextPage": "Pagina successiva",
       "previousPage": "Pagina precedente",
       "pagination": "Navigazione tra le pagine",
       "expandRow": "Espandi riga",
       "collapseRow": "Riduci riga"
+    },
+    "HeaderView": {
+      "goBack": "Torna indietro"
     },
     "form": {
       "user": {

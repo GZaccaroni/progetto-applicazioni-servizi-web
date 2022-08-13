@@ -6,6 +6,7 @@
       icon
       class="ms-2"
       @click="$router.back()"
+      :aria-label="$t('components.HeaderView.goBack')"
     >
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>

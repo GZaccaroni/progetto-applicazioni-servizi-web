@@ -18,7 +18,13 @@
           dark
           color="primary"
         >
-          <v-btn icon dark :disabled="submitButtonLoading" @click="closeForm">
+          <v-btn
+            icon
+            dark
+            :disabled="submitButtonLoading"
+            @click="closeForm"
+            :aria-label="$t('word.close')"
+          >
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>{{ title }}</v-toolbar-title>
@@ -54,7 +60,7 @@
             text
             tabindex="-1"
             @click="closeForm"
-            >Chiudi</v-btn
+            >{{ $t("word.close") }}</v-btn
           >
           <v-btn
             color="primary"
