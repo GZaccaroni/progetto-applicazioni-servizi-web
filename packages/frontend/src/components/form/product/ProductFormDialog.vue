@@ -8,66 +8,64 @@
     @submit="saveForm"
     @close="closeForm"
   >
-    <v-form ref="form" class="pa-4">
-      <v-row>
+    <v-row>
+      <v-text-field
+        v-model="formData.name"
+        :label="$t('model.product.name')"
+      ></v-text-field>
+    </v-row>
+    <v-row>
+      <v-col cols="5" class="pa-0">
         <v-text-field
-          v-model="formData.name"
+          type="number"
+          v-model.number="formData.pricePerUnit"
+          :suffix="priceSuffix"
+          :label="$t('model.product.pricePerUnit')"
+          :min="0"
+        ></v-text-field>
+      </v-col>
+      <v-spacer />
+      <v-col cols="5" class="pa-0">
+        <async-select
+          v-model="formData.unitOfMeasure"
+          :label="$t('model.product.unitOfMeasure').toString()"
+          :find-items-fn="getSelectUnitOfMeasure"
+          :lazy="false"
+        />
+      </v-col>
+    </v-row>
+    <v-row class="pt-6 pb-4">
+      <div class="text-h5">Varietà</div>
+      <v-spacer />
+      <v-btn @click="addKind" icon>
+        <v-icon>mdi-plus-circle</v-icon>
+      </v-btn>
+    </v-row>
+    <v-row
+      v-for="(_, index) in formData.kinds"
+      :key="formData.kinds[index].id"
+      align="center"
+    >
+      <v-col cols="6">
+        <v-text-field
+          v-model="formData.kinds[index].name"
           :label="$t('model.product.name')"
         ></v-text-field>
-      </v-row>
-      <v-row>
-        <v-col cols="5" class="pa-0">
-          <v-text-field
-            type="number"
-            v-model.number="formData.pricePerUnit"
-            :suffix="priceSuffix"
-            :label="$t('model.product.pricePerUnit')"
-            :min="0"
-          ></v-text-field>
-        </v-col>
-        <v-spacer />
-        <v-col cols="5" class="pa-0">
-          <async-select
-            v-model="formData.unitOfMeasure"
-            :label="$t('model.product.unitOfMeasure').toString()"
-            :find-items-fn="getSelectUnitOfMeasure"
-            :lazy="false"
-          />
-        </v-col>
-      </v-row>
-      <v-row class="pt-6 pb-4">
-        <div class="text-h5">Varietà</div>
-        <v-spacer />
-        <v-btn @click="addKind" icon>
-          <v-icon>mdi-plus-circle</v-icon>
-        </v-btn>
-      </v-row>
-      <v-row
-        v-for="(_, index) in formData.kinds"
-        :key="formData.kinds[index].id"
-        align="center"
-      >
-        <v-col cols="6">
-          <v-text-field
-            v-model="formData.kinds[index].name"
-            :label="$t('model.product.name')"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="4">
-          <v-text-field
-            type="number"
-            v-model.number="formData.kinds[index].pricePerUnit"
-            :label="$t('model.product.pricePerUnit')"
-            :suffix="priceSuffix"
-            :min="0"
-          ></v-text-field>
-        </v-col>
-        <v-spacer />
-        <v-btn @click="removeKind(index)" icon>
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </v-row>
-    </v-form>
+      </v-col>
+      <v-col cols="4">
+        <v-text-field
+          type="number"
+          v-model.number="formData.kinds[index].pricePerUnit"
+          :label="$t('model.product.pricePerUnit')"
+          :suffix="priceSuffix"
+          :min="0"
+        ></v-text-field>
+      </v-col>
+      <v-spacer />
+      <v-btn @click="removeKind(index)" icon>
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+    </v-row>
   </form-dialog>
 </template>
 <script setup lang="ts">

@@ -8,89 +8,87 @@
     @submit="saveForm"
     @close="closeForm"
   >
-    <v-form ref="form" class="pa-4">
-      <v-row>
+    <v-row>
+      <async-select
+        v-model="formData.storeId"
+        :label="$t('model.order.store').toString()"
+        :find-items-fn="getSelectStores"
+      />
+    </v-row>
+    <v-row>
+      <async-select
+        v-model="formData.customerId"
+        :label="$t('model.order.customer').toString()"
+        :find-items-fn="getSelectCustomers"
+      />
+    </v-row>
+    <v-row>
+      <text-field-date-picker
+        v-model="formData.date"
+        :show-icon="false"
+        :label="$t('model.order.date').toString()"
+      />
+    </v-row>
+    <v-row class="pt-6 pb-4">
+      <div class="text-h5">Voci</div>
+      <v-spacer />
+      <v-btn @click="addEntry" icon>
+        <v-icon>mdi-plus-circle</v-icon>
+      </v-btn>
+    </v-row>
+    <v-row v-for="(_, index) in formData.entries" :key="index" align="center">
+      <v-col cols="6" md="4" class="py-0">
         <async-select
-          v-model="formData.storeId"
-          :label="$t('model.order.store').toString()"
-          :find-items-fn="getSelectStores"
+          v-model="selectedProducts[index]"
+          :label="$t('model.order.product').toString()"
+          :find-items-fn="getSelectProductKinds"
+          :return-object="true"
         />
-      </v-row>
-      <v-row>
+      </v-col>
+      <v-col cols="6" md="2" class="py-0">
         <async-select
-          v-model="formData.customerId"
-          :label="$t('model.order.customer').toString()"
-          :find-items-fn="getSelectCustomers"
+          v-model="formData.entries[index].grade"
+          :label="$t('model.order.productGrade').toString()"
+          :find-items-fn="getSelectProductGrade"
         />
-      </v-row>
-      <v-row>
-        <text-field-date-picker
-          v-model="formData.date"
-          :show-icon="false"
-          :label="$t('model.order.date').toString()"
-        />
-      </v-row>
-      <v-row class="pt-6 pb-4">
-        <div class="text-h5">Voci</div>
-        <v-spacer />
-        <v-btn @click="addEntry" icon>
-          <v-icon>mdi-plus-circle</v-icon>
-        </v-btn>
-      </v-row>
-      <v-row v-for="(_, index) in formData.entries" :key="index" align="center">
-        <v-col cols="6" md="4" class="py-0">
-          <async-select
-            v-model="selectedProducts[index]"
-            :label="$t('model.order.product').toString()"
-            :find-items-fn="getSelectProductKinds"
-            :return-object="true"
-          />
-        </v-col>
-        <v-col cols="6" md="2" class="py-0">
-          <async-select
-            v-model="formData.entries[index].grade"
-            :label="$t('model.order.productGrade').toString()"
-            :find-items-fn="getSelectProductGrade"
-          />
-        </v-col>
-        <v-col cols="6" md="3" class="py-0">
-          <v-text-field
-            type="number"
-            v-model.number="formData.entries[index].pricePerUnit"
-            :label="$t('model.order.pricePerUnit')"
-            :placeholder="priceHint(index)"
-            :suffix="priceSuffix(index)"
-            :min="0"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="5" md="2" class="py-0">
-          <v-text-field
-            type="number"
-            v-model.number="formData.entries[index].quantity"
-            :label="$t('model.order.quantity')"
-            :suffix="unitOfMeasure(index)"
-            :min="0"
-          ></v-text-field>
-        </v-col>
-        <v-spacer />
-        <v-btn @click="removeEntry(index)" icon>
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-        <v-col v-if="$vuetify.breakpoint.smAndDown" cols="12" class="px-2">
-          <v-divider cols="12" />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-textarea
-            :label="$t('model.order.note')"
-            v-model="formData.note"
-            rows="1"
-            auto-grow
-          ></v-textarea>
-        </v-col>
-      </v-row>
-    </v-form>
+      </v-col>
+      <v-col cols="6" md="3" class="py-0">
+        <v-text-field
+          type="number"
+          v-model.number="formData.entries[index].pricePerUnit"
+          :label="$t('model.order.pricePerUnit')"
+          :placeholder="priceHint(index)"
+          :suffix="priceSuffix(index)"
+          :min="0"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="5" md="2" class="py-0">
+        <v-text-field
+          type="number"
+          v-model.number="formData.entries[index].quantity"
+          :label="$t('model.order.quantity')"
+          :suffix="unitOfMeasure(index)"
+          :min="0"
+        ></v-text-field>
+      </v-col>
+      <v-spacer />
+      <v-btn @click="removeEntry(index)" icon>
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+      <v-col v-if="$vuetify.breakpoint.smAndDown" cols="12" class="px-2">
+        <v-divider cols="12" />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-textarea
+          :label="$t('model.order.note')"
+          v-model="formData.note"
+          rows="1"
+          auto-grow
+        ></v-textarea>
+      </v-col>
+    </v-row>
   </form-dialog>
 </template>
 

@@ -7,19 +7,17 @@
     @submit="saveForm"
     @close="closeForm"
   >
-    <v-form :disabled="submitButtonLoading" class="pa-4">
-      <v-text-field
-        v-model="formData.username"
-        :label="$t('model.user.username')"
-        autocomplete="username"
-      ></v-text-field>
-      <v-text-field
-        type="password"
-        v-model="formData.password"
-        :label="$t('model.user.password')"
-        autocomplete="current-password"
-      ></v-text-field>
-    </v-form>
+    <v-text-field
+      v-model="formData.username"
+      :label="$t('model.user.username')"
+      autocomplete="username"
+    ></v-text-field>
+    <v-text-field
+      type="password"
+      v-model="formData.password"
+      :label="$t('model.user.password')"
+      autocomplete="current-password"
+    ></v-text-field>
   </form-dialog>
 </template>
 

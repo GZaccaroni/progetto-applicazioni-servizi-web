@@ -8,46 +8,44 @@
     @submit="saveForm"
     @close="closeForm"
   >
-    <v-form ref="form" class="pa-4">
-      <v-row>
-        <v-text-field
-          v-model="formData.name"
-          :label="$t('model.store.name')"
-        ></v-text-field>
-      </v-row>
-      <v-row class="pt-6 pb-4">
-        <div class="text-h5">Utenti</div>
-        <v-spacer />
-        <v-btn @click="addAuthorizedUser" icon>
-          <v-icon>mdi-plus-circle</v-icon>
-        </v-btn>
-      </v-row>
-      <v-row
-        v-for="(_, index) in formData.authorizations"
-        :key="index"
-        align="center"
-      >
-        <v-col cols="6">
-          <async-select
-            v-model="formData.authorizations[index].userId"
-            :label="$t('word.user').toString()"
-            :find-items-fn="getSelectUsers"
-          />
-        </v-col>
-        <v-col cols="4">
-          <async-select
-            v-model="formData.authorizations[index].accessLevel"
-            :label="$t('model.store.accessLevel.name').toString()"
-            :find-items-fn="getSelectStoreAccessLevel"
-            :lazy="false"
-          />
-        </v-col>
-        <v-spacer />
-        <v-btn @click="removeAuthorizedUser(index)" icon>
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </v-row>
-    </v-form>
+    <v-row>
+      <v-text-field
+        v-model="formData.name"
+        :label="$t('model.store.name')"
+      ></v-text-field>
+    </v-row>
+    <v-row class="pt-6 pb-4">
+      <div class="text-h5">Utenti</div>
+      <v-spacer />
+      <v-btn @click="addAuthorizedUser" icon>
+        <v-icon>mdi-plus-circle</v-icon>
+      </v-btn>
+    </v-row>
+    <v-row
+      v-for="(_, index) in formData.authorizations"
+      :key="index"
+      align="center"
+    >
+      <v-col cols="6">
+        <async-select
+          v-model="formData.authorizations[index].userId"
+          :label="$t('word.user').toString()"
+          :find-items-fn="getSelectUsers"
+        />
+      </v-col>
+      <v-col cols="4">
+        <async-select
+          v-model="formData.authorizations[index].accessLevel"
+          :label="$t('model.store.accessLevel.name').toString()"
+          :find-items-fn="getSelectStoreAccessLevel"
+          :lazy="false"
+        />
+      </v-col>
+      <v-spacer />
+      <v-btn @click="removeAuthorizedUser(index)" icon>
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+    </v-row>
   </form-dialog>
 </template>
 

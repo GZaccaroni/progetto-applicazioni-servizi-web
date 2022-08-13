@@ -8,33 +8,31 @@
     :title="$t(create ? 'model.user.add' : 'model.user.edit').toString()"
     @submit="saveForm"
   >
-    <v-form ref="form" class="pa-4">
-      <v-text-field
-        v-model="formData.username"
-        :label="$t('model.user.username')"
-        minlength="4"
-        maxlength="30"
-        counter
-        :disabled="!create"
-      ></v-text-field>
-      <v-checkbox
-        v-model="formData.isAdmin"
-        :label="$t('model.user.isAdmin')"
-      ></v-checkbox>
-      <v-switch
-        v-model="changePassword"
-        v-if="!create"
-        inset
-        :label="$t('components.form.user.changePassword')"
-      ></v-switch>
-      <v-text-field
-        type="password"
-        v-if="changePassword"
-        v-model="formData.password"
-        minlength="6"
-        :label="$t('model.user.password')"
-      ></v-text-field>
-    </v-form>
+    <v-text-field
+      v-model="formData.username"
+      :label="$t('model.user.username')"
+      minlength="4"
+      maxlength="30"
+      counter
+      :disabled="!create"
+    ></v-text-field>
+    <v-checkbox
+      v-model="formData.isAdmin"
+      :label="$t('model.user.isAdmin')"
+    ></v-checkbox>
+    <v-switch
+      v-model="changePassword"
+      v-if="!create"
+      inset
+      :label="$t('components.form.user.changePassword')"
+    ></v-switch>
+    <v-text-field
+      type="password"
+      v-if="changePassword"
+      v-model="formData.password"
+      minlength="6"
+      :label="$t('model.user.password')"
+    ></v-text-field>
   </form-dialog>
 </template>
 

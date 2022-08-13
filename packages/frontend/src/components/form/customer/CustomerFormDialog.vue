@@ -9,24 +9,22 @@
     "
     @submit="saveForm"
   >
-    <v-form ref="form" class="pa-4">
-      <v-text-field
-        v-model="formData.name"
-        :label="$t('model.customer.name')"
-      ></v-text-field>
-      <v-text-field
-        v-model="formData.address"
-        :label="$t('model.customer.address')"
-      ></v-text-field>
-      <v-text-field
-        v-model="formData.phoneNumber"
-        :label="$t('model.customer.phoneNumber')"
-      ></v-text-field>
-      <v-text-field
-        v-model="formData.vatNumber"
-        :label="$t('model.customer.vatNumber')"
-      ></v-text-field>
-    </v-form>
+    <v-text-field
+      v-model="formData.name"
+      :label="$t('model.customer.name')"
+    ></v-text-field>
+    <v-text-field
+      v-model="formData.address"
+      :label="$t('model.customer.address')"
+    ></v-text-field>
+    <v-text-field
+      v-model="formData.phoneNumber"
+      :label="$t('model.customer.phoneNumber')"
+    ></v-text-field>
+    <v-text-field
+      v-model="formData.vatNumber"
+      :label="$t('model.customer.vatNumber')"
+    ></v-text-field>
   </form-dialog>
 </template>
 
