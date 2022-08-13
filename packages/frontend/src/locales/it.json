@@ -87,6 +87,7 @@
       "price": "Importo totale",
       "pricePerUnit": "Prezzo unitario",
       "quantity": "Quantità",
+      "varietyName": "Nome varietà",
       "product": "Prodotto",
       "productGrade": "Qualità",
       "note": "Note",

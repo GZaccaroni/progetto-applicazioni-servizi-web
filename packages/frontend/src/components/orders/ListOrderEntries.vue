@@ -29,17 +29,17 @@ export default defineComponent({
     return {
       headers: [
         {
-          text: "Nome",
+          text: this.$t("model.order.varietyName"),
           sortable: false,
           value: "name",
         },
         {
-          text: "Quantità",
+          text: this.$t("model.order.quantity"),
           sortable: false,
           value: "quantity",
         },
         {
-          text: "Prezzo Unitario",
+          text: this.$t("model.order.pricePerUnit"),
           sortable: false,
           value: "pricePerUnit",
         },
