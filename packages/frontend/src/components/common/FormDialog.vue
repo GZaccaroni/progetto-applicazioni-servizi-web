@@ -57,10 +57,10 @@
             >Chiudi</v-btn
           >
           <v-btn
-            color="blue darken-1"
+            color="primary"
+            elevation="0"
             :disabled="submitButtonLoading || !submitButtonEnabled"
             :loading="submitButtonLoading"
-            text
             @click="submitForm"
           >
             {{ submitButtonText }}
