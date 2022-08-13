@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <user-login-dialog v-model="loginDialogVisible" />
-    <v-app-bar app color="white" elevate-on-scroll>
+    <v-app-bar app color="white" elevate-on-scroll ref="menubar">
       <v-app-bar-nav-icon
         v-if="isLoggedIn"
         :aria-label="$t('word.mainMenu')"
@@ -9,7 +9,7 @@
       />
       <div class="d-flex align-center">
         <v-img
-          alt="Colture in Cloud Logo"
+          alt=""
           class="shrink mr-2"
           contain
           :src="require('../../assets/logo.png')"
