@@ -21,24 +21,26 @@
       <slot name="header"></slot>
     </template>
     <template v-slot:footer>
-      <v-btn
-        :disabled="!hasPreviousPage"
-        @click="loadItems('previous')"
-        text
-        normal
-        :aria-label="$t('components.PaginatedTableBuilder.previousPage')"
-      >
-        <v-icon>mdi-chevron-left</v-icon>
-      </v-btn>
-      <v-btn
-        :disabled="!hasNextPage"
-        @click="loadItems('next')"
-        text
-        normal
-        :aria-label="$t('components.PaginatedTableBuilder.nextPage')"
-      >
-        <v-icon>mdi-chevron-right</v-icon>
-      </v-btn>
+      <nav :aria-label="$t('components.PaginatedTableBuilder.pagination')">
+        <v-btn
+          :disabled="!hasPreviousPage"
+          @click="loadItems('previous')"
+          text
+          normal
+          :aria-label="$t('components.PaginatedTableBuilder.previousPage')"
+        >
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+        <v-btn
+          :disabled="!hasNextPage"
+          @click="loadItems('next')"
+          text
+          normal
+          :aria-label="$t('components.PaginatedTableBuilder.nextPage')"
+        >
+          <v-icon>mdi-chevron-right</v-icon>
+        </v-btn>
+      </nav>
     </template>
     <template v-slot:expanded-item="slotData">
       <slot name="expanded-item" v-bind="slotData" />
