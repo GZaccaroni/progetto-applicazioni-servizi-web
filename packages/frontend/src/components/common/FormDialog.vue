@@ -77,9 +77,8 @@
   </v-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { passthroughVModel } from "@/helpers/passthroughVModel";
+<script setup lang="ts">
+import { computed, PropType } from "vue";
 
 export type GenericFormDialogModel<T> =
   | ({ isVisible: true } & T)
@@ -88,63 +87,61 @@ export type GenericFormDialogModel<T> =
 type FormDialogParams = {
   persistent: boolean;
 };
-export default defineComponent({
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    submitButtonText: {
-      type: String,
-      required: true,
-    },
-    submitButtonEnabled: {
-      type: Boolean,
-      default: true,
-    },
-    submitButtonLoading: {
-      type: Boolean,
-      required: true,
-    },
-    customParams: {
-      type: Object as PropType<FormDialogParams>,
-      default: () => {
-        return {
-          persistent: false,
-        };
-      },
-    },
-    value: {
-      type: Boolean,
-      required: true,
-    },
-    dialogLoading: {
-      value: Boolean,
-      default: false,
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
+  submitButtonText: {
+    type: String,
+    required: true,
+  },
+  submitButtonEnabled: {
+    type: Boolean,
+    default: true,
+  },
+  submitButtonLoading: {
+    type: Boolean,
+    required: true,
+  },
+  customParams: {
+    type: Object as PropType<FormDialogParams>,
+    default: () => {
+      return {
+        persistent: false,
+      };
     },
   },
-  setup(props, context) {
-    const isVisibleState = passthroughVModel(props, context, "value");
-    return { isVisibleState };
+  value: {
+    type: Boolean,
+    required: true,
   },
-  computed: {
-    isPersistent(): boolean {
-      return this.$props.customParams.persistent || this.submitButtonLoading;
-    },
-  },
-  methods: {
-    submitForm() {
-      this.$emit("submit");
-    },
-    closeFormIfNotPersistent() {
-      if (!this.isPersistent) {
-        this.closeForm();
-      }
-    },
-    closeForm() {
-      this.isVisibleState = false;
-      this.$emit("close");
-    },
+  dialogLoading: {
+    value: Boolean,
+    default: false,
   },
 });
+const emit = defineEmits(["input", "submit", "close"]);
+
+const isVisibleState = computed({
+  get: () => props.value,
+  set: (value) => emit("input", value),
+});
+
+const isPersistent = computed(() => {
+  return props.customParams.persistent || props.submitButtonLoading;
+});
+
+function submitForm() {
+  emit("submit");
+}
+function closeForm() {
+  isVisibleState.value = false;
+  emit("close");
+}
+function closeFormIfNotPersistent() {
+  if (!isPersistent.value) {
+    closeForm();
+  }
+}
 </script>
