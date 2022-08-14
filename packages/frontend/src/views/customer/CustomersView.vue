@@ -14,8 +14,8 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 import {
   TableItemEvent,
   TableItemEventType,
@@ -29,55 +29,43 @@ import ListCustomers from "@/components/customers/ListCustomers.vue";
 import CustomerFormDialog, {
   CustomerFormDialogModel,
 } from "@/components/form/customer/CustomerFormDialog.vue";
+import i18n from "@/i18n";
 
-export default defineComponent({
-  components: {
-    CustomerFormDialog,
-    HeaderView,
-    ListCustomers,
-    ConfirmDialog,
-  },
-  setup() {
-    const dialogModel = ref<CustomerFormDialogModel>({ isVisible: false });
-    const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
-    return {
-      confirmDialog,
-      dialogModel,
-    };
-  },
-  methods: {
-    openNewItemDialog() {
-      this.dialogModel = {
-        isVisible: true,
-      };
-    },
-    deleteItem(item: DbCustomer) {
-      this.confirmDialog
-        ?.open(
-          this.$t("confirm.delete.customer.title").toString(),
-          this.$t("confirm.delete.customer.message", {
-            name: item.name,
-          }).toString()
-        )
-        .then((confirmed) => {
-          if (confirmed) {
-            deleteCustomer(item.id).catch(repositoryErrorHandler);
-          }
-        });
-    },
-    onRowEvent(event: TableItemEvent<DbCustomer>) {
-      switch (event.type) {
-        case TableItemEventType.rowEditAction:
-          this.dialogModel = {
-            isVisible: true,
-            customerToUpdate: event.item.id,
-          };
-          break;
-        case TableItemEventType.rowDeleteAction:
-          this.deleteItem(event.item);
-          break;
+const dialogModel = ref<CustomerFormDialogModel>({ isVisible: false });
+const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
+
+function openNewItemDialog() {
+  dialogModel.value = {
+    isVisible: true,
+  };
+}
+function deleteItem(item: DbCustomer) {
+  confirmDialog.value
+    ?.open(
+      i18n.t("confirm.delete.customer.title").toString(),
+      i18n
+        .t("confirm.delete.customer.message", {
+          name: item.name,
+        })
+        .toString()
+    )
+    .then((confirmed) => {
+      if (confirmed) {
+        deleteCustomer(item.id).catch(repositoryErrorHandler);
       }
-    },
-  },
-});
+    });
+}
+function onRowEvent(event: TableItemEvent<DbCustomer>) {
+  switch (event.type) {
+    case TableItemEventType.rowEditAction:
+      dialogModel.value = {
+        isVisible: true,
+        customerToUpdate: event.item.id,
+      };
+      break;
+    case TableItemEventType.rowDeleteAction:
+      deleteItem(event.item);
+      break;
+  }
+}
 </script>
