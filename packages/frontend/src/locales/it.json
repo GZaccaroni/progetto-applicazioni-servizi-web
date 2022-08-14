@@ -29,7 +29,7 @@
     "confirm": "Ok",
     "cancel": "Annulla",
     "close": "Chiudi",
-    "login": "Accedi",
+    "login": "Accesso",
     "logout": "Disconnessione",
     "save": "Salva",
     "fromDate": "Da",
@@ -168,7 +168,8 @@
         "changePassword": "Cambia password"
       },
       "userLogin": {
-        "title": "Accedi"
+        "title": "Accesso",
+        "submitButton": "Accedi"
       },
       "product": {
         "addKind": "Aggiungi varietà al prodotto",

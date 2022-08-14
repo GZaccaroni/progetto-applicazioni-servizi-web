@@ -1,7 +1,9 @@
 <template>
   <form-dialog
     v-model="isVisible"
-    :submit-button-text="$t('word.login').toString()"
+    :submit-button-text="
+      $t('components.form.userLogin.submitButton').toString()
+    "
     :submit-button-loading="submitButtonLoading"
     :title="$t('components.form.userLogin.title').toString()"
     @submit="saveForm"
