@@ -14,8 +14,8 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 import {
   TableItemEvent,
   TableItemEventType,
@@ -29,53 +29,39 @@ import { deleteOrder } from "@/repositories/OrderRepository";
 import OrderFormDialog, {
   OrderFormDialogModel,
 } from "@/components/form/order/OrderFormDialog.vue";
+import i18n from "@/i18n";
 
-export default defineComponent({
-  components: {
-    OrderFormDialog,
-    HeaderView,
-    ListOrders,
-    ConfirmDialog,
-  },
-  setup() {
-    const dialogModel = ref<OrderFormDialogModel>({ isVisible: false });
-    const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
-    return {
-      confirmDialog,
-      dialogModel,
-    };
-  },
-  methods: {
-    openNewItemDialog() {
-      this.dialogModel = {
-        isVisible: true,
-      };
-    },
-    deleteItem(item: DbOrder) {
-      this.confirmDialog
-        ?.open(
-          this.$t("confirm.delete.order.title").toString(),
-          this.$t("confirm.delete.order.message").toString()
-        )
-        .then((confirmed) => {
-          if (confirmed) {
-            deleteOrder(item.id).catch(repositoryErrorHandler);
-          }
-        });
-    },
-    onRowEvent(event: TableItemEvent<DbOrder>) {
-      switch (event.type) {
-        case TableItemEventType.rowEditAction:
-          this.dialogModel = {
-            isVisible: true,
-            orderToUpdate: event.item.id,
-          };
-          break;
-        case TableItemEventType.rowDeleteAction:
-          this.deleteItem(event.item);
-          break;
+const dialogModel = ref<OrderFormDialogModel>({ isVisible: false });
+const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
+
+function openNewItemDialog() {
+  dialogModel.value = {
+    isVisible: true,
+  };
+}
+function deleteItem(item: DbOrder) {
+  confirmDialog.value
+    ?.open(
+      i18n.t("confirm.delete.order.title").toString(),
+      i18n.t("confirm.delete.order.message").toString()
+    )
+    .then((confirmed) => {
+      if (confirmed) {
+        deleteOrder(item.id).catch(repositoryErrorHandler);
       }
-    },
-  },
-});
+    });
+}
+function onRowEvent(event: TableItemEvent<DbOrder>) {
+  switch (event.type) {
+    case TableItemEventType.rowEditAction:
+      dialogModel.value = {
+        isVisible: true,
+        orderToUpdate: event.item.id,
+      };
+      break;
+    case TableItemEventType.rowDeleteAction:
+      deleteItem(event.item);
+      break;
+  }
+}
 </script>
