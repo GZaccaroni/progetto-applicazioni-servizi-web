@@ -66,89 +66,75 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import ActionsTable from "./ActionsTable.vue";
 import { DataTableHeader } from "vuetify";
-import { defineComponent, PropType } from "vue";
+import { defineEmits, defineProps, PropType, ref, useSlots, watch } from "vue";
 import { pickBy } from "lodash";
 import { TableItemEventType } from "@/plugins/table-builder/TableItemEventType";
 
 type Item = Partial<Record<string, string>>;
 
-export default defineComponent({
-  components: {
-    ActionsTable,
+defineProps({
+  itemKey: {
+    type: String,
+    default: "id",
   },
-
-  props: {
-    itemKey: {
-      type: String,
-      default: "id",
-    },
-    items: {
-      type: Array as PropType<Partial<Item>[]>,
-      default: () => [],
-    },
-    columns: {
-      type: Array as PropType<DataTableHeader[]>,
-      default: () => [],
-    },
-    hideDefaultFooter: {
-      type: Boolean,
-      default: false,
-    },
-    showCustomFooterPagination: {
-      type: Boolean,
-      default: false,
-    },
-    showSelect: {
-      type: Boolean,
-      default: false,
-    },
-    singleSelect: {
-      type: Boolean,
-      default: false,
-    },
-    numberOfItemsPerPage: {
-      type: Number,
-      default: 10,
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    showExpand: {
-      type: Boolean,
-      default: false,
-    },
+  items: {
+    type: Array as PropType<Partial<Item>[]>,
+    default: () => [],
   },
-  data() {
-    return {
-      selected: [],
-    };
+  columns: {
+    type: Array as PropType<DataTableHeader[]>,
+    default: () => [],
   },
-
-  watch: {
-    selected(newSelected) {
-      this.clickAction(newSelected, TableItemEventType.rowSelection);
-    },
+  hideDefaultFooter: {
+    type: Boolean,
+    default: false,
   },
-
-  computed: {},
-
-  methods: {
-    $_tableItemSlots() {
-      const excludedItems = ["item.actions"];
-      return pickBy(
-        this.$scopedSlots,
-        (_, key) => key.startsWith("item.") && !excludedItems.includes(key)
-      );
-    },
-    clickAction(item: Item, eventType: TableItemEventType): void {
-      this.$emit("onRowEvent", { item, type: eventType });
-    },
+  showCustomFooterPagination: {
+    type: Boolean,
+    default: false,
+  },
+  showSelect: {
+    type: Boolean,
+    default: false,
+  },
+  singleSelect: {
+    type: Boolean,
+    default: false,
+  },
+  numberOfItemsPerPage: {
+    type: Number,
+    default: 10,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  showExpand: {
+    type: Boolean,
+    default: false,
   },
 });
+const emit = defineEmits(["onRowEvent"]);
+const slots = useSlots();
+
+const selected = ref();
+
+watch(selected, (newSelected) => {
+  clickAction(newSelected, TableItemEventType.rowSelection);
+});
+function $_tableItemSlots() {
+  const excludedItems = ["item.actions"];
+  return pickBy(
+    slots,
+    (_, key) => key.startsWith("item.") && !excludedItems.includes(key)
+  );
+}
+function clickAction(item: Item, eventType: TableItemEventType): void {
+  emit("onRowEvent", { item, type: eventType });
+}
 </script>
 
 <style lang="scss">
