@@ -7,6 +7,4 @@ Vue.use(PiniaVuePlugin);
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
-console.log("Called pinia setup");
-
 export default pinia;

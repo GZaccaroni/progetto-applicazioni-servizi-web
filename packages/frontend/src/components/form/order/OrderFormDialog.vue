@@ -185,9 +185,7 @@ async function onBecameVisible(itemToUpdate?: string) {
   if (itemToUpdate != undefined) {
     create.value = false;
     const item = await findOrder(itemToUpdate).catch(repositoryErrorHandler);
-    console.log("Order to update", item);
     if (item != undefined) {
-      console.log("Order mapped", mapToFormValue(item));
       formData.value = mapToFormValue(item);
     }
   } else {
@@ -258,7 +256,6 @@ async function saveForm() {
       submitButtonLoading.value = false;
       return;
     }
-    console.log("Data ", data);
     if (create.value) {
       await addOrder(data);
     } else {

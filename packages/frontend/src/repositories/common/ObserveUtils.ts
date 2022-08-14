@@ -39,7 +39,6 @@ export function observePaginatedResult<Input, Item extends DbIdentifiable>(
       findItemsFn(input).then((result) => {
         isLoading = false;
         currentResult = result;
-        console.log("Result: ", eventName, result);
         onNext(result);
       }, onError);
     }

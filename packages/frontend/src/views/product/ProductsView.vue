@@ -40,8 +40,6 @@ function openNewItemDialog() {
   };
 }
 function deleteItem(item: DbProduct) {
-  console.log("Confirm dialog", confirmDialog);
-  console.log("Confirm dialog value", confirmDialog.value);
   confirmDialog.value
     ?.open(
       i18n.t("confirm.delete.customer.title").toString(),

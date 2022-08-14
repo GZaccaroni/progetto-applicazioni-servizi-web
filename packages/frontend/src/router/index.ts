@@ -87,12 +87,10 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 });
-console.log("Created router");
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
-  console.log("Called router", to.matched);
   const store = useUserStore();
   if (requiresAuth) {
     if (!store.isLoggedIn) {

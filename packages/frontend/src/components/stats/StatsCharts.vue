@@ -2,9 +2,17 @@
   <div style="width: 100%">
     <stats-filter @change="updateChartData" />
     <p v-if="totalValue !== undefined">{{ totalValue }}</p>
-    <stats-line-chart :data="chartData" :global="true" />
-    <stats-line-chart :data="chartData" :global="false" />
-    <stats-bar-chart :data="chartData" />
+    <stats-line-chart
+      v-if="chartData !== undefined"
+      :data="chartData"
+      :global="true"
+    />
+    <stats-line-chart
+      v-if="chartData !== undefined"
+      :data="chartData"
+      :global="false"
+    />
+    <stats-bar-chart v-if="chartData !== undefined" :data="chartData" />
   </div>
 </template>
 
