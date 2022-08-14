@@ -14,8 +14,8 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 import {
   TableItemEvent,
   TableItemEventType,
@@ -29,55 +29,43 @@ import { deleteStore } from "@/repositories/StoreRepository";
 import StoreFormDialog, {
   StoreFormDialogModel,
 } from "@/components/form/store/StoreFormDialog.vue";
+import i18n from "@/i18n";
 
-export default defineComponent({
-  components: {
-    StoreFormDialog,
-    HeaderView,
-    ListStores,
-    ConfirmDialog,
-  },
-  setup() {
-    const dialogModel = ref<StoreFormDialogModel>({ isVisible: false });
-    const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
-    return {
-      confirmDialog,
-      dialogModel,
-    };
-  },
-  methods: {
-    openNewItemDialog() {
-      this.dialogModel = {
-        isVisible: true,
-      };
-    },
-    deleteItem(item: DbStore) {
-      this.confirmDialog
-        ?.open(
-          this.$t("confirm.delete.store.title").toString(),
-          this.$t("confirm.delete.store.message", {
-            name: item.name,
-          }).toString()
-        )
-        .then((confirmed) => {
-          if (confirmed) {
-            deleteStore(item.id).catch(repositoryErrorHandler);
-          }
-        });
-    },
-    onRowEvent(event: TableItemEvent<DbStore>) {
-      switch (event.type) {
-        case TableItemEventType.rowEditAction:
-          this.dialogModel = {
-            isVisible: true,
-            storeToUpdate: event.item.id,
-          };
-          break;
-        case TableItemEventType.rowDeleteAction:
-          this.deleteItem(event.item);
-          break;
+const dialogModel = ref<StoreFormDialogModel>({ isVisible: false });
+const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
+
+function openNewItemDialog() {
+  dialogModel.value = {
+    isVisible: true,
+  };
+}
+function deleteItem(item: DbStore) {
+  confirmDialog.value
+    ?.open(
+      i18n.t("confirm.delete.store.title").toString(),
+      i18n
+        .t("confirm.delete.store.message", {
+          name: item.name,
+        })
+        .toString()
+    )
+    .then((confirmed) => {
+      if (confirmed) {
+        deleteStore(item.id).catch(repositoryErrorHandler);
       }
-    },
-  },
-});
+    });
+}
+function onRowEvent(event: TableItemEvent<DbStore>) {
+  switch (event.type) {
+    case TableItemEventType.rowEditAction:
+      dialogModel.value = {
+        isVisible: true,
+        storeToUpdate: event.item.id,
+      };
+      break;
+    case TableItemEventType.rowDeleteAction:
+      deleteItem(event.item);
+      break;
+  }
+}
 </script>
