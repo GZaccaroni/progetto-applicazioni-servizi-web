@@ -8,20 +8,17 @@
   </v-form>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, watch } from "vue";
+<script setup lang="ts">
+import { reactive, watch } from "vue";
 import { removeBlanks } from "@/helpers/utils";
 import { FindProductsInput } from "@/repositories/ProductRepository";
 
-export default defineComponent({
-  setup(props, { emit }) {
-    const form = reactive<FindProductsInput>({
-      limit: 10,
-    });
-    watch(form, (newValue) => {
-      emit("change", removeBlanks(newValue));
-    });
-    return { form };
-  },
+const emit = defineEmits(["change"]);
+
+const form = reactive<FindProductsInput>({
+  limit: 10,
+});
+watch(form, (newValue) => {
+  emit("change", removeBlanks(newValue));
 });
 </script>
