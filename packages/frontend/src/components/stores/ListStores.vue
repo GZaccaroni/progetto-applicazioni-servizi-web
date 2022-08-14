@@ -23,8 +23,6 @@ import i18n from "@/i18n";
 import ListStoresFilter from "@/components/stores/ListStoresFilter.vue";
 import { FindStoresInput, observeStores } from "@/repositories/StoreRepository";
 import { DbStore } from "@/model/db/DbStore";
-import { FindProductsInput } from "@/repositories/ProductRepository";
-import { DbProduct } from "@/model/db/DbProduct";
 
 const emit = defineEmits(["onRowEvent"]);
 
