@@ -5,8 +5,3 @@ export type RecursivePartial<T> = {
     ? RecursivePartial<T[P]>
     : T[P];
 };
-
-export interface Mapper<F, T> {
-  from: (value: F) => T;
-  to: (value: T) => F;
-}
