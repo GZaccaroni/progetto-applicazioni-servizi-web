@@ -1,5 +1,7 @@
 import { io, Socket } from "socket.io-client";
-const domain = "http://localhost:3000/";
+import AppConfig from "@/config/AppConfig";
+
+const domain = AppConfig.socketIoEndpoint;
 
 export interface ServerToClientEvents {
   orderChanged: (data: ServerEventData) => void;
