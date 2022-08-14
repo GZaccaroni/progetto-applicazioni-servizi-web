@@ -14,8 +14,8 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 import {
   TableItemEvent,
   TableItemEventType,
@@ -29,55 +29,43 @@ import { deleteProduct } from "@/repositories/ProductRepository";
 import ProductFormDialog, {
   ProductFormDialogModel,
 } from "@/components/form/product/ProductFormDialog.vue";
+import i18n from "@/i18n";
 
-export default defineComponent({
-  components: {
-    ProductFormDialog,
-    HeaderView,
-    ListProducts,
-    ConfirmDialog,
-  },
-  setup() {
-    const dialogModel = ref<ProductFormDialogModel>({ isVisible: false });
-    const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
-    return {
-      confirmDialog,
-      dialogModel,
-    };
-  },
-  methods: {
-    openNewItemDialog() {
-      this.dialogModel = {
-        isVisible: true,
-      };
-    },
-    deleteItem(item: DbProduct) {
-      this.confirmDialog
-        ?.open(
-          this.$t("confirm.delete.customer.title").toString(),
-          this.$t("confirm.delete.customer.message", {
-            name: item.name,
-          }).toString()
-        )
-        .then((confirmed) => {
-          if (confirmed) {
-            deleteProduct(item.id).catch(repositoryErrorHandler);
-          }
-        });
-    },
-    onRowEvent(event: TableItemEvent<DbProduct>) {
-      switch (event.type) {
-        case TableItemEventType.rowEditAction:
-          this.dialogModel = {
-            isVisible: true,
-            productToUpdate: event.item.id,
-          };
-          break;
-        case TableItemEventType.rowDeleteAction:
-          this.deleteItem(event.item);
-          break;
+const dialogModel = ref<ProductFormDialogModel>({ isVisible: false });
+const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
+
+function openNewItemDialog() {
+  dialogModel.value = {
+    isVisible: true,
+  };
+}
+function deleteItem(item: DbProduct) {
+  confirmDialog.value
+    ?.open(
+      i18n.t("confirm.delete.customer.title").toString(),
+      i18n
+        .t("confirm.delete.customer.message", {
+          name: item.name,
+        })
+        .toString()
+    )
+    .then((confirmed) => {
+      if (confirmed) {
+        deleteProduct(item.id).catch(repositoryErrorHandler);
       }
-    },
-  },
-});
+    });
+}
+function onRowEvent(event: TableItemEvent<DbProduct>) {
+  switch (event.type) {
+    case TableItemEventType.rowEditAction:
+      dialogModel.value = {
+        isVisible: true,
+        productToUpdate: event.item.id,
+      };
+      break;
+    case TableItemEventType.rowDeleteAction:
+      deleteItem(event.item);
+      break;
+  }
+}
 </script>
