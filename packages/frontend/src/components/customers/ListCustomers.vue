@@ -20,7 +20,6 @@ import { ref } from "vue";
 import { DataTableHeader } from "vuetify";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
-import { FindStoresInput } from "@/repositories/StoreRepository";
 import {
   FindCustomersInput,
   observeCustomers,
@@ -61,7 +60,7 @@ const headers = ref<DataTableHeader[]>([
   },
 ]);
 
-function filterList(input: FindStoresInput) {
+function filterList(input: FindCustomersInput) {
   observeFnInput.value = input;
 }
 function onRowEvent(event: TableItemEvent<DbCustomer>) {
