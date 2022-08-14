@@ -55,7 +55,7 @@
         <v-card-actions v-if="!$vuetify.breakpoint.xsOnly && !dialogLoading">
           <v-spacer></v-spacer>
           <v-btn
-            color="blue darken-1"
+            color="grey darken-2"
             :disabled="submitButtonLoading"
             text
             tabindex="-1"
