@@ -31,8 +31,8 @@ import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
 import { UserCredential } from "@/model/UserCredential";
 import i18n from "@/i18n";
-import store from "@/store";
 import FormDialog from "@/components/common/FormDialog.vue";
+import { useUserStore } from "@/store/user";
 
 const props = defineProps({
   value: {
@@ -58,7 +58,7 @@ function closeForm() {
 async function saveForm() {
   submitButtonLoading.value = true;
   const data = clone(removeBlanks(formData.value));
-  if (!data.username || !data.password) {
+  if (!validateForm(data)) {
     showMessage({
       text: i18n.t("error.formGeneric").toString(),
       type: "error",
@@ -66,12 +66,17 @@ async function saveForm() {
     submitButtonLoading.value = false;
     return;
   }
+  const store = useUserStore();
   try {
-    await store.dispatch("user/login", formData.value);
+    await store.login(data);
     closeForm();
   } catch (e) {
     repositoryErrorHandler(e);
   }
   submitButtonLoading.value = false;
+}
+function validateForm(form: Partial<UserCredential>): form is UserCredential {
+  const data = clone(removeBlanks(form));
+  return data.username != undefined && data.password != undefined;
 }
 </script>

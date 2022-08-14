@@ -10,39 +10,24 @@
   </v-app>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import AppSnackbar from "@/components/common/AppSnackbar.vue";
-import { defineComponent } from "vue";
+import { watch } from "vue";
 import AppNavbar from "@/components/common/AppNavbar.vue";
-import { mapGetters } from "vuex";
-import { setDocumentLang } from "@/i18n";
+import i18n, { setDocumentLang } from "@/i18n";
+import { storeToRefs } from "pinia";
+import { useUserStore } from "@/store/user";
 
-export default defineComponent({
-  name: "App",
-  components: {
-    AppNavbar,
-    AppSnackbar,
+const { userProfile, isLoggedIn } = storeToRefs(useUserStore());
+
+watch(
+  () => i18n.locale,
+  (newLocale, oldLocale) => {
+    if (newLocale === oldLocale) {
+      return;
+    }
+    setDocumentLang(newLocale);
   },
-  computed: {
-    ...mapGetters("user", {
-      isLoggedIn: "isLoggedIn",
-      userProfile: "userProfile",
-    }),
-  },
-  data: () => ({
-    loginDialogVisible: false,
-  }),
-  mounted() {
-    this.$watch(
-      "$i18n.locale",
-      (newLocale, oldLocale) => {
-        if (newLocale === oldLocale) {
-          return;
-        }
-        setDocumentLang(newLocale);
-      },
-      { immediate: true }
-    );
-  },
-});
+  { immediate: true }
+);
 </script>

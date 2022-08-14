@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import store from "@/store";
 import i18n from "@/i18n";
+import { useUserStore } from "@/store/user";
 
 Vue.use(VueRouter);
 
@@ -87,18 +87,21 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 });
+console.log("Created router");
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+  console.log("Called router", to.matched);
+  const store = useUserStore();
   if (requiresAuth) {
-    if (!store.getters["user/isLoggedIn"]) {
+    if (!store.isLoggedIn) {
       next("/");
       return;
     }
   }
   if (requiresAdmin) {
-    if (store.getters["user/userProfile"]?.isAdmin != true) {
+    if (store.userProfile?.isAdmin != true) {
       next("/");
       return;
     }

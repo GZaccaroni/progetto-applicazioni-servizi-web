@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, reactive, watch } from "vue";
+import { reactive, watch } from "vue";
 import { FindUsersInput } from "@/repositories/UserRepository";
 import { removeBlanks } from "@/helpers/utils";
 
@@ -21,5 +21,4 @@ const form = reactive<FindUsersInput>({
 watch(form, (newValue) => {
   emit("change", removeBlanks(newValue));
 });
-
 </script>

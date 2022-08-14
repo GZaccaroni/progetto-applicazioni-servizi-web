@@ -1,8 +1,8 @@
 import { showMessage } from "./snackbar";
 import { AxiosError } from "axios";
-import store from "@/store";
 import router from "@/router";
 import i18n from "@/i18n";
+import { useUserStore } from "@/store/user";
 
 export function repositoryErrorHandler(reason: unknown, isLogin = false) {
   let errorMessage: string;
@@ -20,7 +20,7 @@ export function repositoryErrorHandler(reason: unknown, isLogin = false) {
         errorMessage = i18n.t("error.itemNotFound").toString();
         break;
       case 401:
-        store.dispatch("user/logout");
+        useUserStore().logout();
         router.push("/");
         errorMessage = i18n.t("error.userNotLoggedIn").toString();
         break;

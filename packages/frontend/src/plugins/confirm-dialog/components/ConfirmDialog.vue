@@ -2,8 +2,8 @@
   <v-dialog
     v-if="dialogVisible"
     v-model="dialogVisible"
-    :max-width="options.width"
-    :style="{ zIndex: options.zIndex }"
+    :max-width="dialogOptions.width"
+    :style="{ zIndex: dialogOptions.zIndex }"
     @click:outside="cancel"
     @keydown.esc="cancel"
     role="alertdialog"
@@ -11,16 +11,16 @@
     <v-card>
       <v-toolbar dark color="primary" dense flat>
         <v-toolbar-title class="text-body-2 font-weight-bold white--text">
-          {{ title }}
+          {{ dialogTitle }}
         </v-toolbar-title>
       </v-toolbar>
-      <v-card-text v-show="!!message" class="pa-4 black--text">
-        {{ message }}
+      <v-card-text v-show="!!dialogMessage" class="pa-4 black--text">
+        {{ dialogMessage }}
       </v-card-text>
       <v-card-actions class="pt-3">
         <v-spacer></v-spacer>
         <v-btn
-          v-if="!options.hideCancel"
+          v-if="!dialogOptions.hideCancel"
           color="grey"
           text
           class="body-2 font-weight-bold"
@@ -34,8 +34,10 @@
   </v-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
+
+defineExpose({ open });
 
 export type ConfirmDialogOptions = {
   color: string;
@@ -43,46 +45,32 @@ export type ConfirmDialogOptions = {
   zIndex: number;
   hideCancel: boolean;
 };
-export default defineComponent({
-  data(): {
-    dialogVisible: boolean;
-    resolve?: (confirmed: boolean) => void;
-    message?: string;
-    title?: string;
-    options: ConfirmDialogOptions;
-  } {
-    return {
-      dialogVisible: false,
-      resolve: undefined,
-      message: undefined,
-      title: undefined,
-      options: {
-        color: "primary",
-        width: 400,
-        zIndex: 200,
-        hideCancel: false,
-      },
-    };
-  },
 
-  methods: {
-    open(title: string, message: string, options?: ConfirmDialogOptions) {
-      this.dialogVisible = true;
-      this.title = title;
-      this.message = message;
-      this.options = Object.assign(this.options, options);
-      return new Promise((resolve) => {
-        this.resolve = resolve;
-      });
-    },
-    agree() {
-      this.resolve?.(true);
-      this.dialogVisible = false;
-    },
-    cancel() {
-      this.resolve?.(false);
-      this.dialogVisible = false;
-    },
-  },
+const dialogVisible = ref(false);
+let dialogResolve: (confirmed: boolean) => void | undefined;
+const dialogMessage = ref<string>();
+const dialogTitle = ref<string>();
+const dialogOptions = ref<ConfirmDialogOptions>({
+  color: "primary",
+  width: 400,
+  zIndex: 200,
+  hideCancel: false,
 });
+function open(title: string, message: string, options?: ConfirmDialogOptions) {
+  dialogVisible.value = true;
+  dialogTitle.value = title;
+  dialogMessage.value = message;
+  dialogOptions.value = Object.assign(dialogOptions.value, options);
+  return new Promise((resolve) => {
+    dialogResolve = resolve;
+  });
+}
+function agree() {
+  dialogResolve?.(true);
+  dialogVisible.value = false;
+}
+function cancel() {
+  dialogResolve?.(false);
+  dialogVisible.value = false;
+}
 </script>

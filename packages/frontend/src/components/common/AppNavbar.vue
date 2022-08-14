@@ -57,8 +57,8 @@ import UserLoginDialog from "@/components/form/user/UserLoginDialog.vue";
 import { PropType, ref } from "vue";
 import { DbUser } from "@/model/db/DbUser";
 import AppNavigationDrawer from "@/components/common/AppNavigationDrawer.vue";
-import store from "@/store";
 import router from "@/router";
+import { useUserStore } from "@/store/user";
 
 defineProps({
   isLoggedIn: {
@@ -76,7 +76,8 @@ function login() {
   loginDialogVisible.value = true;
 }
 async function logout() {
-  await store.dispatch("user/logout");
+  const userStore = useUserStore();
+  await userStore.logout();
   await router.push("/");
 }
 </script>

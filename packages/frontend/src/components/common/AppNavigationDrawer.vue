@@ -14,7 +14,7 @@
     <v-divider></v-divider>
 
     <v-list dense nav>
-      <template v-for="group in menuItems">
+      <template v-for="group in visibleMenuItems">
         <v-subheader :key="group.title" v-if="group.title !== undefined">
           {{ $t(group.title) }}
         </v-subheader>
@@ -38,9 +38,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapGetters } from "vuex";
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed } from "vue";
+import { storeToRefs } from "pinia";
+import { useUserStore } from "@/store/user";
 
 interface MenuGroup {
   title?: string;
@@ -105,23 +106,17 @@ const menuItems: MenuGroup[] = [
     ],
   },
 ];
-export default defineComponent({
-  computed: {
-    ...mapGetters("user", {
-      userProfile: "userProfile",
-    }),
-    menuItems() {
-      const userHasAccess = (group: MenuGroup) => {
-        if (group.meta.requiresAuth) {
-          if (this.userProfile == undefined) return false;
-        }
-        if (group.meta.requiresAdmin) {
-          if (this.userProfile?.isAdmin != true) return false;
-        }
-        return true;
-      };
-      return menuItems.filter((group) => userHasAccess(group));
-    },
-  },
+const { userProfile } = storeToRefs(useUserStore());
+const visibleMenuItems = computed(() => {
+  const userHasAccess = (group: MenuGroup) => {
+    if (group.meta.requiresAuth) {
+      if (userProfile?.value == undefined) return false;
+    }
+    if (group.meta.requiresAdmin) {
+      if (userProfile?.value?.isAdmin != true) return false;
+    }
+    return true;
+  };
+  return menuItems.filter((group) => userHasAccess(group));
 });
 </script>

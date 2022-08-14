@@ -1,40 +1,30 @@
-import { Module } from "vuex";
-import { RootState } from "@/store/types";
 import { UserState } from "@/store/user/types";
 import { UserCredential } from "@/model/UserCredential";
-import { DbUser } from "@/model/db/DbUser";
 import { login, logout } from "@/repositories/AuthenticationService";
 import { findUser } from "@/repositories/UserRepository";
+import { defineStore } from "pinia";
 
-const module: Module<UserState, RootState> = {
-  namespaced: true,
-  state: {
-    userProfile: undefined,
-  },
+export const useUserStore = defineStore("user", {
+  persist: true,
+  state: () =>
+    ({
+      userProfile: undefined,
+    } as UserState),
   getters: {
-    userProfile: ({ userProfile }) => userProfile,
     isLoggedIn: ({ userProfile }) => userProfile != undefined,
   },
-  mutations: {
-    auth_success(state, userProfile: DbUser) {
-      state.userProfile = userProfile;
-    },
-    logout(state) {
-      state.userProfile = undefined;
-    },
-  },
   actions: {
-    async login(context, userCredential: UserCredential): Promise<void> {
-      if (context.getters.isLoggedIn) return;
+    async login(userCredential: UserCredential): Promise<void> {
+      if (this.isLoggedIn) return;
       await login(userCredential.username, userCredential.password);
-      const user = await findUser(userCredential.username);
-      context.commit("auth_success", user);
+      this.userProfile = await findUser(userCredential.username);
     },
 
-    async logout(context): Promise<void> {
-      await logout();
-      context.commit("logout");
+    async logout(): Promise<void> {
+      if (this.isLoggedIn) {
+        await logout();
+        this.userProfile = undefined;
+      }
     },
   },
-};
-export default module;
+});
