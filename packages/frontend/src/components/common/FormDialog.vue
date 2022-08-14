@@ -23,7 +23,7 @@
             dark
             :disabled="submitButtonLoading"
             @click="closeForm"
-            :aria-label="$t('word.close')"
+            :aria-label="$t('word.cancel')"
           >
             <v-icon>mdi-close</v-icon>
           </v-btn>
@@ -60,7 +60,7 @@
             text
             tabindex="-1"
             @click="closeForm"
-            >{{ $t("word.close") }}</v-btn
+            >{{ $t("word.cancel") }}</v-btn
           >
           <v-btn
             color="primary"

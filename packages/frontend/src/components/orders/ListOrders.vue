@@ -20,7 +20,7 @@
       </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length" class="px-4 py-3">
-          <div class="subtitle-2">Contenuto dell'ordine</div>
+          <div class="subtitle-2">{{ $t("word.orderEntries") }}</div>
           <list-order-entries :entries="item.entries" />
         </td>
       </template>
