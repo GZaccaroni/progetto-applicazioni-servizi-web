@@ -52,38 +52,31 @@
     </v-navigation-drawer>
   </v-container>
 </template>
-<script lang="ts">
+<script setup lang="ts">
 import UserLoginDialog from "@/components/form/user/UserLoginDialog.vue";
-import { defineComponent, PropType } from "vue";
+import { PropType, ref } from "vue";
 import { DbUser } from "@/model/db/DbUser";
 import AppNavigationDrawer from "@/components/common/AppNavigationDrawer.vue";
+import store from "@/store";
+import router from "@/router";
 
-export default defineComponent({
-  components: {
-    UserLoginDialog,
-    AppNavigationDrawer,
+defineProps({
+  isLoggedIn: {
+    type: Boolean,
+    required: true,
   },
-  props: {
-    isLoggedIn: {
-      type: Boolean,
-      required: true,
-    },
-    userProfile: {
-      type: Object as PropType<DbUser>,
-    },
-  },
-  data: () => ({
-    loginDialogVisible: false,
-    drawer: false,
-  }),
-  methods: {
-    login() {
-      this.loginDialogVisible = true;
-    },
-    async logout() {
-      await this.$store.dispatch("user/logout");
-      await this.$router.push("/");
-    },
+  userProfile: {
+    type: Object as PropType<DbUser>,
   },
 });
+const loginDialogVisible = ref(false);
+const drawer = ref(false);
+
+function login() {
+  loginDialogVisible.value = true;
+}
+async function logout() {
+  await store.dispatch("user/logout");
+  await router.push("/");
+}
 </script>
