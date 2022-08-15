@@ -10,7 +10,6 @@
     </header-view>
     <list-users @onRowEvent="onRowEvent" />
     <user-form-dialog v-model="dialogModel" />
-    <confirm-dialog ref="confirmDialog" />
   </v-container>
 </template>
 
@@ -28,11 +27,10 @@ import UserFormDialog, {
 } from "@/components/form/user/UserFormDialog.vue";
 import { deleteUser } from "@/repositories/UserRepository";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
 import i18n from "@/i18n";
+import { showConfirmDialog } from "@/helpers/confirmDialog";
 
 const dialogModel = ref<UserFormDialogModel>({ isVisible: false });
-const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
 
 function openNewItemDialog() {
   dialogModel.value = {
@@ -40,20 +38,18 @@ function openNewItemDialog() {
   };
 }
 function deleteItem(item: DbUser) {
-  confirmDialog.value
-    ?.open(
-      i18n.t("confirm.delete.user.title").toString(),
-      i18n
-        .t("confirm.delete.user.message", {
-          username: item.username,
-        })
-        .toString()
-    )
-    .then((confirmed) => {
-      if (confirmed) {
-        deleteUser(item.username).catch(repositoryErrorHandler);
-      }
-    });
+  showConfirmDialog({
+    title: i18n.t("confirm.delete.user.title").toString(),
+    message: i18n
+      .t("confirm.delete.user.message", {
+        username: item.username,
+      })
+      .toString(),
+  }).then((confirmed) => {
+    if (confirmed) {
+      deleteUser(item.username).catch(repositoryErrorHandler);
+    }
+  });
 }
 function onRowEvent(event: TableItemEvent<DbUser>) {
   switch (event.type) {

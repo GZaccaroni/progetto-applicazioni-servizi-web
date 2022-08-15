@@ -10,7 +10,6 @@
     </header-view>
     <list-stores @onRowEvent="onRowEvent" />
     <store-form-dialog v-model="dialogModel" />
-    <confirm-dialog ref="confirmDialog" />
   </v-container>
 </template>
 
@@ -22,7 +21,6 @@ import {
 } from "@/plugins/table-builder/TableItemEventType";
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
 import ListStores from "@/components/stores/ListStores.vue";
 import { DbStore } from "@/model/db/DbStore";
 import { deleteStore } from "@/repositories/StoreRepository";
@@ -30,9 +28,9 @@ import StoreFormDialog, {
   StoreFormDialogModel,
 } from "@/components/form/store/StoreFormDialog.vue";
 import i18n from "@/i18n";
+import { showConfirmDialog } from "@/helpers/confirmDialog";
 
 const dialogModel = ref<StoreFormDialogModel>({ isVisible: false });
-const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
 
 function openNewItemDialog() {
   dialogModel.value = {
@@ -40,20 +38,18 @@ function openNewItemDialog() {
   };
 }
 function deleteItem(item: DbStore) {
-  confirmDialog.value
-    ?.open(
-      i18n.t("confirm.delete.store.title").toString(),
-      i18n
-        .t("confirm.delete.store.message", {
-          name: item.name,
-        })
-        .toString()
-    )
-    .then((confirmed) => {
-      if (confirmed) {
-        deleteStore(item.id).catch(repositoryErrorHandler);
-      }
-    });
+  showConfirmDialog({
+    title: i18n.t("confirm.delete.store.title").toString(),
+    message: i18n
+      .t("confirm.delete.store.message", {
+        name: item.name,
+      })
+      .toString(),
+  }).then((confirmed) => {
+    if (confirmed) {
+      deleteStore(item.id).catch(repositoryErrorHandler);
+    }
+  });
 }
 function onRowEvent(event: TableItemEvent<DbStore>) {
   switch (event.type) {

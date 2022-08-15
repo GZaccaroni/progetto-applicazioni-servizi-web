@@ -10,7 +10,6 @@
     </header-view>
     <list-orders @onRowEvent="onRowEvent" />
     <order-form-dialog v-model="dialogModel" />
-    <confirm-dialog ref="confirmDialog" />
   </v-container>
 </template>
 
@@ -22,7 +21,6 @@ import {
 } from "@/plugins/table-builder/TableItemEventType";
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
 import ListOrders from "@/components/orders/ListOrders.vue";
 import { DbOrder } from "@/model/db/DbOrder";
 import { deleteOrder } from "@/repositories/OrderRepository";
@@ -30,9 +28,9 @@ import OrderFormDialog, {
   OrderFormDialogModel,
 } from "@/components/form/order/OrderFormDialog.vue";
 import i18n from "@/i18n";
+import { showConfirmDialog } from "@/helpers/confirmDialog";
 
 const dialogModel = ref<OrderFormDialogModel>({ isVisible: false });
-const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
 
 function openNewItemDialog() {
   dialogModel.value = {
@@ -40,16 +38,14 @@ function openNewItemDialog() {
   };
 }
 function deleteItem(item: DbOrder) {
-  confirmDialog.value
-    ?.open(
-      i18n.t("confirm.delete.order.title").toString(),
-      i18n.t("confirm.delete.order.message").toString()
-    )
-    .then((confirmed) => {
-      if (confirmed) {
-        deleteOrder(item.id).catch(repositoryErrorHandler);
-      }
-    });
+  showConfirmDialog({
+    title: i18n.t("confirm.delete.order.title").toString(),
+    message: i18n.t("confirm.delete.order.message").toString(),
+  }).then((confirmed) => {
+    if (confirmed) {
+      deleteOrder(item.id).catch(repositoryErrorHandler);
+    }
+  });
 }
 function onRowEvent(event: TableItemEvent<DbOrder>) {
   switch (event.type) {

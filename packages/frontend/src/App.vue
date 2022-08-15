@@ -4,6 +4,7 @@
     <v-main>
       <v-container fluid>
         <app-snackbar />
+        <confirm-dialog />
         <router-view />
       </v-container>
     </v-main>
@@ -17,6 +18,7 @@ import AppNavbar from "@/components/common/AppNavbar.vue";
 import i18n, { setDocumentLang } from "@/i18n";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "@/store/user";
+import ConfirmDialog from "@/components/common/ConfirmDialog.vue";
 
 const { userProfile, isLoggedIn } = storeToRefs(useUserStore());
 

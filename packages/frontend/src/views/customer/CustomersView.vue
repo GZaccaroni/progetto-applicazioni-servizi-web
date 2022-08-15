@@ -10,7 +10,6 @@
     </header-view>
     <list-customers @onRowEvent="onRowEvent" />
     <customer-form-dialog v-model="dialogModel" />
-    <confirm-dialog ref="confirmDialog" />
   </v-container>
 </template>
 
@@ -22,7 +21,6 @@ import {
 } from "@/plugins/table-builder/TableItemEventType";
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
 import { DbCustomer } from "@/model/db/DbCustomer";
 import { deleteCustomer } from "@/repositories/CustomerRepository";
 import ListCustomers from "@/components/customers/ListCustomers.vue";
@@ -30,9 +28,9 @@ import CustomerFormDialog, {
   CustomerFormDialogModel,
 } from "@/components/form/customer/CustomerFormDialog.vue";
 import i18n from "@/i18n";
+import { showConfirmDialog } from "@/helpers/confirmDialog";
 
 const dialogModel = ref<CustomerFormDialogModel>({ isVisible: false });
-const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
 
 function openNewItemDialog() {
   dialogModel.value = {
@@ -40,20 +38,18 @@ function openNewItemDialog() {
   };
 }
 function deleteItem(item: DbCustomer) {
-  confirmDialog.value
-    ?.open(
-      i18n.t("confirm.delete.customer.title").toString(),
-      i18n
-        .t("confirm.delete.customer.message", {
-          name: item.name,
-        })
-        .toString()
-    )
-    .then((confirmed) => {
-      if (confirmed) {
-        deleteCustomer(item.id).catch(repositoryErrorHandler);
-      }
-    });
+  showConfirmDialog({
+    title: i18n.t("confirm.delete.customer.title").toString(),
+    message: i18n
+      .t("confirm.delete.customer.message", {
+        name: item.name,
+      })
+      .toString(),
+  }).then((confirmed) => {
+    if (confirmed) {
+      deleteCustomer(item.id).catch(repositoryErrorHandler);
+    }
+  });
 }
 function onRowEvent(event: TableItemEvent<DbCustomer>) {
   switch (event.type) {

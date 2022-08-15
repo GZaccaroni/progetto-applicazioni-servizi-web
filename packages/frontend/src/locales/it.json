@@ -20,6 +20,11 @@
         "title": "Elimina cliente",
         "message":
         "Sei sicuro di voler davvero eliminare {name}?"
+      },
+      "product": {
+        "title": "Elimina prodotto",
+        "message":
+        "Sei sicuro di voler davvero eliminare {name}?"
       }
     }
   },
