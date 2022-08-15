@@ -1,18 +1,19 @@
 import {Response} from "express";
 import {validateRequest} from "../model/request/validation";
-import {CreateUser} from "../model/request/type/CreateUser";
-import {UpdateUser} from "../model/request/type/UpdateUser";
-import {User} from "../model/request/type/User";
 import passport from "passport";
 import UserDb, {UserProjection} from "../model/db_model/User";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import {io} from "../app";
 import Store from "../model/db_model/Store";
-import {GetUsers} from "../model/request/type/GetUsers";
+import {CreateUserSchema} from "../model/request/json_schema/CreateUser";
+import {GetUsersSchema} from "../model/request/json_schema/GetUsers";
+import {UpdateUserSchema} from "../model/request/json_schema/UpdateUser";
+import {UserSchema} from "../model/request/json_schema/User";
 
 export const createUser = (req, res: Response) => {
-  if (!validateRequest<CreateUser>("CreateUser", req.body)) {
+
+  if (!validateRequest(CreateUserSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -70,7 +71,7 @@ export const getUsers = (req, res: Response) => {
     res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
     return;
   }
-  if (!validateRequest<GetUsers>("GetUsers", req.query)) {
+  if (!validateRequest(GetUsersSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -123,7 +124,7 @@ export const getUserByName = (req, res: Response) => {
   });
 }
 export const updateUser = (req, res: Response) => {
-  if (!validateRequest<UpdateUser>("UpdateUser", req.body) || !req.params.username) {
+  if (!validateRequest(UpdateUserSchema, req.body) || !req.params.username) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid input"
@@ -239,7 +240,7 @@ export const userLogin = (req, res: Response) => {
     res.json({message: "User already authenticated"});
     return;
   }
-  if (!validateRequest<User>("User", req.body)) {
+  if (!validateRequest(UserSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"

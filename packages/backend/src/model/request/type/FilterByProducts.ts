@@ -1,6 +1,6 @@
 export interface FilterByProducts{
-  products?: [{
+  products?: {
     productId:string;
     variantId?:string;
-  }];
+  }[];
 }

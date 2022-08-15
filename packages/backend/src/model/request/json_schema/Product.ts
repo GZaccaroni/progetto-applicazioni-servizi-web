@@ -1,4 +1,8 @@
-{
+import {JSONSchemaType} from "ajv"
+import {Product} from "../type/Product";
+import {ProductKindSchema} from "./ProductKind";
+
+export const ProductSchema: JSONSchemaType<Product> = {
   "required": [
     "kinds",
     "name",
@@ -12,13 +16,12 @@
     },
     "pricePerUnit": {
       "exclusiveMinimum": 0,
-      "type": "number"
+      "type": "number",
+      "nullable": true,
     },
     "kinds": {
       "type": "array",
-      "items": {
-        "$ref": "ProductKind#"
-      }
+      "items": ProductKindSchema
     },
     "unitOfMeasure": {
       "type": "string",

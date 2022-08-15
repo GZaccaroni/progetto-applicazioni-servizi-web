@@ -1,14 +1,14 @@
 import {Request, Response} from "express";
 import {validateRequest} from "../model/request/validation";
-import {CreateCustomer} from "../model/request/type/CreateCustomer";
-import {UpdateCustomer} from "../model/request/type/UpdateCustomer";
 import Customer, {CustomerProjection} from "../model/db_model/Customer";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
-import {GetCustomers} from "../model/request/type/GetCustomers";
 import Order from "../model/db_model/Order";
+import {CreateCustomerSchema} from "../model/request/json_schema/CreateCustomer";
+import {GetCustomersSchema} from "../model/request/json_schema/GetCustomers";
+import {UpdateCustomerSchema} from "../model/request/json_schema/UpdateCustomer";
 
 const checkCustomerConsistence = async (customer, customerId?) => {
   await Customer.findOne({name: customer.name}).then(customer => {
@@ -22,7 +22,7 @@ const checkCustomerConsistence = async (customer, customerId?) => {
 }
 
 export const addCustomer = (req, res: Response) => {
-  if (!validateRequest<CreateCustomer>("CreateCustomer", req.body)) {
+  if (!validateRequest(CreateCustomerSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -54,7 +54,7 @@ export const addCustomer = (req, res: Response) => {
 
 }
 export const getCustomers=(req,res: Response)=>{
-  if (!validateRequest<GetCustomers>("GetCustomers", req.query)) {
+  if (!validateRequest(GetCustomersSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -97,7 +97,7 @@ export const getCustomerById=(req:Request,res: Response)=>{
 }
 
 export const updateCustomer = (req, res: Response) => {
-  if (!validateRequest<UpdateCustomer>("UpdateCustomer", req.body)
+  if (!validateRequest(UpdateCustomerSchema, req.body)
     || !mongoose.isValidObjectId(req.params.customerId)) {
     res.status(400).json({
       errCode: "invalidArgument",

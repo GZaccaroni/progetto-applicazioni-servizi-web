@@ -1,4 +1,7 @@
-{
+import {JSONSchemaType} from "ajv"
+import {CreateOrderEntry} from "../type/CreateOrderEntry";
+
+export const CreateOrderEntrySchema: JSONSchemaType<CreateOrderEntry> = {
   "required": [
     "pricePerUnit",
     "productId",
@@ -10,7 +13,8 @@
       "type": "string"
     },
     "variantId": {
-      "type": "string"
+      "type": "string",
+      "nullable": true,
     },
     "grade": {
       "type": "string",
@@ -18,7 +22,8 @@
         "first",
         "second",
         "mixed"
-      ]
+      ],
+      "nullable": true,
     },
     "quantity": {
       "exclusiveMinimum": 0,

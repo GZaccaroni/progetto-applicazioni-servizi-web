@@ -1,15 +1,15 @@
 import {Request, Response} from "express";
 import {validateRequest} from "../model/request/validation";
-import {CreateStore} from "../model/request/type/CreateStore";
-import {UpdateStore} from "../model/request/type/UpdateStore";
 import Store, {StoreProjection} from "../model/db_model/Store";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
-import {GetStores} from "../model/request/type/GetStores";
 import User from "../model/db_model/User";
 import Order from "../model/db_model/Order";
+import {CreateStoreSchema} from "../model/request/json_schema/CreateStore";
+import {GetStoresSchema} from "../model/request/json_schema/GetStores";
+import {UpdateStoreSchema} from "../model/request/json_schema/UpdateStore";
 
 const checkStoreConsistence = async (store, storeId?) => {
   const invalidAuthorizationError = {
@@ -72,7 +72,7 @@ export const addStore = (req, res: Response) => {
     });
     return;
   }
-  if (!validateRequest<CreateStore>("CreateStore", req.body)) {
+  if (!validateRequest(CreateStoreSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -103,7 +103,7 @@ export const addStore = (req, res: Response) => {
   });
 }
 export const getStores = (req, res: Response) => {
-  if (!validateRequest<GetStores>("GetStores", req.query)) {
+  if (!validateRequest(GetStoresSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -142,7 +142,7 @@ export const updateStore = (req, res: Response) => {
   if (!req.user.isAdmin) {
     res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
   }
-  if (!validateRequest<UpdateStore>("UpdateStore", req.body)
+  if (!validateRequest(UpdateStoreSchema, req.body)
     || !mongoose.isValidObjectId(req.params.storeId)) {
     res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;

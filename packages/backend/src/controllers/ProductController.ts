@@ -1,14 +1,14 @@
 import {Request, Response} from "express";
 import {validateRequest} from "../model/request/validation";
-import {UpdateProduct} from "../model/request/type/UpdateProduct";
-import {CreateProduct} from "../model/request/type/CreateProduct";
 import Product, {ProductProjection} from "../model/db_model/Product";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
 import mongoose from "mongoose";
 import {io} from "../app";
-import {GetProducts} from "../model/request/type/GetProducts";
 import Order from "../model/db_model/Order";
+import {CreateProductSchema} from "../model/request/json_schema/CreateProduct";
+import {GetProductsSchema} from "../model/request/json_schema/GetProducts";
+import {UpdateProductSchema} from "../model/request/json_schema/UpdateProduct";
 
 const checkProductConsistence = async (product, productId?) => {
   const productKindSet = new Set(product.kinds.map(productKind => productKind.name));
@@ -41,7 +41,7 @@ export const addProduct = (req, res: Response) => {
       message: "User not authorized"
     });
   }
-  if (!validateRequest<CreateProduct>("CreateProduct", req.body)) {
+  if (!validateRequest(CreateProductSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -74,7 +74,7 @@ export const addProduct = (req, res: Response) => {
 }
 
 export const getProducts = (req, res: Response) => {
-  if (!validateRequest<GetProducts>("GetProducts", req.query)) {
+  if (!validateRequest(GetProductsSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -133,7 +133,7 @@ export const updateProduct = (req, res: Response) => {
     });
     return;
   }
-  if (!validateRequest<UpdateProduct>("UpdateProduct", req.body)
+  if (!validateRequest(UpdateProductSchema, req.body)
     || !mongoose.isValidObjectId(req.params.productId)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -144,42 +144,53 @@ export const updateProduct = (req, res: Response) => {
   const enrichedProduct = enrichProduct(req.body);
   checkProductConsistence(enrichedProduct, req.params.productId).then(() => {
     Product.findById(req.params.productId).then(product => {
-      const deletedKindId = product.kinds.filter(k => enrichedProduct.kinds.find(x => x.id == k.id) == null).map(k => k.id);
-      Order.findOne({"entries.variantId": deletedKindId}).then(order => {
-        if (order) {
-          throw {
-            code: 403,
-            error: {
-              errCode: "cannotDelete",
-              message: "Can't delete product kind: the product kind has associated orders"
-            }
-          };
-        }
-      }).then(() => {
-        Product.findByIdAndUpdate(req.params.productId, enrichedProduct, {new: true}).then((product) => {
-          if (product == null) {
-            throw {
-              code: 404,
-              error: {
-                errCode: "itemNotFound",
-                message: 'Product not found'
-              }
-            }
-          } else {
-            Log.create({
-              username: req.user.username,
-              action: "Update",
-              object: {
-                id: product._id,
-                type: "Product"
-              }
-            }).then(() => {
-              io.emit("productChanged", {id: product._id, action: "update"});
-              res.json({message: "Product updated"})
-            });
+      if (product == null) {
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: 'Product not found'
           }
-        });
-      })
+        }
+      } else {
+        const deletedKindId = product.kinds.filter(k => enrichedProduct.kinds.find(x => x.id == k.id) == null).map(k => k.id);
+        Order.findOne({"entries.variantId": deletedKindId}).then(order => {
+          if (order) {
+            throw {
+              code: 403,
+              error: {
+                errCode: "cannotDelete",
+                message: "Can't delete product kind: the product kind has associated orders"
+              }
+            };
+          }
+        }).then(() => {
+          Product.findByIdAndUpdate(req.params.productId, enrichedProduct, {new: true}).then((product) => {
+            if (product == null) {
+              throw {
+                code: 404,
+                error: {
+                  errCode: "itemNotFound",
+                  message: 'Product not found'
+                }
+              }
+            } else {
+              Log.create({
+                username: req.user.username,
+                action: "Update",
+                object: {
+                  id: product._id,
+                  type: "Product"
+                }
+              }).then(() => {
+                io.emit("productChanged", {id: product._id, action: "update"});
+                res.json({message: "Product updated"})
+              });
+            }
+          });
+        })
+      }
+
     });
   }).catch(err => {
     if (err.code && err.error) {

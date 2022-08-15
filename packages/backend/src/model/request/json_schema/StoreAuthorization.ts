@@ -1,4 +1,7 @@
-{
+import {JSONSchemaType} from "ajv"
+import {StoreAuthorization} from "../type/StoreAuthorization";
+
+export const StoreAuthorizationSchema: JSONSchemaType<StoreAuthorization> = {
   "required": [
     "accessLevel",
     "userId"

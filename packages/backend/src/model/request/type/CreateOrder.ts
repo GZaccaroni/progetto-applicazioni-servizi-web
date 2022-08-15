@@ -14,7 +14,7 @@ import { CreateOrderEntry } from './CreateOrderEntry';
 export interface CreateOrder { 
     customerId?: string;
     storeId: string;
-    date: Date;
+    date: string;
     entries: Array<CreateOrderEntry>;
     note?: string;
 }

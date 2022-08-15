@@ -1,7 +1,5 @@
-import {Request, Response} from "express";
+import {Response} from "express";
 import {validateRequest} from "../model/request/validation";
-import {CreateOrder} from "../model/request/type/CreateOrder";
-import {UpdateOrder} from "../model/request/type/UpdateOrder";
 import Order, {OrderProjection} from "../model/db_model/Order";
 import Log from "../model/db_model/Log";
 import {paginateOptions, paginateResponse} from "../paginationUtils";
@@ -10,9 +8,11 @@ import Product from "../model/db_model/Product";
 import Customer, {CustomerProjection} from "../model/db_model/Customer";
 import mongoose from "mongoose";
 import {io} from "../app";
-import {GetOrders} from "../model/request/type/GetOrders";
 import {AccessLevel} from "../model/request/type/StoreAuthorization";
 import {getUserStoreRole} from "./StoreController";
+import {CreateOrderSchema} from "../model/request/json_schema/CreateOrder";
+import {GetOrdersSchema} from "../model/request/json_schema/GetOrders";
+import {UpdateOrderSchema} from "../model/request/json_schema/UpdateOrder";
 
 const enrichOrder = async (order, creatorId) => {
   const enrichedOrder = {
@@ -95,7 +95,7 @@ const enrichOrder = async (order, creatorId) => {
 }
 
 export const addOrder = (req, res: Response) => {
-  if (!validateRequest<CreateOrder>("CreateOrder", req.body)) {
+  if (!validateRequest(CreateOrderSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -136,7 +136,7 @@ export const addOrder = (req, res: Response) => {
   });
 }
 export const getOrders = (req, res: Response) => {
-  if(!validateRequest<GetOrders>("GetOrders",req.query)){
+  if(!validateRequest(GetOrdersSchema,req.query)){
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input"
@@ -224,7 +224,7 @@ export const getOrderById = (req, res: Response) => {
   });
 }
 export const updateOrder = (req, res: Response) => {
-  if (!validateRequest<UpdateOrder>("UpdateOrder", req.body)
+  if (!validateRequest(UpdateOrderSchema, req.body)
     || !mongoose.isValidObjectId(req.params.orderId)) {
     res.status(400).json({errCode: "invalidArgument", message: "Invalid Input"});
     return;
@@ -251,17 +251,27 @@ export const updateOrder = (req, res: Response) => {
         }
         enrichOrder(req.body, order.createdBy).then(newOrder => {
           Order.findOneAndReplace({_id: req.params.orderId}, newOrder).then(order => {
-            Log.create({
-              username: req.user.username,
-              action: "Update",
-              object: {
-                id: order._id,
-                type: "Order"
+            if (order == null) {
+              throw {
+                code: 404,
+                error: {
+                  errCode: "itemNotFound",
+                  message: "Order not found"
+                }
               }
-            }).then(() => {
-              io.emit("orderChanged", {id: order._id, action: "update"});
-              res.json("Order Updated");
-            });
+            } else {
+              Log.create({
+                username: req.user.username,
+                action: "Update",
+                object: {
+                  id: order._id,
+                  type: "Order"
+                }
+              }).then(() => {
+                io.emit("orderChanged", {id: order._id, action: "update"});
+                res.json("Order Updated");
+              });
+            }
           })
         })
       })
@@ -301,7 +311,7 @@ export const deleteOrder=(req,res: Response)=>{
             }
           }
         }
-        Order.findByIdAndDelete(req.params.orderId).then(order => {
+        Order.findByIdAndDelete(req.params.orderId).then(_ => {
           Log.create({
             username: req.user.username,
             action: "Delete",
