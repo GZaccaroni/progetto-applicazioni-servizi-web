@@ -1,4 +1,4 @@
-export interface FilterByDate{
+export interface FilterByDate {
   fromDate?: string;
   toDate?: string;
 }

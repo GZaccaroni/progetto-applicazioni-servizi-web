@@ -1,6 +1,6 @@
 /**
  * Swagger Petstore
- * This is a sample Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/). 
+ * This is a sample Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
  *
  * OpenAPI spec version: 1.0.0
  * Contact: apiteam@swagger.io
@@ -9,9 +9,9 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { StoreAuthorization } from './StoreAuthorization';
+import { StoreAuthorization } from "./StoreAuthorization";
 
-export interface Store { 
-    name: string;
-    authorizations: Array<StoreAuthorization>;
+export interface Store {
+  name: string;
+  authorizations: Array<StoreAuthorization>;
 }

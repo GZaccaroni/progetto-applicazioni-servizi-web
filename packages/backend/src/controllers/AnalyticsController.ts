@@ -1,26 +1,26 @@
-import { Response} from "express";
+import { Response } from "express";
 import mongoose from "mongoose";
 import Order from "../model/db_model/Order";
-import {validateRequest} from "../model/request/validation";
-import {DataTypeEnum} from "../model/request/type/GetAnalytics";
-import {GetAnalyticsSchema} from "../model/request/json_schema/GetAnalytics";
+import { validateRequest } from "../model/request/validation";
+import { DataTypeEnum } from "../model/request/type/GetAnalytics";
+import { GetAnalyticsSchema } from "../model/request/json_schema/GetAnalytics";
 
 export const getAnalytics = (req, res: Response) => {
   if (!validateRequest(GetAnalyticsSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Invalid Input"
+      message: "Invalid Input",
     });
     return;
   }
-  const query={};
-  if(req.query.storeId ){
-    if(mongoose.isValidObjectId(req.query.storeId)) {
+  const query = {};
+  if (req.query.storeId) {
+    if (mongoose.isValidObjectId(req.query.storeId)) {
       query["store.id"] = req.query.storeId;
     } else {
       res.status(400).json({
         errCode: "invalidArgument",
-        message: "Invalid storeId supplied"
+        message: "Invalid storeId supplied",
       });
       return;
     }
@@ -31,46 +31,46 @@ export const getAnalytics = (req, res: Response) => {
     } else {
       res.status(400).json({
         errCode: "invalidArgument",
-        message: "Invalid customerId supplied"
+        message: "Invalid customerId supplied",
       });
       return;
     }
   }
   if (req.query.fromDate) {
-    if(!query["date"]){
-      query["date"]={};
+    if (!query["date"]) {
+      query["date"] = {};
     }
     query["date"]["$gte"] = new Date(req.query.fromDate);
   }
   if (req.query.toDate) {
-    if(!query["date"]){
-      query["date"]={};
+    if (!query["date"]) {
+      query["date"] = {};
     }
     query["date"]["$lte"] = new Date(req.query.toDate);
   }
   const productAndVariant = new Array<any>();
   const products = new Array<any>();
   if (req.query.products?.length) {
-      req.query.products.forEach(p => {
+    req.query.products.forEach((p) => {
       const productCondition = {
-        "entries.productId": p.productId
+        "entries.productId": p.productId,
       };
       if (p.variantId) {
         productCondition["entries.variantId"] = p.variantId;
-        productAndVariant.push(productCondition)
+        productAndVariant.push(productCondition);
       } else {
-        products.push(productCondition)
+        products.push(productCondition);
       }
     });
-    query["$or"]=products.concat(productAndVariant)
+    query["$or"] = products.concat(productAndVariant);
   }
-  const projection={
-    date:1,
-    name:"$entries.name",
-    entries:{
-      productId:1,
-      variantId:1
-    }
+  const projection = {
+    date: 1,
+    name: "$entries.name",
+    entries: {
+      productId: 1,
+      variantId: 1,
+    },
   };
   if (req.query.dataType == DataTypeEnum.Price) {
     projection["value"] = "$entries.price";
@@ -78,80 +78,97 @@ export const getAnalytics = (req, res: Response) => {
     projection["value"] = "$entries.quantity";
   }
   Order.aggregate([
-    {$unwind: "$entries"},
-    {$match: query},
-    {$project: projection},
+    { $unwind: "$entries" },
+    { $match: query },
+    { $project: projection },
     {
       $facet: {
-        "CategorizedByVariant":[
+        CategorizedByVariant: [
           {
-            $match: productAndVariant?.length?{$or:productAndVariant}:{_id:null},
+            $match: productAndVariant?.length
+              ? { $or: productAndVariant }
+              : { _id: null },
           },
           {
             $group: {
               _id: {
-                productId: {$toObjectId: "$entries.productId"},
-                variantId: "$entries.variantId"
+                productId: { $toObjectId: "$entries.productId" },
+                variantId: "$entries.variantId",
               },
-              "value": {$sum: "$value"},
-              "productData": {
+              value: { $sum: "$value" },
+              productData: {
                 $push: {
-                  "date": "$date",
-                  "value": "$value"
-                }
-              }
-            }
-          }
+                  date: "$date",
+                  value: "$value",
+                },
+              },
+            },
+          },
         ],
-        "CategorizedByProduct":[
+        CategorizedByProduct: [
           {
-            $match: products?.length?{$or:products}:{_id:null}
+            $match: products?.length ? { $or: products } : { _id: null },
           },
           {
             $group: {
-              _id: {productId: {$toObjectId: "$entries.productId"}},
-              "value": {$sum: "$value"},
-              "productData": {
+              _id: { productId: { $toObjectId: "$entries.productId" } },
+              value: { $sum: "$value" },
+              productData: {
                 $push: {
-                  "date": "$date",
-                  "value": "$value"
-                }
-              }
-            }
-          }
-        ]
-      }
+                  date: "$date",
+                  value: "$value",
+                },
+              },
+            },
+          },
+        ],
+      },
     },
-    {$project: {"items": {$concatArrays: ["$CategorizedByVariant", "$CategorizedByProduct"]}}},
-    {$unwind: "$items"},
-    {$replaceRoot: {newRoot: "$items"}},
+    {
+      $project: {
+        items: {
+          $concatArrays: ["$CategorizedByVariant", "$CategorizedByProduct"],
+        },
+      },
+    },
+    { $unwind: "$items" },
+    { $replaceRoot: { newRoot: "$items" } },
     {
       $lookup: {
         from: "products",
         localField: "_id.productId",
         foreignField: "_id",
-        as: "product"
-      }
+        as: "product",
+      },
     },
     {
       $addFields: {
-        "variant": {$arrayElemAt: [{
-            $filter: {
-              input: {$first:"$product.kinds"},
-              as: "kind",
-              cond: {$eq: ["$$kind.id", "$_id.variantId"]}
-            }}, 0]}
-      }
+        variant: {
+          $arrayElemAt: [
+            {
+              $filter: {
+                input: { $first: "$product.kinds" },
+                as: "kind",
+                cond: { $eq: ["$$kind.id", "$_id.variantId"] },
+              },
+            },
+            0,
+          ],
+        },
+      },
     },
     {
       $addFields: {
-        "name": {$ifNull: ["$variant.fullName", "$product.name"]}
-      }
+        name: { $ifNull: ["$variant.fullName", "$product.name"] },
+      },
     },
     {
-      $unset:["_id","product","variant"]
-    }
-  ]).then(analytics => {
-    res.json(analytics)
-  }, err=> res.status(500).json(err));
-}
+      $unset: ["_id", "product", "variant"],
+    },
+  ]).then(
+    (analytics) => {
+      res.json(analytics);
+    },
+    (err) => res.status(500).json(err)
+  );
+};

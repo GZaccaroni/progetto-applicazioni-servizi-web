@@ -1,7 +1,7 @@
-import {Router} from "express";
-import {getAnalytics} from "../controllers/AnalyticsController";
+import { Router } from "express";
+import { getAnalytics } from "../controllers/AnalyticsController";
 
-const AnalyticsRoutes=Router();
+const AnalyticsRoutes = Router();
 
 AnalyticsRoutes.route("/").get(getAnalytics);
 

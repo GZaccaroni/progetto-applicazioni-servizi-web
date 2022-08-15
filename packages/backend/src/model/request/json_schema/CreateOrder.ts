@@ -1,34 +1,30 @@
-import {JSONSchemaType} from "ajv"
-import {CreateOrderEntrySchema} from "./CreateOrderEntry";
-import {CreateOrder} from "../type/CreateOrder";
+import { JSONSchemaType } from "ajv";
+import { CreateOrderEntrySchema } from "./CreateOrderEntry";
+import { CreateOrder } from "../type/CreateOrder";
 
 export const CreateOrderSchema: JSONSchemaType<CreateOrder> = {
-  "required": [
-    "date",
-    "entries",
-    "storeId"
-  ],
-  "type": "object",
-  "properties": {
-    "customerId": {
-      "type": "string",
-      "nullable": true,
+  required: ["date", "entries", "storeId"],
+  type: "object",
+  properties: {
+    customerId: {
+      type: "string",
+      nullable: true,
     },
-    "storeId": {
-      "type": "string"
+    storeId: {
+      type: "string",
     },
-    "date": {
-      "type": "string",
-      "format": "date-time"
+    date: {
+      type: "string",
+      format: "date-time",
     },
-    "entries": {
-      "type": "array",
-      "minItems": 1,
-      "items": CreateOrderEntrySchema
+    entries: {
+      type: "array",
+      minItems: 1,
+      items: CreateOrderEntrySchema,
     },
-    "note": {
-      "type": "string",
-      "nullable": true,
-    }
-  }
-}
+    note: {
+      type: "string",
+      nullable: true,
+    },
+  },
+};

@@ -1,23 +1,25 @@
 /* eslint:disable no-var-requires */
-import sourceMapSupport = require('source-map-support');
+import sourceMapSupport = require("source-map-support");
 sourceMapSupport.install();
-import express from 'express';
-import session from 'express-session';
-import passport from 'passport';
+import express from "express";
+import session from "express-session";
+import passport from "passport";
 import User from "./model/db_model/User";
-import cors from 'cors';
+import cors from "cors";
 import routes from "./routes/Routes";
 import mongoose from "mongoose";
-import {Server} from "socket.io";
+import { Server } from "socket.io";
 import * as http from "http";
-import {queryParser} from "express-query-parser";
+import { queryParser } from "express-query-parser";
 
 const app = express();
 const port = 3000;
-const server= http.createServer(app);
-export const io = new Server(server, { cors: { credentials: true, origin: true }});
+const server = http.createServer(app);
+export const io = new Server(server, {
+  cors: { credentials: true, origin: true },
+});
 
-app.use(cors({credentials: true, origin: true}));
+app.use(cors({ credentials: true, origin: true }));
 
 app.use(express.json());
 app.use(
@@ -25,16 +27,18 @@ app.use(
     parseNull: true,
     parseUndefined: true,
     parseBoolean: true,
-    parseNumber: true
+    parseNumber: true,
   })
-)
+);
 
-app.use(session({
-  secret: 'r8q,+&1LM3)CD*zAGpx1xm{Pusadnstrc;#',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { maxAge: 60 * 60 * 1000 } // 1 hour
-}));
+app.use(
+  session({
+    secret: "r8q,+&1LM3)CD*zAGpx1xm{Pusadnstrc;#",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -42,13 +46,17 @@ passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use('/',routes);
+app.use("/", routes);
 
 server.listen(port, () => {
   return console.log(`Express is listening at http://localhost:${port}`);
 });
 
 // connect to database
-mongoose.connect('mongodb+srv://admin:C0W6J0tA3jl8X4Cb@maincolturecloud.fujik.mongodb.net/main').then(()=>{
-  console.log("Db connected");
-});
+mongoose
+  .connect(
+    "mongodb+srv://admin:C0W6J0tA3jl8X4Cb@maincolturecloud.fujik.mongodb.net/main"
+  )
+  .then(() => {
+    console.log("Db connected");
+  });

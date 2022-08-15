@@ -1,5 +1,5 @@
-import {JSONSchemaType} from "ajv"
-import {UpdateProduct} from "../type/UpdateProduct";
-import {ProductSchema} from "./Product";
+import { JSONSchemaType } from "ajv";
+import { UpdateProduct } from "../type/UpdateProduct";
+import { ProductSchema } from "./Product";
 
-export const UpdateProductSchema: JSONSchemaType<UpdateProduct> = ProductSchema
+export const UpdateProductSchema: JSONSchemaType<UpdateProduct> = ProductSchema;

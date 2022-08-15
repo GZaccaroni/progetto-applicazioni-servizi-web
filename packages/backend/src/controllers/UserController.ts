@@ -1,256 +1,282 @@
-import {Response} from "express";
-import {validateRequest} from "../model/request/validation";
+import { Response } from "express";
+import { validateRequest } from "../model/request/validation";
 import passport from "passport";
-import UserDb, {UserProjection} from "../model/db_model/User";
+import UserDb, { UserProjection } from "../model/db_model/User";
 import Log from "../model/db_model/Log";
-import {paginateOptions, paginateResponse} from "../paginationUtils";
-import {io} from "../app";
+import { paginateOptions, paginateResponse } from "../paginationUtils";
+import { io } from "../app";
 import Store from "../model/db_model/Store";
-import {CreateUserSchema} from "../model/request/json_schema/CreateUser";
-import {GetUsersSchema} from "../model/request/json_schema/GetUsers";
-import {UpdateUserSchema} from "../model/request/json_schema/UpdateUser";
-import {UserSchema} from "../model/request/json_schema/User";
+import { CreateUserSchema } from "../model/request/json_schema/CreateUser";
+import { GetUsersSchema } from "../model/request/json_schema/GetUsers";
+import { UpdateUserSchema } from "../model/request/json_schema/UpdateUser";
+import { UserSchema } from "../model/request/json_schema/User";
 
 export const createUser = (req, res: Response) => {
-
   if (!validateRequest(CreateUserSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Invalid Input"
+      message: "Invalid Input",
     });
     return;
   }
   if (!req.user.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",
-      message: "User not authorized"
+      message: "User not authorized",
     });
     return;
   }
-  UserDb.findOne({username:req.body.username}).then(user=>{
-    if(user){
-      throw {
-        code: 400,
-        error: {
-          errCode: "nameAlreadyInUse",
-          message: "Invalid Username"
-        }
+  UserDb.findOne({ username: req.body.username })
+    .then((user) => {
+      if (user) {
+        throw {
+          code: 400,
+          error: {
+            errCode: "nameAlreadyInUse",
+            message: "Invalid Username",
+          },
+        };
       }
-    }
-  }).then(()=>{
-    UserDb.register(req.body, req.body.password).then(user => {
-      Log.create({
-        username: req.user.username,
-        action: "Create",
-        object: {
-          id: user._id,
-          type: "User"
+    })
+    .then(() => {
+      UserDb.register(req.body, req.body.password).then(
+        (user) => {
+          Log.create({
+            username: req.user.username,
+            action: "Create",
+            object: {
+              id: user._id,
+              type: "User",
+            },
+          }).then(() => {
+            io.emit("userChanged", { id: user._id, action: "create" });
+            res.json({ message: "User added" });
+          });
+        },
+        () => {
+          throw {
+            code: 400,
+            error: {
+              errCode: "invalidArgument",
+              message: "Registration error",
+            },
+          };
         }
-      }).then(() => {
-        io.emit("userChanged", {id: user._id, action: "create"});
-        res.json({message: "User added"})
-      });
-    }, () =>{
-      throw {
-        code: 400,
-        error: {
-          errCode: "invalidArgument",
-          message: "Registration error"
-        }
-      }});
-  }).catch(err => {
-    if(err.code && err.error){
-      res.status(err.code).json(err.error)
-    } else {
-      res.status(500).json(err);
-    }
-  });
-}
+      );
+    })
+    .catch((err) => {
+      if (err.code && err.error) {
+        res.status(err.code).json(err.error);
+      } else {
+        res.status(500).json(err);
+      }
+    });
+};
 export const getUsers = (req, res: Response) => {
   if (!req.user.isAdmin) {
-    res.status(403).json({errCode: "notAuthorized", message: "User not authorized"});
+    res
+      .status(403)
+      .json({ errCode: "notAuthorized", message: "User not authorized" });
     return;
   }
   if (!validateRequest(GetUsersSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Invalid Input"
+      message: "Invalid Input",
     });
     return;
   }
   const query = {};
   if (req.query.searchName) {
-    query["username"] = {$regex: req.query.searchName, $options: "i"};
+    query["username"] = { $regex: req.query.searchName, $options: "i" };
   }
-  const options = paginateOptions(query, UserProjection, {}, req.query.limit, req.query.pagingNext, req.query.pagingPrevious)
-  UserDb.paginate(options, err => res.status(500).json(err)).then((result) => {
-    res.json(paginateResponse(result));
-  });
-}
+  const options = paginateOptions(
+    query,
+    UserProjection,
+    {},
+    req.query.limit,
+    req.query.pagingNext,
+    req.query.pagingPrevious
+  );
+  UserDb.paginate(options, (err) => res.status(500).json(err)).then(
+    (result) => {
+      res.json(paginateResponse(result));
+    }
+  );
+};
 
 export const getUserByName = (req, res: Response) => {
   if (!req.params.username) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Invalid Username supplied"
+      message: "Invalid Username supplied",
     });
     return;
   }
   if (!req.user.isAdmin && req.params.username != req.user.username) {
     res.status(403).json({
       errCode: "notAuthorized",
-      message: "User not authorized"
+      message: "User not authorized",
     });
     return;
   }
-  UserDb.findOne({username: req.params.username}, UserProjection).then(user => {
-    if (!user) {
-      throw {
-        code: 404,
-        error: {
-          errCode: "itemNotFound",
-          message: "User not found"
-        }
+  UserDb.findOne({ username: req.params.username }, UserProjection)
+    .then((user) => {
+      if (!user) {
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: "User not found",
+          },
+        };
+      } else {
+        res.json(user);
       }
-    } else {
-      res.json(user);
-    }
-  }).catch(err => {
-    if(err.code && err.error){
-      res.status(err.code).json(err.error)
-    } else {
-      res.status(500).json(err);
-    }
-  });
-}
+    })
+    .catch((err) => {
+      if (err.code && err.error) {
+        res.status(err.code).json(err.error);
+      } else {
+        res.status(500).json(err);
+      }
+    });
+};
 export const updateUser = (req, res: Response) => {
   if (!validateRequest(UpdateUserSchema, req.body) || !req.params.username) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Invalid input"
+      message: "Invalid input",
     });
     return;
   }
   if (!req.params.username) {
     res.status(400).json({
       errCode: "notAuthorized",
-      message: "Invalid Username supplied"
+      message: "Invalid Username supplied",
     });
     return;
   }
   if (req.user.username != req.params.username && !req.user.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",
-      message: "User not authorized"
+      message: "User not authorized",
     });
     return;
   }
-  UserDb.findOne({username: req.params.username}).then(user => {
-    if (!user) {
-      throw {
-        code: 404,
-        error: {
-          errCode: "itemNotFound",
-          message: "User not found"
-        }
-      }
-    } else {
-      user.setPassword(req.body.password).then(user => {
-        user.save();
-        Log.create({
+  UserDb.findOne({ username: req.params.username })
+    .then((user) => {
+      if (!user) {
+        throw {
+          code: 404,
+          error: {
+            errCode: "itemNotFound",
+            message: "User not found",
+          },
+        };
+      } else {
+        user.setPassword(req.body.password).then((user) => {
+          user.save();
+          Log.create({
             username: req.user.username,
             action: "Update",
             object: {
               id: user._id,
-              type: "User"
-            }
-          }).then(() => res.json({message: "User password updated"}));
-      });
-    }
-  }).catch(err => {
-    if(err.code && err.error){
-      res.status(err.code).json(err.error)
-    } else {
-      res.status(500).json(err);
-    }
-  });
-}
+              type: "User",
+            },
+          }).then(() => res.json({ message: "User password updated" }));
+        });
+      }
+    })
+    .catch((err) => {
+      if (err.code && err.error) {
+        res.status(err.code).json(err.error);
+      } else {
+        res.status(500).json(err);
+      }
+    });
+};
 export const deleteUser = (req, res: Response) => {
   if (!req.params.username) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Invalid Username supplied"
+      message: "Invalid Username supplied",
     });
     return;
   }
   if (req.user.username != req.params.username && !req.user.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",
-      message: "User not authorized"
+      message: "User not authorized",
     });
     return;
   }
-  UserDb.findOne({username: req.params.username}).then(user => {
-    if(user == null){
-      throw {
-        code: 400,
-        error: {
-          errCode: "itemNotFound",
-          message: "User not found"
-        }
+  UserDb.findOne({ username: req.params.username })
+    .then((user) => {
+      if (user == null) {
+        throw {
+          code: 400,
+          error: {
+            errCode: "itemNotFound",
+            message: "User not found",
+          },
+        };
       }
-    }
-    Store.updateMany({"authorizations.userId": user._id}, {$pullAll: {authorizations: user._id}}).then(() => {
-      UserDb.deleteOne({_id: user._id}).then(result => {
-        if (result.deletedCount < 1) {
-          throw {
-            code: 400,
-            error: {
-              errCode: "itemNotFound",
-              message: "User not found"
-            }
+      Store.updateMany(
+        { "authorizations.userId": user._id },
+        { $pullAll: { authorizations: user._id } }
+      ).then(() => {
+        UserDb.deleteOne({ _id: user._id }).then((result) => {
+          if (result.deletedCount < 1) {
+            throw {
+              code: 400,
+              error: {
+                errCode: "itemNotFound",
+                message: "User not found",
+              },
+            };
           }
-        }
-        if (req.user.username == user.username) {
-          req.logout();
-        }
-        Log.create({
-          username: user.username,
-          action: "Delete",
-          object: {
-            id: user._id,
-            type: "User"
+          if (req.user.username == user.username) {
+            req.logout();
           }
-        }).then(() => {
-          io.emit("userChanged", {id: user._id, action: "delete"});
-          res.json({message: "User deleted"})
+          Log.create({
+            username: user.username,
+            action: "Delete",
+            object: {
+              id: user._id,
+              type: "User",
+            },
+          }).then(() => {
+            io.emit("userChanged", { id: user._id, action: "delete" });
+            res.json({ message: "User deleted" });
+          });
         });
-      })
+      });
     })
-  }).catch(err => {
-    if(err.code && err.error){
-      res.status(err.code).json(err.error)
-    } else {
-      res.status(500).json(err);
-    }
-  });
-}
+    .catch((err) => {
+      if (err.code && err.error) {
+        res.status(err.code).json(err.error);
+      } else {
+        res.status(500).json(err);
+      }
+    });
+};
 export const userLogin = (req, res: Response) => {
   if (req.isAuthenticated()) {
-    res.json({message: "User already authenticated"});
+    res.json({ message: "User already authenticated" });
     return;
   }
   if (!validateRequest(UserSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
-      message: "Invalid Input"
+      message: "Invalid Input",
     });
     return;
   }
-  passport.authenticate('local', function (err, user) {
+  passport.authenticate("local", function (err, user) {
     if (err) {
-      if(err.code && err.error) {
-        res.status(err.code).json(err.error)
+      if (err.code && err.error) {
+        res.status(err.code).json(err.error);
       } else {
         res.status(500).json(err);
       }
@@ -261,26 +287,26 @@ export const userLogin = (req, res: Response) => {
         if (err) {
           res.status(500).json(err);
         } else {
-          res.json({message: "Logged In"});
+          res.json({ message: "Logged In" });
         }
       });
     } else {
       throw {
-        code:400,
+        code: 400,
         error: {
           errCode: "invalidArgument",
-          message: "Invalid username/password supplied"
-        }
-      }
+          message: "Invalid username/password supplied",
+        },
+      };
     }
   })(req, res);
-}
+};
 export const userLogout = (req, res: Response) => {
   req.logout(function (err) {
     if (err) {
       res.status(500).json(err);
     } else {
-      res.json({message: "logout"});
+      res.json({ message: "logout" });
     }
   });
-}
+};

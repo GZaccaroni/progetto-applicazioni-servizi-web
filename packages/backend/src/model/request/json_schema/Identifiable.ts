@@ -1,14 +1,12 @@
-import {JSONSchemaType} from "ajv"
-import {Identifiable} from "../type/Identifiable";
+import { JSONSchemaType } from "ajv";
+import { Identifiable } from "../type/Identifiable";
 
 export const IdentifiableSchema: JSONSchemaType<Identifiable> = {
-  "required": [
-    "id"
-  ],
-  "type": "object",
-  "properties": {
-    "id": {
-      "type": "string"
-    }
-  }
-}
+  required: ["id"],
+  type: "object",
+  properties: {
+    id: {
+      type: "string",
+    },
+  },
+};

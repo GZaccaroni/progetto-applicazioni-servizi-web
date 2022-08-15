@@ -1,3 +1,3 @@
-import {Product} from "./Product";
+import { Product } from "./Product";
 
 export type CreateProduct = Product;

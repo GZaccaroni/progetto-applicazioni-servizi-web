@@ -1,6 +1,6 @@
 /**
  * Swagger Petstore
- * This is a sample Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/). 
+ * This is a sample Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
  *
  * OpenAPI spec version: 1.0.0
  * Contact: apiteam@swagger.io
@@ -11,16 +11,16 @@
  */
 
 export interface CreateOrderEntry {
-    productId: string;
-    variantId?: string;
-    grade?: GradeEnum;
-    quantity: number;
-    pricePerUnit: number;
+  productId: string;
+  variantId?: string;
+  grade?: GradeEnum;
+  quantity: number;
+  pricePerUnit: number;
 }
 
-export type GradeEnum = 'first' | 'second' | 'mixed';
+export type GradeEnum = "first" | "second" | "mixed";
 export const GradeEnum = {
-    First: 'first' as GradeEnum,
-    Second: 'second' as GradeEnum,
-    Mixed: 'mixed' as GradeEnum
+  First: "first" as GradeEnum,
+  Second: "second" as GradeEnum,
+  Mixed: "mixed" as GradeEnum,
 };

@@ -1,3 +1,3 @@
-export interface FilterByCustomer{
+export interface FilterByCustomer {
   customerId?: string;
 }

@@ -1,5 +1,4 @@
-import {PaginateParams} from "./PaginateParams";
-import {FilterByName} from "./FilterByName";
+import { PaginateParams } from "./PaginateParams";
+import { FilterByName } from "./FilterByName";
 
-export interface GetUsers extends PaginateParams, FilterByName {
-}
+export interface GetUsers extends PaginateParams, FilterByName {}

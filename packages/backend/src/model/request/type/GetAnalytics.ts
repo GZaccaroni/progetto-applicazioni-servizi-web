@@ -1,14 +1,18 @@
-import {FilterByStore} from "./FilterByStore";
-import {FilterByDate} from "./FilterByDate";
-import {FilterByCustomer} from "./FilterByCustomer";
-import {FilterByProducts} from "./FilterByProducts";
+import { FilterByStore } from "./FilterByStore";
+import { FilterByDate } from "./FilterByDate";
+import { FilterByCustomer } from "./FilterByCustomer";
+import { FilterByProducts } from "./FilterByProducts";
 
-export interface GetAnalytics extends FilterByStore, FilterByDate, FilterByCustomer, FilterByProducts {
+export interface GetAnalytics
+  extends FilterByStore,
+    FilterByDate,
+    FilterByCustomer,
+    FilterByProducts {
   dataType: DataTypeEnum;
 }
 
-export type DataTypeEnum = 'quantity' | 'price';
+export type DataTypeEnum = "quantity" | "price";
 export const DataTypeEnum = {
-  Quantity: 'quantity' as DataTypeEnum,
-  Price: 'price' as DataTypeEnum
+  Quantity: "quantity" as DataTypeEnum,
+  Price: "price" as DataTypeEnum,
 };

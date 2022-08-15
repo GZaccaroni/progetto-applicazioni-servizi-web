@@ -1,5 +1,6 @@
-import {JSONSchemaType} from "ajv"
-import {CreateCustomer} from "../type/CreateCustomer";
-import {CustomerSchema} from "./Customer";
+import { JSONSchemaType } from "ajv";
+import { CreateCustomer } from "../type/CreateCustomer";
+import { CustomerSchema } from "./Customer";
 
-export const CreateCustomerSchema: JSONSchemaType<CreateCustomer> = CustomerSchema
+export const CreateCustomerSchema: JSONSchemaType<CreateCustomer> =
+  CustomerSchema;

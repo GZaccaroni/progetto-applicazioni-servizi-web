@@ -1,4 +1,4 @@
-import {Router} from "express";
+import { Router } from "express";
 import {
   createUser,
   deleteUser,
@@ -6,20 +6,20 @@ import {
   getUsers,
   updateUser,
   userLogin,
-  userLogout
+  userLogout,
 } from "../controllers/UserController";
-import {isUserLoggedIn} from "../utils";
+import { isUserLoggedIn } from "../utils";
 
 const UserRoutes = Router();
-
 
 UserRoutes.route("/login").post(userLogin);
 UserRoutes.route("/logout").post(userLogout);
 UserRoutes.use(isUserLoggedIn);
 UserRoutes.route("/").post(createUser);
 UserRoutes.route("/find").get(getUsers);
-UserRoutes.route("/:username").get(getUserByName)
-                                    .post(updateUser)
-                                    .delete(deleteUser);
+UserRoutes.route("/:username")
+  .get(getUserByName)
+  .post(updateUser)
+  .delete(deleteUser);
 
 export default UserRoutes;

@@ -1,3 +1,3 @@
-export interface FilterByName{
+export interface FilterByName {
   searchName?: string;
 }
