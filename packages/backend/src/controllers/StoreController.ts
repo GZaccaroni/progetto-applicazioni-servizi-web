@@ -23,7 +23,7 @@ const checkStoreConsistence = async (store, storeId?) => {
   if (userSet.size != store.authorizations.length) {
     throw invalidAuthorizationError;
   }
-  const promises = [];
+  const promises = new Array<Promise<unknown>>();
   userSet.forEach(userId => {
     if (!mongoose.isValidObjectId(userId)) {
       throw invalidAuthorizationError;

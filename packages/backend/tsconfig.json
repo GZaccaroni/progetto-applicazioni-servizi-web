@@ -8,7 +8,8 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "strictNullChecks": true
   },
   "include": ["src/**/*", "src/**/*.json"],
   "lib": ["es2022"],

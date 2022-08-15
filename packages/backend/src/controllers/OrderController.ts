@@ -17,13 +17,13 @@ import {getUserStoreRole} from "./StoreController";
 const enrichOrder = async (order, creatorId) => {
   const enrichedOrder = {
     date: order.date,
-    entries: [],
+    entries: new Array<any>(),
     createdBy: creatorId
   }
   if (order.note) {
     enrichedOrder["note"] = order.note;
   }
-  const promises = []
+  const promises = new Array<Promise<unknown>>();
   //get Store data
   promises.push(Store.findById(order.storeId, {id: "$_id", name: 1}).then(
     store => {
@@ -41,7 +41,7 @@ const enrichOrder = async (order, creatorId) => {
     }
   ))
   //generate product name
-  const entryPromises = [];
+  const entryPromises = new Array<Promise<unknown>>();
   order.entries.forEach(entry => {
     entry["price"] = entry.pricePerUnit * entry.quantity;
     entryPromises.push(Product.findById(entry.productId).then(product => {

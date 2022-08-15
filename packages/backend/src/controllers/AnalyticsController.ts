@@ -47,8 +47,8 @@ export const getAnalytics = (req, res: Response) => {
     }
     query["date"]["$lte"] = new Date(req.query.toDate);
   }
-  const productAndVariant=[];
-  const products=[]
+  const productAndVariant = new Array<any>();
+  const products = new Array<any>();
   if (req.query.products?.length) {
       req.query.products.forEach(p => {
       const productCondition = {
