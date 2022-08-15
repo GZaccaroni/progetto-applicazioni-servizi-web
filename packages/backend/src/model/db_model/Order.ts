@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 import { Customer } from "../request/type/Customer";
 import { Identifiable } from "../request/type/Identifiable";
-import { GradeEnum } from "../request/type/CreateOrderEntry";
+import { GradeEnum } from "../request/type/CreateOrderInputEntry";
 
 type OrderDocument = mongoose.Document & {
   customer?: Customer & Identifiable;

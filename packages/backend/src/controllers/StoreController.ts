@@ -7,9 +7,9 @@ import mongoose from "mongoose";
 import { io } from "../app";
 import User from "../model/db_model/User";
 import Order from "../model/db_model/Order";
-import { CreateStoreSchema } from "../model/request/json_schema/CreateStore";
-import { GetStoresSchema } from "../model/request/json_schema/GetStores";
-import { UpdateStoreSchema } from "../model/request/json_schema/UpdateStore";
+import { CreateStoreInputSchema } from "../model/request/json_schema/CreateStoreInput";
+import { GetStoresInputSchema } from "../model/request/json_schema/GetStoresInput";
+import { UpdateStoreInputSchema } from "../model/request/json_schema/UpdateStoreInput";
 
 const checkStoreConsistence = async (store, storeId?) => {
   const invalidAuthorizationError = {
@@ -80,7 +80,7 @@ export const addStore = (req, res: Response) => {
     });
     return;
   }
-  if (!validateRequest(CreateStoreSchema, req.body)) {
+  if (!validateRequest(CreateStoreInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -112,7 +112,7 @@ export const addStore = (req, res: Response) => {
     });
 };
 export const getStores = (req, res: Response) => {
-  if (!validateRequest(GetStoresSchema, req.query)) {
+  if (!validateRequest(GetStoresInputSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -164,7 +164,7 @@ export const updateStore = (req, res: Response) => {
       .json({ errCode: "notAuthorized", message: "User not authorized" });
   }
   if (
-    !validateRequest(UpdateStoreSchema, req.body) ||
+    !validateRequest(UpdateStoreInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.storeId)
   ) {
     res

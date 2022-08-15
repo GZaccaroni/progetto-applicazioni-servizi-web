@@ -10,9 +10,9 @@ import mongoose from "mongoose";
 import { io } from "../app";
 import { AccessLevel } from "../model/request/type/StoreAuthorization";
 import { getUserStoreRole } from "./StoreController";
-import { CreateOrderSchema } from "../model/request/json_schema/CreateOrder";
-import { GetOrdersSchema } from "../model/request/json_schema/GetOrders";
-import { UpdateOrderSchema } from "../model/request/json_schema/UpdateOrder";
+import { CreateOrderInputSchema } from "../model/request/json_schema/CreateOrderInput";
+import { GetOrdersInputSchema } from "../model/request/json_schema/GetOrdersInput";
+import { UpdateOrderInputSchema } from "../model/request/json_schema/UpdateOrderInput";
 
 const enrichOrder = async (order, creatorId) => {
   const enrichedOrder = {
@@ -111,7 +111,7 @@ const enrichOrder = async (order, creatorId) => {
 };
 
 export const addOrder = (req, res: Response) => {
-  if (!validateRequest(CreateOrderSchema, req.body)) {
+  if (!validateRequest(CreateOrderInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -158,7 +158,7 @@ export const addOrder = (req, res: Response) => {
     });
 };
 export const getOrders = (req, res: Response) => {
-  if (!validateRequest(GetOrdersSchema, req.query)) {
+  if (!validateRequest(GetOrdersInputSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -266,7 +266,7 @@ export const getOrderById = (req, res: Response) => {
 };
 export const updateOrder = (req, res: Response) => {
   if (
-    !validateRequest(UpdateOrderSchema, req.body) ||
+    !validateRequest(UpdateOrderInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.orderId)
   ) {
     res

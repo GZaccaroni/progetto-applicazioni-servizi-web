@@ -6,6 +6,7 @@
   "scripts": {
     "start": "tsc && npm run lint && node dist/app.js",
     "lint": "eslint . --ext .ts",
+    "autofix": "eslint --fix --ext .ts .",
     "format": "prettier-eslint --write \"{,!(node_modules)/**/}*.{js,jsx}\""
   },
   "keywords": [],

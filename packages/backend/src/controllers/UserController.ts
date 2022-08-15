@@ -6,13 +6,13 @@ import Log from "../model/db_model/Log";
 import { paginateOptions, paginateResponse } from "../paginationUtils";
 import { io } from "../app";
 import Store from "../model/db_model/Store";
-import { CreateUserSchema } from "../model/request/json_schema/CreateUser";
-import { GetUsersSchema } from "../model/request/json_schema/GetUsers";
-import { UpdateUserSchema } from "../model/request/json_schema/UpdateUser";
+import { CreateUserInputSchema } from "../model/request/json_schema/CreateUserInput";
+import { GetUsersInputSchema } from "../model/request/json_schema/GetUsersInput";
+import { UpdateUserInputSchema } from "../model/request/json_schema/UpdateUserInput";
 import { UserSchema } from "../model/request/json_schema/User";
 
 export const createUser = (req, res: Response) => {
-  if (!validateRequest(CreateUserSchema, req.body)) {
+  if (!validateRequest(CreateUserInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -79,7 +79,7 @@ export const getUsers = (req, res: Response) => {
       .json({ errCode: "notAuthorized", message: "User not authorized" });
     return;
   }
-  if (!validateRequest(GetUsersSchema, req.query)) {
+  if (!validateRequest(GetUsersInputSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -143,7 +143,10 @@ export const getUserByName = (req, res: Response) => {
     });
 };
 export const updateUser = (req, res: Response) => {
-  if (!validateRequest(UpdateUserSchema, req.body) || !req.params.username) {
+  if (
+    !validateRequest(UpdateUserInputSchema, req.body) ||
+    !req.params.username
+  ) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid input",

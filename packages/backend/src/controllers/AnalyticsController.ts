@@ -2,11 +2,11 @@ import { Response } from "express";
 import mongoose from "mongoose";
 import Order from "../model/db_model/Order";
 import { validateRequest } from "../model/request/validation";
-import { DataTypeEnum } from "../model/request/type/GetAnalytics";
-import { GetAnalyticsSchema } from "../model/request/json_schema/GetAnalytics";
+import { DataTypeEnum } from "../model/request/type/GetAnalyticsInput";
+import { GetAnalyticsInputSchema } from "../model/request/json_schema/GetAnalyticsInput";
 
 export const getAnalytics = (req, res: Response) => {
-  if (!validateRequest(GetAnalyticsSchema, req.query)) {
+  if (!validateRequest(GetAnalyticsInputSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",

@@ -6,9 +6,9 @@ import { paginateOptions, paginateResponse } from "../paginationUtils";
 import mongoose from "mongoose";
 import { io } from "../app";
 import Order from "../model/db_model/Order";
-import { CreateProductSchema } from "../model/request/json_schema/CreateProduct";
-import { GetProductsSchema } from "../model/request/json_schema/GetProducts";
-import { UpdateProductSchema } from "../model/request/json_schema/UpdateProduct";
+import { CreateProductInputSchema } from "../model/request/json_schema/CreateProductInput";
+import { GetProductsInputSchema } from "../model/request/json_schema/GetProductsInput";
+import { UpdateProductInputSchema } from "../model/request/json_schema/UpdateProductInput";
 
 const checkProductConsistence = async (product, productId?) => {
   const productKindSet = new Set(
@@ -45,7 +45,7 @@ export const addProduct = (req, res: Response) => {
       message: "User not authorized",
     });
   }
-  if (!validateRequest(CreateProductSchema, req.body)) {
+  if (!validateRequest(CreateProductInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -80,7 +80,7 @@ export const addProduct = (req, res: Response) => {
 };
 
 export const getProducts = (req, res: Response) => {
-  if (!validateRequest(GetProductsSchema, req.query)) {
+  if (!validateRequest(GetProductsInputSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -148,7 +148,7 @@ export const updateProduct = (req, res: Response) => {
     return;
   }
   if (
-    !validateRequest(UpdateProductSchema, req.body) ||
+    !validateRequest(UpdateProductInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.productId)
   ) {
     res.status(400).json({
