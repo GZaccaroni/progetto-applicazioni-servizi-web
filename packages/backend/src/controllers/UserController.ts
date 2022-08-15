@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { validateRequest } from "../model/request/validation";
 import passport from "passport";
 import UserDb, { UserProjection } from "../model/db_model/User";
@@ -10,8 +10,9 @@ import { CreateUserInputSchema } from "../model/request/json_schema/CreateUserIn
 import { GetUsersInputSchema } from "../model/request/json_schema/GetUsersInput";
 import { UpdateUserInputSchema } from "../model/request/json_schema/UpdateUserInput";
 import { UserLoginInputSchema } from "../model/request/json_schema/UserLoginInput";
+import { UserRequest } from "../utils";
 
-export const createUser = (req, res: Response) => {
+export const createUser = (req: UserRequest, res: Response) => {
   if (!validateRequest(CreateUserInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -19,7 +20,7 @@ export const createUser = (req, res: Response) => {
     });
     return;
   }
-  if (!req.user.isAdmin) {
+  if (!req.user?.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",
       message: "User not authorized",
@@ -72,7 +73,7 @@ export const createUser = (req, res: Response) => {
       }
     });
 };
-export const getUsers = (req, res: Response) => {
+export const getUsers = (req: UserRequest, res: Response) => {
   if (!req.user.isAdmin) {
     res
       .status(403)
@@ -105,7 +106,7 @@ export const getUsers = (req, res: Response) => {
   );
 };
 
-export const getUserByName = (req, res: Response) => {
+export const getUserByName = (req: UserRequest, res: Response) => {
   if (!req.params.username) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -142,7 +143,7 @@ export const getUserByName = (req, res: Response) => {
       }
     });
 };
-export const updateUser = (req, res: Response) => {
+export const updateUser = (req: UserRequest, res: Response) => {
   if (
     !validateRequest(UpdateUserInputSchema, req.body) ||
     !req.params.username
@@ -199,7 +200,7 @@ export const updateUser = (req, res: Response) => {
       }
     });
 };
-export const deleteUser = (req, res: Response) => {
+export const deleteUser = (req: UserRequest, res: Response) => {
   if (!req.params.username) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -240,7 +241,9 @@ export const deleteUser = (req, res: Response) => {
             };
           }
           if (req.user.username == user.username) {
-            req.logout();
+            req.logout((err) => {
+              // TODO: Implement correct logic
+            });
           }
           Log.create({
             username: user.username,
@@ -264,7 +267,7 @@ export const deleteUser = (req, res: Response) => {
       }
     });
 };
-export const userLogin = (req, res: Response) => {
+export const userLogin = (req: Request, res: Response) => {
   if (req.isAuthenticated()) {
     res.json({ message: "User already authenticated" });
     return;
@@ -304,7 +307,7 @@ export const userLogin = (req, res: Response) => {
     }
   })(req, res);
 };
-export const userLogout = (req, res: Response) => {
+export const userLogout = (req: Request, res: Response) => {
   req.logout(function (err) {
     if (err) {
       res.status(500).json(err);

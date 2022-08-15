@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { validateRequest } from "../model/request/validation";
 import Store, { StoreProjection } from "../model/db_model/Store";
 import Log from "../model/db_model/Log";
@@ -10,6 +10,7 @@ import Order from "../model/db_model/Order";
 import { CreateStoreInputSchema } from "../model/request/json_schema/CreateStoreInput";
 import { GetStoresInputSchema } from "../model/request/json_schema/GetStoresInput";
 import { UpdateStoreInputSchema } from "../model/request/json_schema/UpdateStoreInput";
+import { UserRequest } from "../utils";
 
 const checkStoreConsistence = async (store, storeId?) => {
   const invalidAuthorizationError = {
@@ -72,7 +73,7 @@ export const getUserStoreRole = async (userId, storeId) => {
   }
 };
 
-export const addStore = (req, res: Response) => {
+export const addStore = (req: UserRequest, res: Response) => {
   if (!req.user.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",
@@ -111,7 +112,7 @@ export const addStore = (req, res: Response) => {
       }
     });
 };
-export const getStores = (req, res: Response) => {
+export const getStores = (req: UserRequest, res: Response) => {
   if (!validateRequest(GetStoresInputSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -120,7 +121,7 @@ export const getStores = (req, res: Response) => {
     return;
   }
   const query = {};
-  if (req.query.authorized == "true") {
+  if (req.query.authorized) {
     query["authorizations.userId"] = req.user.id;
   }
   if (req.query.searchName) {
@@ -139,7 +140,7 @@ export const getStores = (req, res: Response) => {
   });
 };
 
-export const getStoreById = (req: Request, res: Response) => {
+export const getStoreById = (req: UserRequest, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.storeId)) {
     res
       .status(400)
@@ -157,7 +158,7 @@ export const getStoreById = (req: Request, res: Response) => {
     (err) => res.status(500).json(err)
   );
 };
-export const updateStore = (req, res: Response) => {
+export const updateStore = (req: UserRequest, res: Response) => {
   if (!req.user.isAdmin) {
     res
       .status(403)
@@ -209,7 +210,7 @@ export const updateStore = (req, res: Response) => {
     });
 };
 
-export const deleteStore = (req, res: Response) => {
+export const deleteStore = (req: UserRequest, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.storeId)) {
     res
       .status(400)

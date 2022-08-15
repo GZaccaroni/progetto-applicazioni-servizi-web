@@ -9,6 +9,7 @@ import Order from "../model/db_model/Order";
 import { CreateCustomerInputSchema } from "../model/request/json_schema/CreateCustomerInput";
 import { GetCustomersInputSchema } from "../model/request/json_schema/GetCustomersInput";
 import { UpdateCustomerInputSchema } from "../model/request/json_schema/UpdateCustomerInput";
+import { UserRequest } from "../utils";
 
 const checkCustomerConsistence = async (customer, customerId?) => {
   await Customer.findOne({ name: customer.name }).then((customer) => {
@@ -24,7 +25,7 @@ const checkCustomerConsistence = async (customer, customerId?) => {
   });
 };
 
-export const addCustomer = (req, res: Response) => {
+export const addCustomer = (req: UserRequest, res: Response) => {
   if (!validateRequest(CreateCustomerInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -56,7 +57,7 @@ export const addCustomer = (req, res: Response) => {
       }
     });
 };
-export const getCustomers = (req, res: Response) => {
+export const getCustomers = (req: UserRequest, res: Response) => {
   if (!validateRequest(GetCustomersInputSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -83,7 +84,7 @@ export const getCustomers = (req, res: Response) => {
   );
 };
 
-export const getCustomerById = (req: Request, res: Response) => {
+export const getCustomerById = (req: UserRequest, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.customerId)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -106,7 +107,7 @@ export const getCustomerById = (req: Request, res: Response) => {
   );
 };
 
-export const updateCustomer = (req, res: Response) => {
+export const updateCustomer = (req: UserRequest, res: Response) => {
   if (
     !validateRequest(UpdateCustomerInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.customerId)
@@ -153,7 +154,7 @@ export const updateCustomer = (req, res: Response) => {
       }
     });
 };
-export const deleteCustomer = (req, res: Response) => {
+export const deleteCustomer = (req: UserRequest, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.customerId)) {
     res.status(400).send({
       errCode: "invalidArgument",

@@ -4,8 +4,9 @@ import Order from "../model/db_model/Order";
 import { validateRequest } from "../model/request/validation";
 import { DataTypeEnum } from "../model/request/type/GetAnalyticsInput";
 import { GetAnalyticsInputSchema } from "../model/request/json_schema/GetAnalyticsInput";
+import { UserRequest } from "../utils";
 
-export const getAnalytics = (req, res: Response) => {
+export const getAnalytics = (req: UserRequest, res: Response) => {
   if (!validateRequest(GetAnalyticsInputSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",

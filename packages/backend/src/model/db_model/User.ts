@@ -2,7 +2,7 @@ import mongoose, { PassportLocalDocument, PassportLocalModel } from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 
-type UserDocument = PassportLocalDocument & {
+export type UserDocument = PassportLocalDocument & {
   username: string;
   isAdmin: boolean;
 };

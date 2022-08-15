@@ -13,6 +13,7 @@ import { getUserStoreRole } from "./StoreController";
 import { CreateOrderInputSchema } from "../model/request/json_schema/CreateOrderInput";
 import { GetOrdersInputSchema } from "../model/request/json_schema/GetOrdersInput";
 import { UpdateOrderInputSchema } from "../model/request/json_schema/UpdateOrderInput";
+import { UserRequest } from "../utils";
 
 const enrichOrder = async (order, creatorId) => {
   const enrichedOrder = {
@@ -110,7 +111,7 @@ const enrichOrder = async (order, creatorId) => {
   return enrichedOrder;
 };
 
-export const addOrder = (req, res: Response) => {
+export const addOrder = (req: UserRequest, res: Response) => {
   if (!validateRequest(CreateOrderInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -153,15 +154,16 @@ export const addOrder = (req, res: Response) => {
       }
     });
 };
-export const getOrders = (req, res: Response) => {
-  if (!validateRequest(GetOrdersInputSchema, req.query)) {
+export const getOrders = (req: UserRequest, res: Response) => {
+  const requestQuery = req.query;
+  if (!validateRequest(GetOrdersInputSchema, requestQuery)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
     });
     return;
   }
-  if (!mongoose.isValidObjectId(req.query.storeId)) {
+  if (!mongoose.isValidObjectId(requestQuery.storeId)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Bad request",
@@ -178,18 +180,18 @@ export const getOrders = (req, res: Response) => {
           },
         };
       }
-      const query = { "store.id": req.query.storeId };
-      if (req.query.fromDate) {
+      const query = { "store.id": requestQuery.storeId };
+      if (requestQuery.fromDate != undefined) {
         if (!query["date"]) {
           query["date"] = {};
         }
-        query["date"]["$gte"] = new Date(req.query.fromDate);
+        query["date"]["$gte"] = new Date(requestQuery.fromDate);
       }
-      if (req.query.toDate) {
+      if (requestQuery.toDate != undefined) {
         if (!query["date"]) {
           query["date"] = {};
         }
-        query["date"]["$lte"] = new Date(req.query.toDate);
+        query["date"]["$lte"] = new Date(requestQuery.toDate);
       }
       const options = paginateOptions(
         query,
@@ -211,7 +213,7 @@ export const getOrders = (req, res: Response) => {
       }
     });
 };
-export const getOrderById = (req, res: Response) => {
+export const getOrderById = (req: UserRequest, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.orderId)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -230,7 +232,7 @@ export const getOrderById = (req, res: Response) => {
           },
         };
       } else {
-        getUserStoreRole(req.user._id, order.storeId).then((storeRole) => {
+        getUserStoreRole(req.user._id, order.store.id).then((storeRole) => {
           if (storeRole == undefined && !req.user.isAdmin) {
             throw {
               code: 403,
@@ -252,7 +254,7 @@ export const getOrderById = (req, res: Response) => {
       }
     });
 };
-export const updateOrder = (req, res: Response) => {
+export const updateOrder = (req: UserRequest, res: Response) => {
   if (
     !validateRequest(UpdateOrderInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.orderId)
@@ -273,7 +275,7 @@ export const updateOrder = (req, res: Response) => {
           },
         };
       } else {
-        getUserStoreRole(req.user._id, order.storeId).then((storeRole) => {
+        getUserStoreRole(req.user._id, order.store.id).then((storeRole) => {
           if (
             !(
               storeRole == AccessLevel.Salesman &&
@@ -331,7 +333,7 @@ export const updateOrder = (req, res: Response) => {
       }
     });
 };
-export const deleteOrder = (req, res: Response) => {
+export const deleteOrder = (req: UserRequest, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.orderId)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -350,7 +352,7 @@ export const deleteOrder = (req, res: Response) => {
           },
         };
       } else {
-        getUserStoreRole(req.user._id, order.storeId).then((storeRole) => {
+        getUserStoreRole(req.user._id, order.store.id).then((storeRole) => {
           if (
             !(
               storeRole == AccessLevel.Salesman &&

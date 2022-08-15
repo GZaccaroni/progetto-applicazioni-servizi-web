@@ -9,6 +9,7 @@ import Order from "../model/db_model/Order";
 import { CreateProductInputSchema } from "../model/request/json_schema/CreateProductInput";
 import { GetProductsInputSchema } from "../model/request/json_schema/GetProductsInput";
 import { UpdateProductInputSchema } from "../model/request/json_schema/UpdateProductInput";
+import { UserRequest } from "../utils";
 
 const checkProductConsistence = async (product, productId?) => {
   const productKindSet = new Set(
@@ -38,7 +39,7 @@ const enrichProduct = (product) => {
   return product;
 };
 
-export const addProduct = (req, res: Response) => {
+export const addProduct = (req: UserRequest, res: Response) => {
   if (!req.user.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",
@@ -79,7 +80,7 @@ export const addProduct = (req, res: Response) => {
     });
 };
 
-export const getProducts = (req, res: Response) => {
+export const getProducts = (req: UserRequest, res: Response) => {
   if (!validateRequest(GetProductsInputSchema, req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -109,7 +110,7 @@ export const getProducts = (req, res: Response) => {
   );
 };
 
-export const getProductById = (req: Request, res: Response) => {
+export const getProductById = (req: UserRequest, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.productId)) {
     res.status(400).json({
       errCode: "invaliArgument",
@@ -139,7 +140,7 @@ export const getProductById = (req: Request, res: Response) => {
       }
     });
 };
-export const updateProduct = (req, res: Response) => {
+export const updateProduct = (req: UserRequest, res: Response) => {
   if (!req.user.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",
@@ -229,7 +230,7 @@ export const updateProduct = (req, res: Response) => {
       }
     });
 };
-export const deleteProduct = (req, res: Response) => {
+export const deleteProduct = (req: UserRequest, res: Response) => {
   if (!req.user.isAdmin) {
     res.status(403).json({
       errCode: "notAuthorized",

@@ -3,7 +3,6 @@ import sourceMapSupport = require("source-map-support");
 sourceMapSupport.install();
 import express from "express";
 import session from "express-session";
-import passport from "passport";
 import User from "./model/db_model/User";
 import cors from "cors";
 import routes from "./routes/Routes";
@@ -11,6 +10,7 @@ import mongoose from "mongoose";
 import { Server } from "socket.io";
 import * as http from "http";
 import { queryParser } from "express-query-parser";
+import passport from "passport";
 
 const app = express();
 const port = 3000;
