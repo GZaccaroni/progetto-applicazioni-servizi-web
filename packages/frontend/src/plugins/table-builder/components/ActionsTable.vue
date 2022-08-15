@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineEmits, defineProps, PropType } from "vue";
+import { computed, PropType } from "vue";
 import { TableItemEventType } from "@/plugins/table-builder/TableItemEventType";
 
 export type ItemAction = "edit" | "delete";

@@ -141,9 +141,7 @@ export async function getSelectStoreAccessLevel(): Promise<
   return Object.values(DbStoreAccessLevel).map((elKey) => {
     return {
       id: elKey,
-      text: i18n
-        .t("model.store.accessLevel." + DbStoreAccessLevel[elKey])
-        .toString(),
+      text: i18n.t("model.store.accessLevel." + elKey).toString(),
       item: elKey,
     };
   });
@@ -154,7 +152,7 @@ export async function getSelectUnitOfMeasure(): Promise<
   return Object.values(DbUnitOfMeasure).map((elKey) => {
     return {
       id: elKey,
-      text: i18n.t("model.unitOfMeasure." + DbUnitOfMeasure[elKey]).toString(),
+      text: i18n.t("model.unitOfMeasure." + elKey).toString(),
       item: elKey,
     };
   });
@@ -165,7 +163,7 @@ export async function getSelectProductGrade(): Promise<
   return Object.values(DbProductGrade).map((elKey) => {
     return {
       id: elKey,
-      text: i18n.t("model.productGrade." + DbProductGrade[elKey]).toString(),
+      text: i18n.t("model.productGrade." + elKey).toString(),
       item: elKey,
     };
   });
@@ -176,7 +174,7 @@ export async function getSelectChartDataType(): Promise<
   return Object.values(DbChartDataType).map((elKey) => {
     return {
       id: elKey,
-      text: i18n.t("model.chartDataType." + DbChartDataType[elKey]).toString(),
+      text: i18n.t("model.chartDataType." + elKey).toString(),
       item: elKey,
     };
   });

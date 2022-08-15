@@ -60,6 +60,7 @@
             v-model="formData.entries[index].grade"
             :label="$t('model.order.productGrade').toString()"
             :find-items-fn="getSelectProductGrade"
+            :lazy="false"
           />
         </v-col>
         <v-col cols="6" md="3" class="py-0" role="gridcell">

@@ -1,8 +1,8 @@
 import { DbIdentifiable } from "./DbIdentifiable";
 
 export enum DbStoreAccessLevel {
-  salesman = "salesman",
-  manager = "manager",
+  Salesman = "salesman",
+  Manager = "manager",
 }
 export interface DbStoreAuthorization {
   userId: string;
