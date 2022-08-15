@@ -15,6 +15,7 @@
       maxlength="30"
       counter
       :disabled="!create"
+      :autocomplete="isCurrentUser ? 'username' : 'off'"
     ></v-text-field>
     <v-checkbox
       v-model="formData.isAdmin"
@@ -27,11 +28,14 @@
       :label="$t('components.form.user.changePassword')"
     ></v-switch>
     <v-text-field
-      type="password"
+      :type="showPassword ? 'text' : 'password'"
       v-if="changePassword"
       v-model="formData.password"
-      minlength="6"
       :label="$t('model.user.password')"
+      :rules="[passwordRules.min, passwordRules.strength]"
+      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+      @click:append="showPassword = !showPassword"
+      :autocomplete="isCurrentUser ? 'new-password' : 'off'"
     ></v-text-field>
   </form-dialog>
 </template>
@@ -55,6 +59,8 @@ import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import { DbUser } from "@/model/db/DbUser";
 import i18n from "@/i18n";
+import { zxcvbn } from "@zxcvbn-ts/core";
+import { useUserStore } from "@/store/user";
 export type UserFormDialogModel = GenericFormDialogModel<{
   userToUpdate?: string;
 }>;
@@ -72,7 +78,16 @@ const formData = ref<RecursivePartial<UpdateUserInput>>({});
 const create = ref(false);
 const dialogLoading = ref(false);
 const isVisible = ref(false);
+const isCurrentUser = ref(false);
 const changePassword = ref(false);
+const showPassword = ref(false);
+const passwordRules = {
+  min: (v?: string) =>
+    (v != undefined && v.length >= 8) ||
+    i18n.t("components.form.userLogin.passwordMinLength", { length: 8 }),
+  strength: (v: string) =>
+    zxcvbn(v).score >= 3 || i18n.t("components.form.userLogin.passwordWeak"),
+};
 
 watch(
   () => props.value,
@@ -85,6 +100,7 @@ watch(
 );
 
 async function onBecameVisible(userToUpdate?: string) {
+  const userStore = useUserStore();
   dialogLoading.value = true;
   if (userToUpdate != undefined) {
     create.value = false;
@@ -96,6 +112,7 @@ async function onBecameVisible(userToUpdate?: string) {
     create.value = true;
     formData.value = defaultValues;
   }
+  isCurrentUser.value = userStore.userProfile?.username == userToUpdate;
   changePassword.value = create.value;
   dialogLoading.value = false;
 }

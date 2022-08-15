@@ -174,7 +174,9 @@
       },
       "userLogin": {
         "title": "Accesso",
-        "submitButton": "Accedi"
+        "submitButton": "Accedi",
+        "passwordMinLength": "Inserisci una password di almeno {length} caratteri",
+        "passwordWeak": "Scegli una password migliore, consiglio: prova a mischiare lettere, numeri e simboli."
       },
       "product": {
         "addKind": "Aggiungi varietà al prodotto",

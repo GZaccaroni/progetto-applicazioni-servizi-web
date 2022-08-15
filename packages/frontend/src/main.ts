@@ -6,10 +6,12 @@ import i18n from "./i18n";
 import App from "./App.vue";
 import PaginatedTableBuilder from "@/plugins/paginated-table-builder/main";
 import TableBuilder from "@/plugins/table-builder/main";
+import { setupZxcvbn } from "@/helpers/zxcvbn";
 
 Vue.config.productionTip = false;
 Vue.use(PaginatedTableBuilder);
 Vue.use(TableBuilder);
+setupZxcvbn();
 
 new Vue({
   pinia: store,
