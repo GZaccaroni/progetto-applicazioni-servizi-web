@@ -1,7 +1,7 @@
 import { JSONSchemaType } from "ajv";
-import { User } from "../type/User";
+import { UserLoginInput } from "../type/UserLoginInput";
 
-export const UserSchema: JSONSchemaType<User> = {
+export const UserLoginInputSchema: JSONSchemaType<UserLoginInput> = {
   required: ["username", "password"],
   type: "object",
   properties: {

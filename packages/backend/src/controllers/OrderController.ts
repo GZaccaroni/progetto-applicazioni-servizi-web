@@ -120,11 +120,7 @@ export const addOrder = (req, res: Response) => {
   }
   getUserStoreRole(req.user._id, req.body.storeId)
     .then((storeRole) => {
-      if (
-        (storeRole != AccessLevel.Salesman ||
-          storeRole != AccessLevel.Manager) &&
-        !req.user.isAdmin
-      ) {
+      if (storeRole == undefined && !req.user.isAdmin) {
         throw {
           code: 403,
           error: {
@@ -173,11 +169,7 @@ export const getOrders = (req, res: Response) => {
   }
   getUserStoreRole(req.user._id, req.body.storeId)
     .then((storeRole) => {
-      if (
-        (storeRole != AccessLevel.Salesman ||
-          storeRole != AccessLevel.Manager) &&
-        !req.user.isAdmin
-      ) {
+      if (storeRole == undefined && !req.user.isAdmin) {
         throw {
           code: 403,
           error: {
@@ -239,11 +231,7 @@ export const getOrderById = (req, res: Response) => {
         };
       } else {
         getUserStoreRole(req.user._id, order.storeId).then((storeRole) => {
-          if (
-            (storeRole != AccessLevel.Salesman ||
-              storeRole != AccessLevel.Manager) &&
-            !req.user.isAdmin
-          ) {
+          if (storeRole == undefined && !req.user.isAdmin) {
             throw {
               code: 403,
               error: {

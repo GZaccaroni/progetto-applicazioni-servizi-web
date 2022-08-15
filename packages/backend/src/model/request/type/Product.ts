@@ -3,15 +3,11 @@ import { ProductKind } from "./ProductKind";
 export interface Product {
   name: string;
   pricePerUnit?: number;
-  kinds: Array<ProductKind>;
-  /**
-   * Order Status
-   */
+  kinds: ProductKind[];
   unitOfMeasure: UnitOfMeasureEnum;
 }
 
-export type UnitOfMeasureEnum = "kilogram" | "piece";
-export const UnitOfMeasureEnum = {
-  Kilogram: "kilogram" as UnitOfMeasureEnum,
-  Piece: "piece" as UnitOfMeasureEnum,
-};
+export enum UnitOfMeasureEnum {
+  Kilogram = "kilogram",
+  Piece = "piece",
+}

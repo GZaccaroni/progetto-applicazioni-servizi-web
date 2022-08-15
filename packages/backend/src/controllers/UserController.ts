@@ -9,7 +9,7 @@ import Store from "../model/db_model/Store";
 import { CreateUserInputSchema } from "../model/request/json_schema/CreateUserInput";
 import { GetUsersInputSchema } from "../model/request/json_schema/GetUsersInput";
 import { UpdateUserInputSchema } from "../model/request/json_schema/UpdateUserInput";
-import { UserSchema } from "../model/request/json_schema/User";
+import { UserLoginInputSchema } from "../model/request/json_schema/UserLoginInput";
 
 export const createUser = (req, res: Response) => {
   if (!validateRequest(CreateUserInputSchema, req.body)) {
@@ -269,7 +269,7 @@ export const userLogin = (req, res: Response) => {
     res.json({ message: "User already authenticated" });
     return;
   }
-  if (!validateRequest(UserSchema, req.body)) {
+  if (!validateRequest(UserLoginInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",

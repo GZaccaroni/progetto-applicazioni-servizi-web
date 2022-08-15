@@ -1,5 +1,8 @@
 import { JSONSchemaType } from "ajv";
-import { CreateOrderInputEntry } from "../type/CreateOrderInputEntry";
+import {
+  CreateOrderInputEntry,
+  GradeEnum,
+} from "../type/CreateOrderInputEntry";
 
 export const CreateOrderInputEntrySchema: JSONSchemaType<CreateOrderInputEntry> =
   {
@@ -15,7 +18,7 @@ export const CreateOrderInputEntrySchema: JSONSchemaType<CreateOrderInputEntry> 
       },
       grade: {
         type: "string",
-        enum: ["first", "second", "mixed"],
+        enum: [GradeEnum.First, GradeEnum.Second, GradeEnum.Mixed],
         nullable: true,
       },
       quantity: {

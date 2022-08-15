@@ -11,8 +11,7 @@ export interface GetAnalyticsInput
   dataType: DataTypeEnum;
 }
 
-export type DataTypeEnum = "quantity" | "price";
-export const DataTypeEnum = {
-  Quantity: "quantity" as DataTypeEnum,
-  Price: "price" as DataTypeEnum,
-};
+export enum DataTypeEnum {
+  Quantity = "quantity",
+  Price = "price",
+}

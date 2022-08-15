@@ -1,5 +1,5 @@
 import { JSONSchemaType } from "ajv";
-import { Product } from "../type/Product";
+import { Product, UnitOfMeasureEnum } from "../type/Product";
 import { ProductKindSchema } from "./ProductKind";
 
 export const ProductSchema: JSONSchemaType<Product> = {
@@ -21,7 +21,7 @@ export const ProductSchema: JSONSchemaType<Product> = {
     },
     unitOfMeasure: {
       type: "string",
-      enum: ["kilogram", "piece"],
+      enum: [UnitOfMeasureEnum.Kilogram, UnitOfMeasureEnum.Piece],
     },
   },
 };
