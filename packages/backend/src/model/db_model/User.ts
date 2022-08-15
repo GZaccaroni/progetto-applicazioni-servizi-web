@@ -7,7 +7,7 @@ type UserDocument = PassportLocalDocument & {
   isAdmin: boolean;
 };
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema<UserDocument>({
   username: {
     type: String,
     unique: true,

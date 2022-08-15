@@ -4,7 +4,7 @@ import { Store } from "../request/type/Store";
 import { AccessLevel } from "../request/type/StoreAuthorization";
 
 type StoreDocument = mongoose.Document & Store;
-const StoreSchema = new mongoose.Schema({
+const StoreSchema = new mongoose.Schema<StoreDocument>({
   name: {
     type: String,
     unique: true,

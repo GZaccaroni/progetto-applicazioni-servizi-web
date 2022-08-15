@@ -4,7 +4,7 @@ import { Customer } from "../request/type/Customer";
 
 type CustomerDocument = mongoose.Document & Customer;
 
-const CustomerSchema = new mongoose.Schema({
+const CustomerSchema = new mongoose.Schema<CustomerDocument>({
   name: {
     type: String,
     unique: true,

@@ -6,8 +6,10 @@ import { GradeEnum } from "../request/type/CreateOrderInputEntry";
 
 type OrderDocument = mongoose.Document & {
   customer?: Customer & Identifiable;
-  storeId: string;
-  storeName: string;
+  store: {
+    id: string;
+    name: string;
+  };
   date: Date;
   entries: [
     {
@@ -25,7 +27,7 @@ type OrderDocument = mongoose.Document & {
   createdBy: string;
 };
 
-const OrderSchema = new mongoose.Schema({
+const OrderSchema = new mongoose.Schema<OrderDocument>({
   customer: {
     id: String,
     name: String,
