@@ -85,8 +85,9 @@ const passwordRules = {
   min: (v?: string) =>
     (v != undefined && v.length >= 8) ||
     i18n.t("components.form.userLogin.passwordMinLength", { length: 8 }),
-  strength: (v: string) =>
-    zxcvbn(v).score >= 3 || i18n.t("components.form.userLogin.passwordWeak"),
+  strength: (v?: string) =>
+    (v != undefined && zxcvbn(v).score >= 3) ||
+    i18n.t("components.form.userLogin.passwordWeak"),
 };
 
 watch(
