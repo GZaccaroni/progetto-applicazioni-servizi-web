@@ -1,6 +1,7 @@
 import { QuantityUnitOfMeasure } from "../../common/QuantityUnitOfMeasure";
+import { NetworkIdentifiable } from "./NetworkIdentifiable";
 
-export interface NetworkProduct {
+export interface NetworkProduct extends NetworkIdentifiable {
   name: string;
   pricePerUnit?: number;
   kinds: NetworkProductKind[];
