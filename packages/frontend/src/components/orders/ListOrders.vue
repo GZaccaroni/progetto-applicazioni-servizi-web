@@ -13,7 +13,7 @@
         <list-orders-filter @change="filterList" />
       </template>
       <template v-slot:[`item.date`]="{ item }">
-        {{ item.date.toLocaleDateString() }}
+        {{ new Date(item.date).toLocaleDateString() }}
       </template>
       <template v-slot:[`item.price`]="{ item }">
         {{ $n(item.price, "currency") }}

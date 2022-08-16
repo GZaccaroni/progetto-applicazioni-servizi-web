@@ -1,6 +1,6 @@
 import { NetworkCustomer } from "./NetworkCustomer";
 import { NetworkIdentifiable } from "./NetworkIdentifiable";
-import {ProductGrade} from "@/model/common/ProductGrade";
+import { ProductGrade } from "@/model/common/ProductGrade";
 
 export interface DbOrderEntry {
   productId: string;
@@ -17,7 +17,7 @@ export interface NetworkOrder extends NetworkIdentifiable {
     id: string;
     name: string;
   };
-  date: Date;
+  date: string;
   entries: DbOrderEntry[];
   price: number;
   note?: string;

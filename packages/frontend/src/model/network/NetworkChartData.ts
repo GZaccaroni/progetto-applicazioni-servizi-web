@@ -2,7 +2,7 @@ export interface DbChartDataItem {
   productName: string;
   value: number;
   productData: Array<{
-    date: Date;
+    date: string;
     value: number;
   }>;
 }

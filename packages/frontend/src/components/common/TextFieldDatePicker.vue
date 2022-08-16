@@ -31,17 +31,17 @@ import { computed, PropType, ref } from "vue";
 
 const props = defineProps({
   value: {
-    type: Date as PropType<Date>,
+    type: [Date, String] as PropType<Date | string>,
   },
   label: {
     type: String,
     required: true,
   },
   min: {
-    type: Date as PropType<Date>,
+    type: String,
   },
   max: {
-    type: Date as PropType<Date>,
+    type: String,
   },
   clearable: {
     type: Boolean,
@@ -54,6 +54,10 @@ const props = defineProps({
   buttonAriaLabel: {
     type: String,
   },
+  returnObject: {
+    type: Boolean,
+    default: false,
+  },
 });
 const emit = defineEmits(["input"]);
 
@@ -63,10 +67,23 @@ function toDateString(date?: Date): string | undefined {
 }
 const selectedDate = computed({
   get: () => {
-    return toDateString(props["value"]);
+    if (props["value"] instanceof Date) {
+      return toDateString(props["value"]);
+    } else {
+      return props["value"]?.split("T")[0];
+    }
   },
-  set: (value) =>
-    emit("input", value != undefined ? new Date(value) : undefined),
+  set: (value) => {
+    if (value == undefined) {
+      emit("input", undefined);
+      return;
+    }
+    if (props.returnObject) {
+      emit("input", new Date(value));
+    } else {
+      emit("input", value);
+    }
+  },
 });
 const formattedDate = computed({
   get: () => {
@@ -79,10 +96,10 @@ const formattedDate = computed({
   },
 });
 const minStrDate = computed(() => {
-  return props.min != undefined ? toDateString(props.min) : undefined;
+  return props.min != undefined ? props.min : undefined;
 });
 const maxStrDate = computed(() => {
-  return props.max != undefined ? toDateString(props.max) : undefined;
+  return props.max != undefined ? props.max : undefined;
 });
 function save(date: string) {
   menuVisible.value = false;

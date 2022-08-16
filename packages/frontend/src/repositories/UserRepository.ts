@@ -3,7 +3,6 @@ import {
   PaginatedFindInput,
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
-import { omit } from "lodash";
 import { NetworkUser } from "@/model/network/NetworkUser";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";

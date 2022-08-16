@@ -3,7 +3,7 @@ import { ProductGrade } from "@/model/common/ProductGrade";
 export interface CreateUpdateOrderInput {
   customerId: string;
   storeId: string;
-  date: Date;
+  date: string;
   entries: CreateOrderInputEntry[];
   note?: string;
 }

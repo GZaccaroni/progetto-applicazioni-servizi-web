@@ -86,7 +86,7 @@ function getGlobalDataset(): ChartDataset {
   };
 }
 
-function dateToString(date: Date): string {
-  return date.toLocaleDateString();
+function dateToString(date: string): string {
+  return new Date(date).toLocaleDateString();
 }
 </script>

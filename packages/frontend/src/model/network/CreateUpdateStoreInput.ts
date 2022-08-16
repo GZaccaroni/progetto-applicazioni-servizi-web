@@ -1,4 +1,3 @@
-import { NetworkIdentifiable } from "@/model/network/NetworkIdentifiable";
 import { StoreAccessLevel } from "@/model/common/StoreAccessLevel";
 
 export interface CreateUpdateStoreInput {
