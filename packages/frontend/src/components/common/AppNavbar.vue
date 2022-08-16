@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import UserLoginDialog from "@/components/form/user/UserLoginDialog.vue";
 import { PropType, ref } from "vue";
-import { DbUser } from "@/model/db/DbUser";
+import { NetworkUser } from "@/model/network/NetworkUser";
 import AppNavigationDrawer from "@/components/common/AppNavigationDrawer.vue";
 import router from "@/router";
 import { useUserStore } from "@/store/user";
@@ -66,7 +66,7 @@ defineProps({
     required: true,
   },
   userProfile: {
-    type: Object as PropType<DbUser>,
+    type: Object as PropType<NetworkUser>,
   },
 });
 const loginDialogVisible = ref(false);

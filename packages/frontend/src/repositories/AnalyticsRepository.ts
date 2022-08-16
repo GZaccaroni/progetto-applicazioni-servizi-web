@@ -1,12 +1,13 @@
 import Client from "@/repositories/common/AxiosClient";
-import { DbChartData, DbChartDataType } from "@/model/db/DbChartData";
-import { DbProductKindIdentifier } from "@/model/db/DbProduct";
+import { NetworkChartData } from "@/model/network/NetworkChartData";
+import { DbProductKindIdentifier } from "@/model/network/NetworkProduct";
+import { ChartDataType } from "@/model/common/ChartDataType";
 
 const resource = "/analytics";
 
 export interface AnalyticsDataInput {
   storeId?: string;
-  dataType: DbChartDataType;
+  dataType: ChartDataType;
   fromDate?: Date;
   toDate?: Date;
   items?: DbProductKindIdentifier[];
@@ -14,8 +15,8 @@ export interface AnalyticsDataInput {
 }
 export async function getAnalyticsData(
   input: AnalyticsDataInput
-): Promise<DbChartData> {
-  const result = await Client.get<DbChartData>(`${resource}/find`, {
+): Promise<NetworkChartData> {
+  const result = await Client.get<NetworkChartData>(`${resource}/find`, {
     params: input,
   });
   return result.data;

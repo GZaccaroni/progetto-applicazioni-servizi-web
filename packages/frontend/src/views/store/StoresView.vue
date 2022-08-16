@@ -22,7 +22,7 @@ import {
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import ListStores from "@/components/stores/ListStores.vue";
-import { DbStore } from "@/model/db/DbStore";
+import { NetworkStore } from "@/model/network/NetworkStore";
 import { deleteStore } from "@/repositories/StoreRepository";
 import StoreFormDialog, {
   StoreFormDialogModel,
@@ -37,7 +37,7 @@ function openNewItemDialog() {
     isVisible: true,
   };
 }
-function deleteItem(item: DbStore) {
+function deleteItem(item: NetworkStore) {
   showConfirmDialog({
     title: i18n.t("confirm.delete.store.title").toString(),
     message: i18n
@@ -51,7 +51,7 @@ function deleteItem(item: DbStore) {
     }
   });
 }
-function onRowEvent(event: TableItemEvent<DbStore>) {
+function onRowEvent(event: TableItemEvent<NetworkStore>) {
   switch (event.type) {
     case TableItemEventType.rowEditAction:
       dialogModel.value = {

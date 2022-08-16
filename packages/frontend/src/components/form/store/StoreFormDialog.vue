@@ -72,13 +72,13 @@ import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
-import { DbStore } from "@/model/db/DbStore";
+import { NetworkStore } from "@/model/network/NetworkStore";
 import {
   addStore,
   findStore,
   updateStore,
 } from "@/repositories/StoreRepository";
-import { UpdateStoreInput } from "@/model/UpdateStoreInput";
+import { UpdateStoreInput } from "@/model/network/UpdateStoreInput";
 import {
   getSelectStoreAccessLevel,
   getSelectUsers,
@@ -179,7 +179,9 @@ function removeAuthorizedUser(index: number) {
 }
 // Helpers
 
-function mapToFormValue(item: DbStore): RecursivePartial<UpdateStoreInput> {
+function mapToFormValue(
+  item: NetworkStore
+): RecursivePartial<UpdateStoreInput> {
   return item;
 }
 const defaultValues: RecursivePartial<UpdateStoreInput> = {

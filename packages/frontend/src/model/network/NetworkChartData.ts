@@ -6,11 +6,7 @@ export interface DbChartDataItem {
     value: number;
   }>;
 }
-export enum DbChartDataType {
-  Quantity = "quantity",
-  Price = "price",
-}
 
-export interface DbChartData {
+export interface NetworkChartData {
   data: Array<DbChartDataItem>;
 }

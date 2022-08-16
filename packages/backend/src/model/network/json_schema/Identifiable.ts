@@ -1,7 +1,7 @@
 import { JSONSchemaType } from "ajv";
-import { Identifiable } from "../type/Identifiable";
+import { NetworkIdentifiable } from "../type/NetworkIdentifiable";
 
-export const IdentifiableSchema: JSONSchemaType<Identifiable> = {
+export const IdentifiableSchema: JSONSchemaType<NetworkIdentifiable> = {
   required: ["id"],
   type: "object",
   properties: {

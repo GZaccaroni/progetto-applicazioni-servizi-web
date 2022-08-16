@@ -1,17 +1,18 @@
 import { JSONSchemaType } from "ajv";
-import { StoreAuthorization } from "../type/StoreAuthorization";
 import { StoreAccessLevel } from "../../common/StoreAccessLevel";
+import { NetworkStoreAuthorization } from "../type/NetworkStore";
 
-export const StoreAuthorizationSchema: JSONSchemaType<StoreAuthorization> = {
-  required: ["accessLevel", "userId"],
-  type: "object",
-  properties: {
-    userId: {
-      type: "string",
+export const StoreAuthorizationSchema: JSONSchemaType<NetworkStoreAuthorization> =
+  {
+    required: ["accessLevel", "userId"],
+    type: "object",
+    properties: {
+      userId: {
+        type: "string",
+      },
+      accessLevel: {
+        type: "string",
+        enum: [StoreAccessLevel.Salesman, StoreAccessLevel.Manager],
+      },
     },
-    accessLevel: {
-      type: "string",
-      enum: [StoreAccessLevel.Salesman, StoreAccessLevel.Manager],
-    },
-  },
-};
+  };

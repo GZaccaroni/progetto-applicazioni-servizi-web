@@ -21,15 +21,16 @@ import { computed, onMounted, ref } from "vue";
 import StatsFilter from "@/components/stats/StatsFilter.vue";
 import StatsBarChart from "@/components/stats/StatsBarChart.vue";
 import StatsLineChart from "@/components/stats/StatsLineChart.vue";
-import { DbChartData, DbChartDataType } from "@/model/db/DbChartData";
+import { NetworkChartData } from "@/model/network/NetworkChartData";
 import { sumBy } from "lodash";
 import {
   AnalyticsDataInput,
   getAnalyticsData,
 } from "@/repositories/AnalyticsRepository";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
+import { ChartDataType } from "@/model/common/ChartDataType";
 
-const chartData = ref<DbChartData | undefined>(undefined);
+const chartData = ref<NetworkChartData | undefined>(undefined);
 const totalValue = computed(() => {
   if (chartData.value == undefined) return undefined;
   return sumBy(chartData.value.data, "value");
@@ -38,6 +39,6 @@ function updateChartData(input: AnalyticsDataInput) {
   getAnalyticsData(input).catch(repositoryErrorHandler);
 }
 onMounted(() => {
-  updateChartData({ dataType: DbChartDataType.quantity });
+  updateChartData({ dataType: ChartDataType.quantity });
 });
 </script>

@@ -25,7 +25,7 @@
 import { ref } from "vue";
 import { FindUsersInput, observeUsers } from "@/repositories/UserRepository";
 import { DataTableHeader } from "vuetify";
-import { DbUser } from "@/model/db/DbUser";
+import { NetworkUser } from "@/model/network/NetworkUser";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import ListUsersFilter from "@/components/users/ListUsersFilter.vue";
 import i18n from "@/i18n";
@@ -57,7 +57,7 @@ const headers = ref<DataTableHeader[]>([
 function filterList(input: FindUsersInput) {
   observeFnInput.value = input;
 }
-function onRowEvent(event: TableItemEvent<DbUser>) {
+function onRowEvent(event: TableItemEvent<NetworkUser>) {
   // Pass-through
   emit("onRowEvent", event);
 }

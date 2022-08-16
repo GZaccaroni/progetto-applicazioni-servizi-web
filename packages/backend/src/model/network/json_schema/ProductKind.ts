@@ -1,8 +1,8 @@
 import { JSONSchemaType } from "ajv";
-import { NetworkProductKind } from "../type/NetworkProductKind";
+import { NetworkProductKind } from "../type/NetworkProduct";
 
 export const ProductKindSchema: JSONSchemaType<NetworkProductKind> = {
-  required: ["id", "name", "fullName"],
+  required: ["id", "name"],
   type: "object",
   properties: {
     id: {
@@ -11,10 +11,6 @@ export const ProductKindSchema: JSONSchemaType<NetworkProductKind> = {
     },
     name: {
       maximum: 250,
-      type: "string",
-    },
-    fullName: {
-      maximum: 500,
       type: "string",
     },
     pricePerUnit: {

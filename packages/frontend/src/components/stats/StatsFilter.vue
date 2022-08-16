@@ -84,12 +84,12 @@ import {
   PRODUCT_KIND_IDENTIFIER_SEPARATOR,
 } from "@/helpers/asyncSelectUtils";
 import { AnalyticsDataInput } from "@/repositories/AnalyticsRepository";
-import { DbChartDataType } from "@/model/db/DbChartData";
+import { ChartDataType } from "@/model/common/ChartDataType";
 
 const emit = defineEmits(["change"]);
 
 const form = reactive<AnalyticsDataInput>({
-  dataType: DbChartDataType.price,
+  dataType: ChartDataType.price,
   fromDate: undefined,
   toDate: undefined,
 });

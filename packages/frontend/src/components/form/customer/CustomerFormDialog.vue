@@ -39,7 +39,7 @@ import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
-import { DbCustomer } from "@/model/db/DbCustomer";
+import { NetworkCustomer } from "@/model/network/NetworkCustomer";
 import {
   addCustomer,
   findCustomer,
@@ -58,7 +58,7 @@ const emit = defineEmits(["input"]);
 
 const submitButtonLoading = ref(false);
 const formActionsDisabled = ref(false);
-const formData = ref<RecursivePartial<DbCustomer>>({});
+const formData = ref<RecursivePartial<NetworkCustomer>>({});
 const create = ref(false);
 const dialogLoading = ref(false);
 const isVisible = ref(false);
@@ -125,15 +125,19 @@ async function saveForm() {
 function closeForm() {
   emit("input", { isVisible: false });
 }
-function validateForm(form: RecursivePartial<DbCustomer>): form is DbCustomer {
+function validateForm(
+  form: RecursivePartial<NetworkCustomer>
+): form is NetworkCustomer {
   const data = clone(removeBlanks(form));
   return data.name != undefined;
 }
 
 // Helpers
 
-function mapToFormValue(item: DbCustomer): RecursivePartial<DbCustomer> {
+function mapToFormValue(
+  item: NetworkCustomer
+): RecursivePartial<NetworkCustomer> {
   return item;
 }
-const defaultValues: RecursivePartial<DbCustomer> = {};
+const defaultValues: RecursivePartial<NetworkCustomer> = {};
 </script>

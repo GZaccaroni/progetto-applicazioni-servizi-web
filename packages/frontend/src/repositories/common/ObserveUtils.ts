@@ -1,4 +1,4 @@
-import { DbIdentifiable } from "@/model/db/DbIdentifiable";
+import { NetworkIdentifiable } from "@/model/network/NetworkIdentifiable";
 import {
   PaginatedFindInput,
   PaginatedResult,
@@ -11,14 +11,14 @@ import { Cancellable } from "@/repositories/common/Cancellable";
 
 export type ObservePaginatedResultFunction<
   Input extends PaginatedFindInput,
-  Item extends DbIdentifiable
+  Item extends NetworkIdentifiable
 > = (
   input: Input,
   onNext: (result: PaginatedResult<Item>) => void,
   onError: (error: { code: string; message: string }) => void
 ) => Cancellable;
 
-export function observePaginatedResult<Input, Item extends DbIdentifiable>(
+export function observePaginatedResult<Input, Item extends NetworkIdentifiable>(
   input: Input,
   findItemsFn: (input: Input) => Promise<PaginatedResult<Item>>,
   eventName: keyof ServerToClientEvents & (string | symbol),

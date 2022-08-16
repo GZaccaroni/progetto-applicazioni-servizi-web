@@ -92,7 +92,7 @@ import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
 import { getSelectUnitOfMeasure } from "@/helpers/asyncSelectUtils";
-import { DbProduct } from "@/model/db/DbProduct";
+import { NetworkProduct } from "@/model/network/NetworkProduct";
 import {
   addProduct,
   findProduct,
@@ -112,7 +112,7 @@ const emit = defineEmits(["input"]);
 
 const submitButtonLoading = ref(false);
 const formActionsDisabled = ref(false);
-const formData = ref<RecursivePartial<DbProduct>>({});
+const formData = ref<RecursivePartial<NetworkProduct>>({});
 const create = ref(false);
 const dialogLoading = ref(false);
 const isVisible = ref(false);
@@ -195,17 +195,21 @@ async function saveForm() {
 function closeForm() {
   emit("input", { isVisible: false });
 }
-function validateForm(form: RecursivePartial<DbProduct>): form is DbProduct {
+function validateForm(
+  form: RecursivePartial<NetworkProduct>
+): form is NetworkProduct {
   const data = clone(removeBlanks(form));
   return data.name != undefined;
 }
 
 // Helpers
 
-function mapToFormValue(item: DbProduct): RecursivePartial<DbProduct> {
+function mapToFormValue(
+  item: NetworkProduct
+): RecursivePartial<NetworkProduct> {
   return item;
 }
-const defaultValues: RecursivePartial<DbProduct> = {
+const defaultValues: RecursivePartial<NetworkProduct> = {
   kinds: [],
 };
 </script>

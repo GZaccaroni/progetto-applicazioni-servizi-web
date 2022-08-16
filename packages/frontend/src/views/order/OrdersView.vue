@@ -22,7 +22,7 @@ import {
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import ListOrders from "@/components/orders/ListOrders.vue";
-import { DbOrder } from "@/model/db/DbOrder";
+import { NetworkOrder } from "@/model/network/NetworkOrder";
 import { deleteOrder } from "@/repositories/OrderRepository";
 import OrderFormDialog, {
   OrderFormDialogModel,
@@ -37,7 +37,7 @@ function openNewItemDialog() {
     isVisible: true,
   };
 }
-function deleteItem(item: DbOrder) {
+function deleteItem(item: NetworkOrder) {
   showConfirmDialog({
     title: i18n.t("confirm.delete.order.title").toString(),
     message: i18n.t("confirm.delete.order.message").toString(),
@@ -47,7 +47,7 @@ function deleteItem(item: DbOrder) {
     }
   });
 }
-function onRowEvent(event: TableItemEvent<DbOrder>) {
+function onRowEvent(event: TableItemEvent<NetworkOrder>) {
   switch (event.type) {
     case TableItemEventType.rowEditAction:
       dialogModel.value = {

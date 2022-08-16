@@ -22,7 +22,7 @@ import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
 import ListStoresFilter from "@/components/stores/ListStoresFilter.vue";
 import { FindStoresInput, observeStores } from "@/repositories/StoreRepository";
-import { DbStore } from "@/model/db/DbStore";
+import { NetworkStore } from "@/model/network/NetworkStore";
 
 const emit = defineEmits(["onRowEvent"]);
 
@@ -45,7 +45,7 @@ const headers = ref<DataTableHeader[]>([
 function filterList(input: FindStoresInput) {
   observeFnInput.value = input;
 }
-function onRowEvent(event: TableItemEvent<DbStore>) {
+function onRowEvent(event: TableItemEvent<NetworkStore>) {
   // Pass-through
   emit("onRowEvent", event);
 }

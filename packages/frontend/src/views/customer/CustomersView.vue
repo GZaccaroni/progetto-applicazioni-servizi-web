@@ -21,7 +21,7 @@ import {
 } from "@/plugins/table-builder/TableItemEventType";
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { DbCustomer } from "@/model/db/DbCustomer";
+import { NetworkCustomer } from "@/model/network/NetworkCustomer";
 import { deleteCustomer } from "@/repositories/CustomerRepository";
 import ListCustomers from "@/components/customers/ListCustomers.vue";
 import CustomerFormDialog, {
@@ -37,7 +37,7 @@ function openNewItemDialog() {
     isVisible: true,
   };
 }
-function deleteItem(item: DbCustomer) {
+function deleteItem(item: NetworkCustomer) {
   showConfirmDialog({
     title: i18n.t("confirm.delete.customer.title").toString(),
     message: i18n
@@ -51,7 +51,7 @@ function deleteItem(item: DbCustomer) {
     }
   });
 }
-function onRowEvent(event: TableItemEvent<DbCustomer>) {
+function onRowEvent(event: TableItemEvent<NetworkCustomer>) {
   switch (event.type) {
     case TableItemEventType.rowEditAction:
       dialogModel.value = {

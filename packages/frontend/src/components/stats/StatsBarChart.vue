@@ -18,7 +18,7 @@ import {
   LinearScale,
 } from "chart.js";
 import { computed, PropType } from "vue";
-import { DbChartData } from "@/model/db/DbChartData";
+import { NetworkChartData } from "@/model/network/NetworkChartData";
 import { stringToColor } from "@/helpers/utils";
 
 ChartJS.register(
@@ -35,7 +35,7 @@ const props = defineProps({
     default: 400,
   },
   data: {
-    type: Object as PropType<DbChartData>,
+    type: Object as PropType<NetworkChartData>,
     required: true,
   },
 });

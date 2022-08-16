@@ -1,6 +1,6 @@
 import { JSONSchemaType } from "ajv";
-import { CreateOrderInputEntry } from "../type/CreateOrderInputEntry";
 import { ProductGrade } from "../../common/ProductGrade";
+import { CreateOrderInputEntry } from "../type/CreateOrderInput";
 
 export const CreateOrderInputEntrySchema: JSONSchemaType<CreateOrderInputEntry> =
   {

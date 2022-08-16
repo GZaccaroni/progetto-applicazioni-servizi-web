@@ -22,7 +22,7 @@ import {
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import ListProducts from "@/components/products/ListProducts.vue";
-import { DbProduct } from "@/model/db/DbProduct";
+import { NetworkProduct } from "@/model/network/NetworkProduct";
 import { deleteProduct } from "@/repositories/ProductRepository";
 import ProductFormDialog, {
   ProductFormDialogModel,
@@ -37,7 +37,7 @@ function openNewItemDialog() {
     isVisible: true,
   };
 }
-function deleteItem(item: DbProduct) {
+function deleteItem(item: NetworkProduct) {
   showConfirmDialog({
     title: i18n.t("confirm.delete.product.title").toString(),
     message: i18n
@@ -51,7 +51,7 @@ function deleteItem(item: DbProduct) {
     }
   });
 }
-function onRowEvent(event: TableItemEvent<DbProduct>) {
+function onRowEvent(event: TableItemEvent<NetworkProduct>) {
   switch (event.type) {
     case TableItemEventType.rowEditAction:
       dialogModel.value = {

@@ -57,7 +57,7 @@ import {
 } from "@/repositories/UserRepository";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
-import { DbUser } from "@/model/db/DbUser";
+import { NetworkUser } from "@/model/network/NetworkUser";
 import i18n from "@/i18n";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import { useUserStore } from "@/store/user";
@@ -165,7 +165,7 @@ function validateForm(
 
 // Helpers
 
-function mapToFormValue(item: DbUser): RecursivePartial<UpdateUserInput> {
+function mapToFormValue(item: NetworkUser): RecursivePartial<UpdateUserInput> {
   return item;
 }
 const defaultValues: RecursivePartial<UpdateUserInput> = {

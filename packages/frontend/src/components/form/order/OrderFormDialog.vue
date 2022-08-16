@@ -134,8 +134,8 @@ import {
   findOrder,
   updateOrder,
 } from "@/repositories/OrderRepository";
-import { UpdateOrderInput } from "@/model/UpdateOrderInput";
-import { DbOrder } from "@/model/db/DbOrder";
+import { UpdateOrderInput } from "@/model/network/UpdateOrderInput";
+import { NetworkOrder } from "@/model/network/NetworkOrder";
 import { AsyncSelectItem } from "@/components/common/AsyncSelectTypes";
 
 export type OrderFormDialogModel = GenericFormDialogModel<{
@@ -289,7 +289,9 @@ function validateForm(
 
 // Helpers
 
-function mapToFormValue(item: DbOrder): RecursivePartial<UpdateOrderInput> {
+function mapToFormValue(
+  item: NetworkOrder
+): RecursivePartial<UpdateOrderInput> {
   return {
     customerId: item.customer?.id,
     storeId: item.store.id,

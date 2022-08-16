@@ -4,11 +4,11 @@ import {
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
 import { omit } from "lodash";
-import { DbOrder } from "@/model/db/DbOrder";
+import { NetworkOrder } from "@/model/network/NetworkOrder";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { UpdateOrderInput } from "@/model/UpdateOrderInput";
-import { CreateOrderInput } from "@/model/CreateOrderInput";
+import { UpdateOrderInput } from "@/model/network/UpdateOrderInput";
+import { CreateOrderInput } from "@/model/network/CreateOrderInput";
 
 const resource = "/order";
 
@@ -20,7 +20,7 @@ export interface FindOrdersInput extends PaginatedFindInput {
 }
 export function observeOrders(
   input: FindOrdersInput,
-  onNext: (result: PaginatedResult<DbOrder>) => void,
+  onNext: (result: PaginatedResult<NetworkOrder>) => void,
   onError: (error: { code: string; message: string }) => void
 ): Cancellable {
   return observePaginatedResult(
@@ -33,8 +33,8 @@ export function observeOrders(
 }
 export async function findOrders(
   input: FindOrdersInput
-): Promise<PaginatedResult<DbOrder>> {
-  const result = await Client.get<PaginatedResult<DbOrder>>(
+): Promise<PaginatedResult<NetworkOrder>> {
+  const result = await Client.get<PaginatedResult<NetworkOrder>>(
     `${resource}/find`,
     {
       params: input,
@@ -42,8 +42,8 @@ export async function findOrders(
   );
   return result.data;
 }
-export async function findOrder(id: string): Promise<DbOrder> {
-  const result = await Client.get<DbOrder>(`${resource}/${id}`);
+export async function findOrder(id: string): Promise<NetworkOrder> {
+  const result = await Client.get<NetworkOrder>(`${resource}/${id}`);
   return result.data;
 }
 

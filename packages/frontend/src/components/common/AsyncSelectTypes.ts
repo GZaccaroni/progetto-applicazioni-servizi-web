@@ -1,6 +1,6 @@
-import { DbIdentifiable } from "@/model/db/DbIdentifiable";
+import { NetworkIdentifiable } from "@/model/network/NetworkIdentifiable";
 
-export interface AsyncSelectItem<T> extends DbIdentifiable {
+export interface AsyncSelectItem<T> extends NetworkIdentifiable {
   id: string;
   text: string;
   item?: T;

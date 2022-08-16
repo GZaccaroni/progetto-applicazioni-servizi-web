@@ -4,24 +4,26 @@ import {
   FindSelectItemsInput,
 } from "@/components/common/AsyncSelectTypes";
 import i18n from "@/i18n";
-import { DbStore, DbStoreAccessLevel } from "@/model/db/DbStore";
-import { DbUnitOfMeasure } from "@/model/db/DbUnitOfMeasure";
+import { NetworkStore } from "@/model/network/NetworkStore";
+import { QuantityUnitOfMeasure } from "@/model/common/QuantityUnitOfMeasure";
 import { findProduct, findProducts } from "@/repositories/ProductRepository";
 import { findCustomer, findCustomers } from "@/repositories/CustomerRepository";
 import { compact } from "lodash";
-import { DbCustomer } from "@/model/db/DbCustomer";
-import { DbUser } from "@/model/db/DbUser";
+import { NetworkCustomer } from "@/model/network/NetworkCustomer";
+import { NetworkUser } from "@/model/network/NetworkUser";
 import { findUser, findUsers } from "@/repositories/UserRepository";
-import { DbProduct, DbProductGrade } from "@/model/db/DbProduct";
-import { DbChartDataType } from "@/model/db/DbChartData";
+import { NetworkProduct } from "@/model/network/NetworkProduct";
+import { StoreAccessLevel } from "@/model/common/StoreAccessLevel";
+import { ChartDataType } from "@/model/common/ChartDataType";
+import { ProductGrade } from "@/model/common/ProductGrade";
 
 const selectMaxItems = 10;
 export const PRODUCT_KIND_IDENTIFIER_SEPARATOR = "_$_";
 
 export async function getSelectStores(
   input?: FindSelectItemsInput
-): Promise<AsyncSelectItem<DbStore>[]> {
-  let items: DbStore[];
+): Promise<AsyncSelectItem<NetworkStore>[]> {
+  let items: NetworkStore[];
   if (input?.ids != undefined) {
     items = await findAll(input.ids, findStore);
   } else {
@@ -43,8 +45,8 @@ export async function getSelectStores(
 }
 export async function getSelectUsers(
   input?: FindSelectItemsInput
-): Promise<AsyncSelectItem<DbUser>[]> {
-  let items: DbUser[];
+): Promise<AsyncSelectItem<NetworkUser>[]> {
+  let items: NetworkUser[];
   if (input?.ids != undefined) {
     items = await findAll(input.ids, findUser);
   } else {
@@ -65,8 +67,8 @@ export async function getSelectUsers(
 }
 export async function getSelectCustomers(
   input?: FindSelectItemsInput
-): Promise<AsyncSelectItem<DbCustomer>[]> {
-  let items: DbCustomer[];
+): Promise<AsyncSelectItem<NetworkCustomer>[]> {
+  let items: NetworkCustomer[];
   if (input?.ids != undefined) {
     items = await findAll(input.ids, findCustomer);
   } else {
@@ -88,14 +90,14 @@ export async function getSelectCustomers(
 export interface SelectProductKind {
   productId: string;
   variantId?: string;
-  unitOfMeasure: DbUnitOfMeasure;
+  unitOfMeasure: QuantityUnitOfMeasure;
   pricePerUnit?: number;
 }
 export async function getSelectProductKinds(
   input?: FindSelectItemsInput
 ): Promise<AsyncSelectItem<SelectProductKind>[]> {
   const idSeparator = PRODUCT_KIND_IDENTIFIER_SEPARATOR;
-  let items: DbProduct[];
+  let items: NetworkProduct[];
   if (input?.ids != undefined) {
     const mappedIds = input.ids.map((id) => id.split(idSeparator)[0]);
     items = await findAll(mappedIds, findProduct);
@@ -136,9 +138,9 @@ export async function getSelectProductKinds(
   });
 }
 export async function getSelectStoreAccessLevel(): Promise<
-  AsyncSelectItem<DbStoreAccessLevel>[]
+  AsyncSelectItem<StoreAccessLevel>[]
 > {
-  return Object.values(DbStoreAccessLevel).map((elKey) => {
+  return Object.values(StoreAccessLevel).map((elKey) => {
     return {
       id: elKey,
       text: i18n.t("model.store.accessLevel." + elKey).toString(),
@@ -147,9 +149,9 @@ export async function getSelectStoreAccessLevel(): Promise<
   });
 }
 export async function getSelectUnitOfMeasure(): Promise<
-  AsyncSelectItem<DbUnitOfMeasure>[]
+  AsyncSelectItem<QuantityUnitOfMeasure>[]
 > {
-  return Object.values(DbUnitOfMeasure).map((elKey) => {
+  return Object.values(QuantityUnitOfMeasure).map((elKey) => {
     return {
       id: elKey,
       text: i18n.t("model.unitOfMeasure." + elKey).toString(),
@@ -158,9 +160,9 @@ export async function getSelectUnitOfMeasure(): Promise<
   });
 }
 export async function getSelectProductGrade(): Promise<
-  AsyncSelectItem<DbProductGrade>[]
+  AsyncSelectItem<ProductGrade>[]
 > {
-  return Object.values(DbProductGrade).map((elKey) => {
+  return Object.values(ProductGrade).map((elKey) => {
     return {
       id: elKey,
       text: i18n.t("model.productGrade." + elKey).toString(),
@@ -169,9 +171,9 @@ export async function getSelectProductGrade(): Promise<
   });
 }
 export async function getSelectChartDataType(): Promise<
-  AsyncSelectItem<DbChartDataType>[]
+  AsyncSelectItem<ChartDataType>[]
 > {
-  return Object.values(DbChartDataType).map((elKey) => {
+  return Object.values(ChartDataType).map((elKey) => {
     return {
       id: elKey,
       text: i18n.t("model.chartDataType." + elKey).toString(),

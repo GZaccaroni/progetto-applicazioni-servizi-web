@@ -1,4 +1,4 @@
-export enum DbUnitOfMeasure {
+export enum QuantityUnitOfMeasure {
   Kilogram = "kilogram",
   Piece = "piece",
 }

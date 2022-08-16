@@ -25,7 +25,7 @@ import {
   observeCustomers,
 } from "@/repositories/CustomerRepository";
 import ListCustomersFilter from "@/components/customers/ListCustomersFilter.vue";
-import { DbCustomer } from "@/model/db/DbCustomer";
+import { NetworkCustomer } from "@/model/network/NetworkCustomer";
 
 const emit = defineEmits(["onRowEvent"]);
 
@@ -63,7 +63,7 @@ const headers = ref<DataTableHeader[]>([
 function filterList(input: FindCustomersInput) {
   observeFnInput.value = input;
 }
-function onRowEvent(event: TableItemEvent<DbCustomer>) {
+function onRowEvent(event: TableItemEvent<NetworkCustomer>) {
   // Pass-through
   emit("onRowEvent", event);
 }

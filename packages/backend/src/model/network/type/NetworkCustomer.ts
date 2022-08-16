@@ -1,6 +1,6 @@
 export interface NetworkCustomer {
   name: string;
-  phoneNumber?: string;
   address?: string;
+  phoneNumber?: string;
   vatNumber?: string;
 }

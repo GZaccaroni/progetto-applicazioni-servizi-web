@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
-import { NetworkCustomer } from "../network/type/NetworkCustomer";
 
 export type CustomerDocument = {
   name: string;

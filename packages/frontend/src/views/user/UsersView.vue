@@ -20,7 +20,7 @@ import {
   TableItemEvent,
   TableItemEventType,
 } from "@/plugins/table-builder/TableItemEventType";
-import { DbUser } from "@/model/db/DbUser";
+import { NetworkUser } from "@/model/network/NetworkUser";
 import HeaderView from "@/components/common/HeaderView.vue";
 import UserFormDialog, {
   UserFormDialogModel,
@@ -37,7 +37,7 @@ function openNewItemDialog() {
     isVisible: true,
   };
 }
-function deleteItem(item: DbUser) {
+function deleteItem(item: NetworkUser) {
   showConfirmDialog({
     title: i18n.t("confirm.delete.user.title").toString(),
     message: i18n
@@ -51,7 +51,7 @@ function deleteItem(item: DbUser) {
     }
   });
 }
-function onRowEvent(event: TableItemEvent<DbUser>) {
+function onRowEvent(event: TableItemEvent<NetworkUser>) {
   switch (event.type) {
     case TableItemEventType.rowEditAction:
       dialogModel.value = {

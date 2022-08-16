@@ -1,4 +1,3 @@
-import { NetworkProductKind } from "./NetworkProductKind";
 import { QuantityUnitOfMeasure } from "../../common/QuantityUnitOfMeasure";
 
 export interface NetworkProduct {
@@ -6,4 +5,9 @@ export interface NetworkProduct {
   pricePerUnit?: number;
   kinds: NetworkProductKind[];
   unitOfMeasure: QuantityUnitOfMeasure;
+}
+export interface NetworkProductKind {
+  id: string;
+  name: string;
+  pricePerUnit?: number;
 }

@@ -16,7 +16,7 @@
 </template>
 <script setup lang="ts">
 import { PropType } from "vue";
-import { DbOrderEntry } from "@/model/db/DbOrder";
+import { DbOrderEntry } from "@/model/network/NetworkOrder";
 import i18n from "@/i18n";
 
 defineProps({

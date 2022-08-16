@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsc && npm run lint && node dist/app.js",
+    "start": "npm run lint && tsc && node dist/app.js",
     "lint": "eslint . --ext .ts",
     "autofix": "eslint --fix --ext .ts .",
     "format": "prettier-eslint --write \"{,!(node_modules)/**/}*.{js,jsx}\""

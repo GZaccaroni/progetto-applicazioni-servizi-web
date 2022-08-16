@@ -1,9 +1,9 @@
-import { ProductGrade } from "../../common/ProductGrade";
+import { ProductGrade } from "@/model/common/ProductGrade";
 
 export interface CreateOrderInput {
   customerId: string;
   storeId: string;
-  date: string;
+  date: Date;
   entries: CreateOrderInputEntry[];
   note?: string;
 }

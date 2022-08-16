@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { validateRequest } from "../model/network/validation";
 import Customer, { CustomerProjection } from "../model/db/Customer";
 import Log from "../model/db/Log";

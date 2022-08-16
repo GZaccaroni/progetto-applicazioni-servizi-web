@@ -24,7 +24,7 @@ import {
   FindProductsInput,
   observeProducts,
 } from "@/repositories/ProductRepository";
-import { DbProduct } from "@/model/db/DbProduct";
+import { NetworkProduct } from "@/model/network/NetworkProduct";
 import ListProductsFilter from "@/components/products/ListProductsFilter.vue";
 
 const emit = defineEmits(["onRowEvent"]);
@@ -48,7 +48,7 @@ const headers = ref<DataTableHeader[]>([
 function filterList(input: FindProductsInput) {
   observeFnInput.value = input;
 }
-function onRowEvent(event: TableItemEvent<DbProduct>) {
+function onRowEvent(event: TableItemEvent<NetworkProduct>) {
   // Pass-through
   emit("onRowEvent", event);
 }

@@ -35,7 +35,7 @@ import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
 import { FindOrdersInput, observeOrders } from "@/repositories/OrderRepository";
 import ListOrdersFilter from "@/components/orders/ListOrdersFilter.vue";
-import { DbOrder } from "@/model/db/DbOrder";
+import { NetworkOrder } from "@/model/network/NetworkOrder";
 import ListOrderEntries from "@/components/orders/ListOrderEntries.vue";
 
 const emit = defineEmits(["onRowEvent"]);
@@ -75,7 +75,7 @@ const headers = ref<DataTableHeader[]>([
 function filterList(input: FindOrdersInput) {
   observeFnInput.value = input;
 }
-function onRowEvent(event: TableItemEvent<DbOrder>) {
+function onRowEvent(event: TableItemEvent<NetworkOrder>) {
   // Pass-through
   emit("onRowEvent", event);
 }
