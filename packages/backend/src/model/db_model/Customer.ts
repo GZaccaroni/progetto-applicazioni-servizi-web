@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 import { Customer } from "../request/type/Customer";
 
-type CustomerDocument = mongoose.Document & Customer;
+export type CustomerDocument = Customer;
 
 const CustomerSchema = new mongoose.Schema<CustomerDocument>({
   name: {

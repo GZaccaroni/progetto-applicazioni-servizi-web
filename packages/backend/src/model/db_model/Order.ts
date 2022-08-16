@@ -4,7 +4,7 @@ import { Customer } from "../request/type/Customer";
 import { Identifiable } from "../request/type/Identifiable";
 import { GradeEnum } from "../request/type/CreateOrderInputEntry";
 
-type OrderDocument = mongoose.Document & {
+type OrderDocument = {
   customer?: Customer & Identifiable;
   store: {
     id: string;

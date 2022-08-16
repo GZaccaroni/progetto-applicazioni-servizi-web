@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 import { Product, UnitOfMeasureEnum } from "../request/type/Product";
 
-type ProductDocument = mongoose.Document & Product;
+type ProductDocument = Product;
 const ProductSchema = new mongoose.Schema<ProductDocument>({
   name: {
     type: String,

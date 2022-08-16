@@ -3,7 +3,7 @@ import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 import { Store } from "../request/type/Store";
 import { AccessLevel } from "../request/type/StoreAuthorization";
 
-type StoreDocument = mongoose.Document & Store;
+type StoreDocument = Store;
 const StoreSchema = new mongoose.Schema<StoreDocument>({
   name: {
     type: String,
