@@ -3,12 +3,10 @@ import {
   PaginatedFindInput,
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
-import { omit } from "lodash";
 import { NetworkOrder } from "@/model/network/NetworkOrder";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { UpdateOrderInput } from "@/model/network/UpdateOrderInput";
-import { CreateOrderInput } from "@/model/network/CreateOrderInput";
+import { CreateUpdateOrderInput } from "@/model/network/CreateUpdateOrderInput";
 
 const resource = "/order";
 
@@ -47,15 +45,15 @@ export async function findOrder(id: string): Promise<NetworkOrder> {
   return result.data;
 }
 
-export async function addOrder(data: CreateOrderInput): Promise<void> {
+export async function addOrder(data: CreateUpdateOrderInput): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export async function updateOrder(input: UpdateOrderInput): Promise<void> {
-  const result = await Client.post<void>(
-    `${resource}/${input.id}`,
-    omit(input, "id")
-  );
+export async function updateOrder(
+  id: string,
+  data: CreateUpdateOrderInput
+): Promise<void> {
+  const result = await Client.post<void>(`${resource}/${id}`, data);
   return result.data;
 }
 export async function deleteOrder(id: string): Promise<void> {

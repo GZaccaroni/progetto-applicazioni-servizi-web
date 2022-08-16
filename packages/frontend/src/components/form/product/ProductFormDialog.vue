@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { computed, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { clone } from "lodash";
+import { clone, omit } from "lodash";
 import FormDialog, {
   GenericFormDialogModel,
 } from "@/components/common/FormDialog.vue";
@@ -98,6 +98,7 @@ import {
   findProduct,
   updateProduct,
 } from "@/repositories/ProductRepository";
+import { CreateUpdateProductInput } from "@/model/network/CreateUpdateProductInput";
 
 export type ProductFormDialogModel = GenericFormDialogModel<{
   productToUpdate?: string;
@@ -112,11 +113,11 @@ const emit = defineEmits(["input"]);
 
 const submitButtonLoading = ref(false);
 const formActionsDisabled = ref(false);
-const formData = ref<RecursivePartial<NetworkProduct>>({});
-const create = ref(false);
+const formData = ref<RecursivePartial<CreateUpdateProductInput>>({});
 const dialogLoading = ref(false);
 const isVisible = ref(false);
-const changePassword = ref(false);
+const itemToUpdateId = ref<string>();
+const create = computed(() => itemToUpdateId.value == undefined);
 
 const priceSuffix = computed(() => {
   let suffix = "€";
@@ -131,6 +132,7 @@ watch(
   () => props.value,
   (el) => {
     if (el.isVisible) {
+      itemToUpdateId.value = el.customerToUpdate;
       onBecameVisible(el.productToUpdate);
     }
     isVisible.value = el.isVisible;
@@ -140,16 +142,13 @@ watch(
 async function onBecameVisible(itemToUpdate?: string) {
   dialogLoading.value = true;
   if (itemToUpdate != undefined) {
-    create.value = false;
     const item = await findProduct(itemToUpdate).catch(repositoryErrorHandler);
     if (item != undefined) {
       formData.value = mapToFormValue(item);
     }
   } else {
-    create.value = true;
     formData.value = defaultValues;
   }
-  changePassword.value = create.value;
   dialogLoading.value = false;
 }
 
@@ -172,10 +171,10 @@ async function saveForm() {
       submitButtonLoading.value = false;
       return;
     }
-    if (create.value) {
-      await addProduct(data);
+    if (itemToUpdateId.value != undefined) {
+      await updateProduct(itemToUpdateId.value, data);
     } else {
-      await updateProduct(data);
+      await addProduct(data);
     }
     closeForm();
     const message = create.value
@@ -187,7 +186,7 @@ async function saveForm() {
     });
     closeForm();
   } catch (e) {
-    repositoryErrorHandler(e);
+    await repositoryErrorHandler(e);
   }
   formActionsDisabled.value = false;
   submitButtonLoading.value = false;
@@ -196,8 +195,8 @@ function closeForm() {
   emit("input", { isVisible: false });
 }
 function validateForm(
-  form: RecursivePartial<NetworkProduct>
-): form is NetworkProduct {
+  form: RecursivePartial<CreateUpdateProductInput>
+): form is CreateUpdateProductInput {
   const data = clone(removeBlanks(form));
   return data.name != undefined;
 }
@@ -206,8 +205,8 @@ function validateForm(
 
 function mapToFormValue(
   item: NetworkProduct
-): RecursivePartial<NetworkProduct> {
-  return item;
+): RecursivePartial<CreateUpdateProductInput> {
+  return omit(item, "id");
 }
 const defaultValues: RecursivePartial<NetworkProduct> = {
   kinds: [],

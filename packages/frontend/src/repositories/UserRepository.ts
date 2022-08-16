@@ -51,12 +51,12 @@ export async function addUser(data: AddUserInput): Promise<void> {
 }
 export type UpdateUserInput = Omit<AddUserInput, "password"> & {
   password?: string;
-} & NetworkIdentifiable;
-export async function updateUser(item: UpdateUserInput): Promise<void> {
-  const result = await Client.post<void>(
-    `${resource}/${item.username}`,
-    omit(item, "id")
-  );
+};
+export async function updateUser(
+  username: string,
+  item: UpdateUserInput
+): Promise<void> {
+  const result = await Client.post<void>(`${resource}/${username}`, item);
 
   return result.data;
 }

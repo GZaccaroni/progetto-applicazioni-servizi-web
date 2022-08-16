@@ -3,11 +3,10 @@ import {
   PaginatedFindInput,
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
-import { omit } from "lodash";
 import { NetworkCustomer } from "@/model/network/NetworkCustomer";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { NetworkIdentifiable } from "@/model/network/NetworkIdentifiable";
+import { CreateUpdateCustomerInput } from "@/model/network/CreateUpdateCustomerInput";
 
 const resource = "/customer";
 
@@ -44,16 +43,16 @@ export async function findCustomer(id: string): Promise<NetworkCustomer> {
   return result.data;
 }
 export async function addCustomer(
-  data: Omit<NetworkCustomer, keyof NetworkIdentifiable>
+  data: CreateUpdateCustomerInput
 ): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export async function updateCustomer(item: NetworkCustomer): Promise<void> {
-  const result = await Client.post<void>(
-    `${resource}/${item.id}`,
-    omit(item, "id")
-  );
+export async function updateCustomer(
+  id: string,
+  data: CreateUpdateCustomerInput
+): Promise<void> {
+  const result = await Client.post<void>(`${resource}/${id}`, data);
   return result.data;
 }
 export async function deleteCustomer(id: string): Promise<void> {

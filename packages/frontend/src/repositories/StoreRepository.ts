@@ -3,12 +3,10 @@ import {
   PaginatedFindInput,
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
-import { omit } from "lodash";
 import { NetworkStore } from "@/model/network/NetworkStore";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { CreateStoreInput } from "@/model/network/CreateStoreInput";
-import { UpdateStoreInput } from "@/model/network/UpdateStoreInput";
+import { CreateUpdateStoreInput } from "@/model/network/CreateUpdateStoreInput";
 
 const resource = "/store";
 
@@ -45,15 +43,15 @@ export async function findStore(id: string): Promise<NetworkStore> {
   const result = await Client.get<NetworkStore>(`${resource}/${id}`);
   return result.data;
 }
-export async function addStore(data: CreateStoreInput): Promise<void> {
+export async function addStore(data: CreateUpdateStoreInput): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export async function updateStore(input: UpdateStoreInput): Promise<void> {
-  const result = await Client.post<void>(
-    `${resource}/${input.id}`,
-    omit(input, "id")
-  );
+export async function updateStore(
+  id: string,
+  data: CreateUpdateStoreInput
+): Promise<void> {
+  const result = await Client.post<void>(`${resource}/${id}`, data);
   return result.data;
 }
 export async function deleteStore(id: string): Promise<void> {

@@ -3,11 +3,10 @@ import {
   PaginatedFindInput,
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
-import { omit } from "lodash";
 import { NetworkProduct } from "@/model/network/NetworkProduct";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { NetworkIdentifiable } from "@/model/network/NetworkIdentifiable";
+import { CreateUpdateProductInput } from "@/model/network/CreateUpdateProductInput";
 
 const resource = "/product";
 
@@ -44,16 +43,16 @@ export async function findProduct(id: string): Promise<NetworkProduct> {
   return result.data;
 }
 export async function addProduct(
-  data: Omit<NetworkProduct, keyof NetworkIdentifiable>
+  data: CreateUpdateProductInput
 ): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export async function updateProduct(item: NetworkProduct): Promise<void> {
-  const result = await Client.post<void>(
-    `${resource}/${item.id}`,
-    omit(item, "id")
-  );
+export async function updateProduct(
+  id: string,
+  data: CreateUpdateProductInput
+): Promise<void> {
+  const result = await Client.post<void>(`${resource}/${id}`, data);
   return result.data;
 }
 export async function deleteProduct(id: string): Promise<void> {

@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, watch } from "vue";
+import { computed, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import FormDialog, {
@@ -134,9 +134,9 @@ import {
   findOrder,
   updateOrder,
 } from "@/repositories/OrderRepository";
-import { UpdateOrderInput } from "@/model/network/UpdateOrderInput";
 import { NetworkOrder } from "@/model/network/NetworkOrder";
 import { AsyncSelectItem } from "@/components/common/AsyncSelectTypes";
+import { CreateUpdateOrderInput } from "@/model/network/CreateUpdateOrderInput";
 
 export type OrderFormDialogModel = GenericFormDialogModel<{
   orderToUpdate?: string;
@@ -151,14 +151,14 @@ const emit = defineEmits(["input"]);
 
 const submitButtonLoading = ref(false);
 const formActionsDisabled = ref(false);
-const formData = ref<RecursivePartial<UpdateOrderInput>>({});
-const create = ref(false);
+const formData = ref<RecursivePartial<CreateUpdateOrderInput>>({});
 const dialogLoading = ref(false);
 const isVisible = ref(false);
-const changePassword = ref(false);
 const selectedProducts = ref<
   (AsyncSelectItem<SelectProductKind> | undefined)[]
 >([]);
+const itemToUpdateId = ref<string>();
+const create = computed(() => itemToUpdateId.value == undefined);
 
 watch(
   selectedProducts,
@@ -175,6 +175,7 @@ watch(
   () => props.value,
   (el) => {
     if (el.isVisible) {
+      itemToUpdateId.value = el.userToUpdate;
       onBecameVisible(el.orderToUpdate);
     }
     isVisible.value = el.isVisible;
@@ -184,17 +185,14 @@ watch(
 async function onBecameVisible(itemToUpdate?: string) {
   dialogLoading.value = true;
   if (itemToUpdate != undefined) {
-    create.value = false;
     const item = await findOrder(itemToUpdate).catch(repositoryErrorHandler);
     if (item != undefined) {
       formData.value = mapToFormValue(item);
     }
   } else {
-    create.value = true;
     formData.value = defaultValues;
   }
   setProductKindsIdentifiers();
-  changePassword.value = create.value;
   dialogLoading.value = false;
 }
 function setProductKindsIdentifiers() {
@@ -257,10 +255,10 @@ async function saveForm() {
       submitButtonLoading.value = false;
       return;
     }
-    if (create.value) {
-      await addOrder(data);
+    if (itemToUpdateId.value != undefined) {
+      await updateOrder(itemToUpdateId.value, data);
     } else {
-      await updateOrder(data);
+      await addOrder(data);
     }
     closeForm();
     const message = create.value
@@ -272,7 +270,7 @@ async function saveForm() {
     });
     closeForm();
   } catch (e) {
-    repositoryErrorHandler(e);
+    await repositoryErrorHandler(e);
   }
   formActionsDisabled.value = false;
   submitButtonLoading.value = false;
@@ -281,8 +279,8 @@ function closeForm() {
   emit("input", { isVisible: false });
 }
 function validateForm(
-  form: RecursivePartial<UpdateOrderInput>
-): form is UpdateOrderInput {
+  form: RecursivePartial<CreateUpdateOrderInput>
+): form is CreateUpdateOrderInput {
   const data = clone(removeBlanks(form));
   return data.date != undefined;
 }
@@ -291,7 +289,7 @@ function validateForm(
 
 function mapToFormValue(
   item: NetworkOrder
-): RecursivePartial<UpdateOrderInput> {
+): RecursivePartial<CreateUpdateOrderInput> {
   return {
     customerId: item.customer?.id,
     storeId: item.store.id,
@@ -309,7 +307,7 @@ function mapToFormValue(
     note: item.note,
   };
 }
-const defaultValues: RecursivePartial<UpdateOrderInput> = {
+const defaultValues: RecursivePartial<CreateUpdateOrderInput> = {
   entries: [],
 };
 </script>
