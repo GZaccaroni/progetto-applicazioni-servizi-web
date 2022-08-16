@@ -6,10 +6,9 @@ import { paginateOptions, paginateResponse } from "../paginationUtils";
 import mongoose from "mongoose";
 import { io } from "../app";
 import Order from "../model/db/Order";
-import { CreateProductInputSchema } from "../model/network/json_schema/CreateProductInput";
 import { GetProductsInputSchema } from "../model/network/json_schema/GetProductsInput";
-import { UpdateProductInputSchema } from "../model/network/json_schema/UpdateProductInput";
 import { UserRequest } from "../utils";
+import { CreateUpdateProductInputSchema } from "../model/network/json_schema/CreateUpdateProductInput";
 
 const checkProductConsistence = async (product, productId?) => {
   const productKindSet = new Set(
@@ -46,7 +45,7 @@ export const addProduct = (req: UserRequest, res: Response) => {
       message: "User not authorized",
     });
   }
-  if (!validateRequest(CreateProductInputSchema, req.body)) {
+  if (!validateRequest(CreateUpdateProductInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -149,7 +148,7 @@ export const updateProduct = (req: UserRequest, res: Response) => {
     return;
   }
   if (
-    !validateRequest(UpdateProductInputSchema, req.body) ||
+    !validateRequest(CreateUpdateProductInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.productId)
   ) {
     res.status(400).json({

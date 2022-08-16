@@ -7,9 +7,8 @@ import mongoose from "mongoose";
 import { io } from "../app";
 import User from "../model/db/User";
 import Order from "../model/db/Order";
-import { CreateStoreInputSchema } from "../model/network/json_schema/CreateStoreInput";
+import { CreateUpdateStoreInputSchema } from "../model/network/json_schema/CreateUpdateStoreInput";
 import { GetStoresInputSchema } from "../model/network/json_schema/GetStoresInput";
-import { UpdateStoreInputSchema } from "../model/network/json_schema/UpdateStoreInput";
 import { UserRequest } from "../utils";
 
 const checkStoreConsistence = async (store, storeId?) => {
@@ -81,7 +80,7 @@ export const addStore = (req: UserRequest, res: Response) => {
     });
     return;
   }
-  if (!validateRequest(CreateStoreInputSchema, req.body)) {
+  if (!validateRequest(CreateUpdateStoreInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -165,7 +164,7 @@ export const updateStore = (req: UserRequest, res: Response) => {
       .json({ errCode: "notAuthorized", message: "User not authorized" });
   }
   if (
-    !validateRequest(UpdateStoreInputSchema, req.body) ||
+    !validateRequest(CreateUpdateStoreInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.storeId)
   ) {
     res

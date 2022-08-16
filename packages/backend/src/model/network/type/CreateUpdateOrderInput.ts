@@ -1,6 +1,6 @@
 import { ProductGrade } from "../../common/ProductGrade";
 
-export interface CreateOrderInput {
+export interface CreateUpdateOrderInput {
   customerId: string;
   storeId: string;
   date: string;

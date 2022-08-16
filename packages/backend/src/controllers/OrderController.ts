@@ -9,9 +9,8 @@ import Customer, { CustomerProjection } from "../model/db/Customer";
 import mongoose from "mongoose";
 import { io } from "../app";
 import { getUserStoreRole } from "./StoreController";
-import { CreateOrderInputSchema } from "../model/network/json_schema/CreateOrderInput";
+import { CreateUpdateOrderInputSchema } from "../model/network/json_schema/CreateUpdateOrderInput";
 import { GetOrdersInputSchema } from "../model/network/json_schema/GetOrdersInput";
-import { UpdateOrderInputSchema } from "../model/network/json_schema/UpdateOrderInput";
 import { UserRequest } from "../utils";
 import { StoreAccessLevel } from "../model/common/StoreAccessLevel";
 
@@ -112,7 +111,7 @@ const enrichOrder = async (order, creatorId) => {
 };
 
 export const addOrder = (req: UserRequest, res: Response) => {
-  if (!validateRequest(CreateOrderInputSchema, req.body)) {
+  if (!validateRequest(CreateUpdateOrderInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -256,7 +255,7 @@ export const getOrderById = (req: UserRequest, res: Response) => {
 };
 export const updateOrder = (req: UserRequest, res: Response) => {
   if (
-    !validateRequest(UpdateOrderInputSchema, req.body) ||
+    !validateRequest(CreateUpdateOrderInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.orderId)
   ) {
     res

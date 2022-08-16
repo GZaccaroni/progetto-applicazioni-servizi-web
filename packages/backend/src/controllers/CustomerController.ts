@@ -6,9 +6,8 @@ import { paginateOptions, paginateResponse } from "../paginationUtils";
 import mongoose from "mongoose";
 import { io } from "../app";
 import Order from "../model/db/Order";
-import { CreateCustomerInputSchema } from "../model/network/json_schema/CreateCustomerInput";
+import { CreateUpdateCustomerInputSchema } from "../model/network/json_schema/CreateUpdateCustomerInput";
 import { GetCustomersInputSchema } from "../model/network/json_schema/GetCustomersInput";
-import { UpdateCustomerInputSchema } from "../model/network/json_schema/UpdateCustomerInput";
 import { UserRequest } from "../utils";
 
 const checkCustomerConsistence = async (customer, customerId?) => {
@@ -26,7 +25,7 @@ const checkCustomerConsistence = async (customer, customerId?) => {
 };
 
 export const addCustomer = (req: UserRequest, res: Response) => {
-  if (!validateRequest(CreateCustomerInputSchema, req.body)) {
+  if (!validateRequest(CreateUpdateCustomerInputSchema, req.body)) {
     res.status(400).json({
       errCode: "invalidArgument",
       message: "Invalid Input",
@@ -109,7 +108,7 @@ export const getCustomerById = (req: UserRequest, res: Response) => {
 
 export const updateCustomer = (req: UserRequest, res: Response) => {
   if (
-    !validateRequest(UpdateCustomerInputSchema, req.body) ||
+    !validateRequest(CreateUpdateCustomerInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.customerId)
   ) {
     res.status(400).json({
