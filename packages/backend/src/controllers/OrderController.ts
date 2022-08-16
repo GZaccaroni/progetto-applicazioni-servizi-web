@@ -279,7 +279,7 @@ export const updateOrder = (req: UserRequest, res: Response) => {
           if (
             !(
               storeRole == AccessLevel.Salesman &&
-              order.createdBy == req.user._id
+              order.createdBy == req.user._id.toString()
             ) &&
             storeRole != AccessLevel.Manager &&
             !req.user.isAdmin
@@ -356,7 +356,7 @@ export const deleteOrder = (req: UserRequest, res: Response) => {
           if (
             !(
               storeRole == AccessLevel.Salesman &&
-              order.createdBy == req.user._id
+              order.createdBy == req.user._id.toString()
             ) &&
             storeRole != AccessLevel.Manager &&
             !req.user.isAdmin

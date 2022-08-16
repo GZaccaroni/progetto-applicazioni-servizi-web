@@ -1,11 +1,16 @@
-import mongoose, { PassportLocalDocument, PassportLocalModel } from "mongoose";
+import mongoose, {
+  PassportLocalDocument,
+  PassportLocalModel,
+  Types,
+} from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 
-export type UserDocument = PassportLocalDocument & {
+export type UserDocument = {
+  _id: Types.ObjectId;
   username: string;
   isAdmin: boolean;
-};
+} & Omit<PassportLocalDocument, "_id">;
 
 const UserSchema = new mongoose.Schema<UserDocument>({
   username: {
