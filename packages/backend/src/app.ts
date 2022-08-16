@@ -3,7 +3,7 @@ import sourceMapSupport = require("source-map-support");
 sourceMapSupport.install();
 import express from "express";
 import session from "express-session";
-import User from "./model/db_model/User";
+import User from "./model/db/User";
 import cors from "cors";
 import routes from "./routes/Routes";
 import mongoose from "mongoose";

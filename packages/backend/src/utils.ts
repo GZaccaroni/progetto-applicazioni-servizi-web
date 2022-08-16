@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { UserDocument } from "./model/db_model/User";
+import { UserDocument } from "./model/db/User";
 
 export const isUserLoggedIn = (
   req: Request,

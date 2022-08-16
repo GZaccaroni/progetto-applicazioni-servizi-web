@@ -1,19 +1,19 @@
 import { Response } from "express";
-import { validateRequest } from "../model/request/validation";
-import Order, { OrderProjection } from "../model/db_model/Order";
-import Log from "../model/db_model/Log";
+import { validateRequest } from "../model/network/validation";
+import Order, { OrderProjection } from "../model/db/Order";
+import Log from "../model/db/Log";
 import { paginateOptions, paginateResponse } from "../paginationUtils";
-import Store from "../model/db_model/Store";
-import Product from "../model/db_model/Product";
-import Customer, { CustomerProjection } from "../model/db_model/Customer";
+import Store from "../model/db/Store";
+import Product from "../model/db/Product";
+import Customer, { CustomerProjection } from "../model/db/Customer";
 import mongoose from "mongoose";
 import { io } from "../app";
-import { AccessLevel } from "../model/request/type/StoreAuthorization";
 import { getUserStoreRole } from "./StoreController";
-import { CreateOrderInputSchema } from "../model/request/json_schema/CreateOrderInput";
-import { GetOrdersInputSchema } from "../model/request/json_schema/GetOrdersInput";
-import { UpdateOrderInputSchema } from "../model/request/json_schema/UpdateOrderInput";
+import { CreateOrderInputSchema } from "../model/network/json_schema/CreateOrderInput";
+import { GetOrdersInputSchema } from "../model/network/json_schema/GetOrdersInput";
+import { UpdateOrderInputSchema } from "../model/network/json_schema/UpdateOrderInput";
 import { UserRequest } from "../utils";
+import { StoreAccessLevel } from "../model/common/StoreAccessLevel";
 
 const enrichOrder = async (order, creatorId) => {
   const enrichedOrder = {
@@ -278,10 +278,10 @@ export const updateOrder = (req: UserRequest, res: Response) => {
         getUserStoreRole(req.user._id, order.store.id).then((storeRole) => {
           if (
             !(
-              storeRole == AccessLevel.Salesman &&
+              storeRole == StoreAccessLevel.Salesman &&
               order.createdBy == req.user._id.toString()
             ) &&
-            storeRole != AccessLevel.Manager &&
+            storeRole != StoreAccessLevel.Manager &&
             !req.user.isAdmin
           ) {
             throw {
@@ -355,10 +355,10 @@ export const deleteOrder = (req: UserRequest, res: Response) => {
         getUserStoreRole(req.user._id, order.store.id).then((storeRole) => {
           if (
             !(
-              storeRole == AccessLevel.Salesman &&
+              storeRole == StoreAccessLevel.Salesman &&
               order.createdBy == req.user._id.toString()
             ) &&
-            storeRole != AccessLevel.Manager &&
+            storeRole != StoreAccessLevel.Manager &&
             !req.user.isAdmin
           ) {
             throw {

@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
-import { Customer } from "../request/type/Customer";
-import { Identifiable } from "../request/type/Identifiable";
-import { GradeEnum } from "../request/type/CreateOrderInputEntry";
+import { NetworkCustomer } from "../network/type/NetworkCustomer";
+import { Identifiable } from "../network/type/Identifiable";
+import { ProductGrade } from "../common/ProductGrade";
 
 export type OrderDocument = {
-  customer?: Customer & Identifiable;
+  customer?: NetworkCustomer & Identifiable;
   store: {
     id: string;
     name: string;
@@ -46,7 +46,7 @@ const OrderSchema = new mongoose.Schema<OrderDocument>({
       variantId: String,
       grade: {
         type: String,
-        enum: [GradeEnum.First, GradeEnum.Second, GradeEnum.Mixed],
+        enum: [ProductGrade.First, ProductGrade.Second, ProductGrade.Mixed],
       },
       name: String,
       quantity: Number,

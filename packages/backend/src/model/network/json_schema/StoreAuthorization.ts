@@ -1,5 +1,6 @@
 import { JSONSchemaType } from "ajv";
-import { AccessLevel, StoreAuthorization } from "../type/StoreAuthorization";
+import { StoreAuthorization } from "../type/StoreAuthorization";
+import { StoreAccessLevel } from "../../common/StoreAccessLevel";
 
 export const StoreAuthorizationSchema: JSONSchemaType<StoreAuthorization> = {
   required: ["accessLevel", "userId"],
@@ -10,7 +11,7 @@ export const StoreAuthorizationSchema: JSONSchemaType<StoreAuthorization> = {
     },
     accessLevel: {
       type: "string",
-      enum: [AccessLevel.Salesman, AccessLevel.Manager],
+      enum: [StoreAccessLevel.Salesman, StoreAccessLevel.Manager],
     },
   },
 };

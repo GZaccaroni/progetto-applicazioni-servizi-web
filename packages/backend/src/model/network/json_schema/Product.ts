@@ -1,8 +1,9 @@
 import { JSONSchemaType } from "ajv";
-import { Product, UnitOfMeasureEnum } from "../type/Product";
+import { NetworkProduct } from "../type/NetworkProduct";
 import { ProductKindSchema } from "./ProductKind";
+import { QuantityUnitOfMeasure } from "../../common/QuantityUnitOfMeasure";
 
-export const ProductSchema: JSONSchemaType<Product> = {
+export const ProductSchema: JSONSchemaType<NetworkProduct> = {
   required: ["kinds", "name", "unitOfMeasure"],
   type: "object",
   properties: {
@@ -21,7 +22,7 @@ export const ProductSchema: JSONSchemaType<Product> = {
     },
     unitOfMeasure: {
       type: "string",
-      enum: [UnitOfMeasureEnum.Kilogram, UnitOfMeasureEnum.Piece],
+      enum: [QuantityUnitOfMeasure.Kilogram, QuantityUnitOfMeasure.Piece],
     },
   },
 };

@@ -1,9 +1,10 @@
 import { JSONSchemaType } from "ajv";
-import { DataTypeEnum, GetAnalyticsInput } from "../type/GetAnalyticsInput";
+import { GetAnalyticsInput } from "../type/GetAnalyticsInput";
 import { FilterByProductsSchema } from "./FilterByProducts";
 import { FilterByDateSchema } from "./FilterByDate";
 import { FilterByStoreSchema } from "./FilterByStore";
 import { FilterByCustomerSchema } from "./FilterByCustomer";
+import { ChartDataType } from "../../common/ChartDataType";
 
 export const GetAnalyticsInputSchema: JSONSchemaType<GetAnalyticsInput> = {
   type: "object",
@@ -18,7 +19,7 @@ export const GetAnalyticsInputSchema: JSONSchemaType<GetAnalyticsInput> = {
       properties: {
         dataType: {
           type: "string",
-          enum: [DataTypeEnum.Quantity, DataTypeEnum.Price],
+          enum: [ChartDataType.Quantity, ChartDataType.Price],
         },
       },
     },

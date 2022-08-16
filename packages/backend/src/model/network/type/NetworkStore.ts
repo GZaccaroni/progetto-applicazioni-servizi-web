@@ -1,6 +1,6 @@
 import { StoreAuthorization } from "./StoreAuthorization";
 
-export interface Store {
+export interface NetworkStore {
   name: string;
   authorizations: Array<StoreAuthorization>;
 }

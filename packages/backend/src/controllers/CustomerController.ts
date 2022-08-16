@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { validateRequest } from "../model/request/validation";
-import Customer, { CustomerProjection } from "../model/db_model/Customer";
-import Log from "../model/db_model/Log";
+import { validateRequest } from "../model/network/validation";
+import Customer, { CustomerProjection } from "../model/db/Customer";
+import Log from "../model/db/Log";
 import { paginateOptions, paginateResponse } from "../paginationUtils";
 import mongoose from "mongoose";
 import { io } from "../app";
-import Order from "../model/db_model/Order";
-import { CreateCustomerInputSchema } from "../model/request/json_schema/CreateCustomerInput";
-import { GetCustomersInputSchema } from "../model/request/json_schema/GetCustomersInput";
-import { UpdateCustomerInputSchema } from "../model/request/json_schema/UpdateCustomerInput";
+import Order from "../model/db/Order";
+import { CreateCustomerInputSchema } from "../model/network/json_schema/CreateCustomerInput";
+import { GetCustomersInputSchema } from "../model/network/json_schema/GetCustomersInput";
+import { UpdateCustomerInputSchema } from "../model/network/json_schema/UpdateCustomerInput";
 import { UserRequest } from "../utils";
 
 const checkCustomerConsistence = async (customer, customerId?) => {

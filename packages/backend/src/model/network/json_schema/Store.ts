@@ -1,8 +1,8 @@
 import { JSONSchemaType } from "ajv";
-import { Store } from "../type/Store";
+import { NetworkStore } from "../type/NetworkStore";
 import { StoreAuthorizationSchema } from "./StoreAuthorization";
 
-export const StoreSchema: JSONSchemaType<Store> = {
+export const StoreSchema: JSONSchemaType<NetworkStore> = {
   required: ["authorizations", "name"],
   type: "object",
   properties: {

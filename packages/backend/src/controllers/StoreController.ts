@@ -1,15 +1,15 @@
 import { Response } from "express";
-import { validateRequest } from "../model/request/validation";
-import Store, { StoreProjection } from "../model/db_model/Store";
-import Log from "../model/db_model/Log";
+import { validateRequest } from "../model/network/validation";
+import Store, { StoreProjection } from "../model/db/Store";
+import Log from "../model/db/Log";
 import { paginateOptions, paginateResponse } from "../paginationUtils";
 import mongoose from "mongoose";
 import { io } from "../app";
-import User from "../model/db_model/User";
-import Order from "../model/db_model/Order";
-import { CreateStoreInputSchema } from "../model/request/json_schema/CreateStoreInput";
-import { GetStoresInputSchema } from "../model/request/json_schema/GetStoresInput";
-import { UpdateStoreInputSchema } from "../model/request/json_schema/UpdateStoreInput";
+import User from "../model/db/User";
+import Order from "../model/db/Order";
+import { CreateStoreInputSchema } from "../model/network/json_schema/CreateStoreInput";
+import { GetStoresInputSchema } from "../model/network/json_schema/GetStoresInput";
+import { UpdateStoreInputSchema } from "../model/network/json_schema/UpdateStoreInput";
 import { UserRequest } from "../utils";
 
 const checkStoreConsistence = async (store, storeId?) => {

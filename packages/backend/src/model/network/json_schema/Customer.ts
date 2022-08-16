@@ -1,7 +1,7 @@
 import { JSONSchemaType } from "ajv";
-import { Customer } from "../type/Customer";
+import { NetworkCustomer } from "../type/NetworkCustomer";
 
-export const CustomerSchema: JSONSchemaType<Customer> = {
+export const CustomerSchema: JSONSchemaType<NetworkCustomer> = {
   required: ["name"],
   type: "object",
   properties: {

@@ -1,8 +1,20 @@
 import mongoose from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
-import { Product, UnitOfMeasureEnum } from "../request/type/Product";
+import { QuantityUnitOfMeasure } from "../common/QuantityUnitOfMeasure";
 
-type ProductDocument = Product;
+export type ProductDocument = {
+  name: string;
+  pricePerUnit?: number;
+  kinds: ProductDocumentKind[];
+  unitOfMeasure: QuantityUnitOfMeasure;
+};
+export type ProductDocumentKind = {
+  id: string;
+  name: string;
+  fullName: string;
+  pricePerUnit?: number;
+};
+
 const ProductSchema = new mongoose.Schema<ProductDocument>({
   name: {
     type: String,
@@ -19,7 +31,7 @@ const ProductSchema = new mongoose.Schema<ProductDocument>({
   ],
   unitOfMeasure: {
     type: String,
-    enum: [UnitOfMeasureEnum.Kilogram, UnitOfMeasureEnum.Piece],
+    enum: [QuantityUnitOfMeasure.Kilogram, QuantityUnitOfMeasure.Piece],
   },
 });
 

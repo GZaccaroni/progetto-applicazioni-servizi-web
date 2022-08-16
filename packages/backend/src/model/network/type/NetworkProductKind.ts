@@ -1,4 +1,4 @@
-export interface ProductKind {
+export interface NetworkProductKind {
   id: string;
   name: string;
   fullName: string;

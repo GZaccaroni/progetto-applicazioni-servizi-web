@@ -1,4 +1,4 @@
-export interface Customer {
+export interface NetworkCustomer {
   name: string;
   phoneNumber?: string;
   address?: string;

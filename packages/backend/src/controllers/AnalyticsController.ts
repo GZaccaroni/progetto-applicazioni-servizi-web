@@ -1,10 +1,10 @@
 import { Response } from "express";
 import mongoose from "mongoose";
-import Order from "../model/db_model/Order";
-import { validateRequest } from "../model/request/validation";
-import { DataTypeEnum } from "../model/request/type/GetAnalyticsInput";
-import { GetAnalyticsInputSchema } from "../model/request/json_schema/GetAnalyticsInput";
+import Order from "../model/db/Order";
+import { validateRequest } from "../model/network/validation";
+import { GetAnalyticsInputSchema } from "../model/network/json_schema/GetAnalyticsInput";
 import { UserRequest } from "../utils";
+import { ChartDataType } from "../model/common/ChartDataType";
 
 export const getAnalytics = (req: UserRequest, res: Response) => {
   if (!validateRequest(GetAnalyticsInputSchema, req.query)) {
@@ -73,7 +73,7 @@ export const getAnalytics = (req: UserRequest, res: Response) => {
       variantId: 1,
     },
   };
-  if (req.query.dataType == DataTypeEnum.Price) {
+  if (req.query.dataType == ChartDataType.Price) {
     projection["value"] = "$entries.price";
   } else {
     projection["value"] = "$entries.quantity";

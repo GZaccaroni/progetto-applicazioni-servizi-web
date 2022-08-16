@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { validateRequest } from "../model/request/validation";
-import Product, { ProductProjection } from "../model/db_model/Product";
-import Log from "../model/db_model/Log";
+import { validateRequest } from "../model/network/validation";
+import Product, { ProductProjection } from "../model/db/Product";
+import Log from "../model/db/Log";
 import { paginateOptions, paginateResponse } from "../paginationUtils";
 import mongoose from "mongoose";
 import { io } from "../app";
-import Order from "../model/db_model/Order";
-import { CreateProductInputSchema } from "../model/request/json_schema/CreateProductInput";
-import { GetProductsInputSchema } from "../model/request/json_schema/GetProductsInput";
-import { UpdateProductInputSchema } from "../model/request/json_schema/UpdateProductInput";
+import Order from "../model/db/Order";
+import { CreateProductInputSchema } from "../model/network/json_schema/CreateProductInput";
+import { GetProductsInputSchema } from "../model/network/json_schema/GetProductsInput";
+import { UpdateProductInputSchema } from "../model/network/json_schema/UpdateProductInput";
 import { UserRequest } from "../utils";
 
 const checkProductConsistence = async (product, productId?) => {

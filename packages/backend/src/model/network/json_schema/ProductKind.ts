@@ -1,7 +1,7 @@
 import { JSONSchemaType } from "ajv";
-import { ProductKind } from "../type/ProductKind";
+import { NetworkProductKind } from "../type/NetworkProductKind";
 
-export const ProductKindSchema: JSONSchemaType<ProductKind> = {
+export const ProductKindSchema: JSONSchemaType<NetworkProductKind> = {
   required: ["id", "name", "fullName"],
   type: "object",
   properties: {

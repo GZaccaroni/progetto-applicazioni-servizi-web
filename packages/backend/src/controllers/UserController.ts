@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
-import { validateRequest } from "../model/request/validation";
+import { validateRequest } from "../model/network/validation";
 import passport from "passport";
-import UserDb, { UserProjection } from "../model/db_model/User";
-import Log from "../model/db_model/Log";
+import UserDb, { UserProjection } from "../model/db/User";
+import Log from "../model/db/Log";
 import { paginateOptions, paginateResponse } from "../paginationUtils";
 import { io } from "../app";
-import Store from "../model/db_model/Store";
-import { CreateUserInputSchema } from "../model/request/json_schema/CreateUserInput";
-import { GetUsersInputSchema } from "../model/request/json_schema/GetUsersInput";
-import { UpdateUserInputSchema } from "../model/request/json_schema/UpdateUserInput";
-import { UserLoginInputSchema } from "../model/request/json_schema/UserLoginInput";
+import Store from "../model/db/Store";
+import { CreateUserInputSchema } from "../model/network/json_schema/CreateUserInput";
+import { GetUsersInputSchema } from "../model/network/json_schema/GetUsersInput";
+import { UpdateUserInputSchema } from "../model/network/json_schema/UpdateUserInput";
+import { UserLoginInputSchema } from "../model/network/json_schema/UserLoginInput";
 import { UserRequest } from "../utils";
 
 export const createUser = (req: UserRequest, res: Response) => {

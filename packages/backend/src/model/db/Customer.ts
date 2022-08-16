@@ -1,8 +1,13 @@
 import mongoose from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
-import { Customer } from "../request/type/Customer";
+import { NetworkCustomer } from "../network/type/NetworkCustomer";
 
-export type CustomerDocument = Customer;
+export type CustomerDocument = {
+  name: string;
+  phoneNumber?: string;
+  address?: string;
+  vatNumber?: string;
+};
 
 const CustomerSchema = new mongoose.Schema<CustomerDocument>({
   name: {

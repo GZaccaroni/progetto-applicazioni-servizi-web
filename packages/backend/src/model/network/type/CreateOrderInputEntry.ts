@@ -1,13 +1,9 @@
+import { ProductGrade } from "../../common/ProductGrade";
+
 export interface CreateOrderInputEntry {
   productId: string;
   variantId?: string;
-  grade?: GradeEnum;
+  grade?: ProductGrade;
   quantity: number;
   pricePerUnit: number;
-}
-
-export enum GradeEnum {
-  First = "first",
-  Second = "second",
-  Mixed = "mixed",
 }
