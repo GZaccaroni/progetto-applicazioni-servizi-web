@@ -148,8 +148,9 @@ export const getOrders = (req, res: Response) => {
       errCode: "invalidArgument",
       message: "Bad request"
     });
+    return;
   }
-  getUserStoreRole(req.user._id, req.body.storeId).then(userRole => {
+  getUserStoreRole(req.user._id, req.query.storeId).then(userRole => {
     if ((userRole != AccessLevel.Salesman || userRole != AccessLevel.Manager) && !req.user.isAdmin) {
       throw {
         code: 403,
