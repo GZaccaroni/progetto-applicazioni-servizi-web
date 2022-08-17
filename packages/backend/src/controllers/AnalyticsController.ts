@@ -3,8 +3,10 @@ import mongoose from "mongoose";
 import Order from "../model/db_model/Order";
 import {validateRequest} from "../model/request/validation";
 import {DataTypeEnum, GetAnalytics} from "../model/request/type/GetAnalytics";
+import {getUserStoreRole} from "./StoreController";
+import {AccessLevel} from "../model/request/type/StoreAuthorization";
 
-export const getAnalytics = (req, res: Response) => {
+export const getAnalytics = async (req, res: Response) => {
   if (!validateRequest<GetAnalytics>("GetAnalytics", req.query)) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -12,9 +14,32 @@ export const getAnalytics = (req, res: Response) => {
     });
     return;
   }
+
   const query={};
-  if(req.query.storeId ){
+  if(req.query.storeId){
     if(mongoose.isValidObjectId(req.query.storeId)) {
+      const r = await getUserStoreRole(req.user._id,req.query.storeId).then(userRole=>{
+        if (userRole != AccessLevel.Manager || !req.user.isAdmin) {
+          throw {
+            code: 403,
+            error: {
+              errCode: "notAuthorized",
+              message: "User not authorized"
+            }
+          }
+        }
+        return true;
+      }).catch(err => {
+        if (err.code && err.error) {
+          res.status(err.code).json(err.error);
+        } else {
+          res.status(500).json(err);
+        }
+        return false;
+      });
+      if (!r) {
+        return;
+      }
       query["store.id"] = req.query.storeId;
     } else {
       res.status(400).json({
@@ -22,6 +47,13 @@ export const getAnalytics = (req, res: Response) => {
         message: "Invalid storeId supplied"
       });
       return;
+    }
+  } else {
+    if(!req.user.isAdmin){
+      res.status(403).json({
+        errCode: "notAuthorized",
+        message: "User not authorized"
+      });
     }
   }
   if (req.query.customerId) {
@@ -148,9 +180,15 @@ export const getAnalytics = (req, res: Response) => {
       }
     },
     {
-      $unset:["_id","product","variant"]
+      $unset: ["_id", "product", "variant"]
     }
   ]).then(analytics => {
     res.json(analytics)
-  }, err=> res.status(500).json(err));
+  }).catch(err => {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error);
+    } else {
+      res.status(500).json(err);
+    }
+  });
 }
