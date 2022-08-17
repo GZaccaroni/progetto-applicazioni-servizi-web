@@ -26,10 +26,10 @@ export const getAnalytics = (req: UserRequest, res: Response) => {
       return;
     }
   } else {
-    if(!req.user.isAdmin){
+    if (!req.user.isAdmin) {
       res.status(403).json({
         errCode: "notAuthorized",
-        message: "User not authorized"
+        message: "User not authorized",
       });
       return;
     }
@@ -174,15 +174,15 @@ export const getAnalytics = (req: UserRequest, res: Response) => {
     {
       $unset: ["_id", "product", "variant"],
     },
-  ]).then(
-    (analytics) => {
-    res.json(analytics);
-  }).catch(
-    (err) => {
-    if (err.code && err.error) {
-      res.status(err.code).json(err.error);
-    } else {
-      res.status(500).json(err);
-    }
-  });
-}
+  ])
+    .then((analytics) => {
+      res.json(analytics);
+    })
+    .catch((err) => {
+      if (err.code && err.error) {
+        res.status(err.code).json(err.error);
+      } else {
+        res.status(500).json(err);
+      }
+    });
+};
