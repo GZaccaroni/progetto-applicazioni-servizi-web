@@ -1,8 +1,0 @@
-{
-  "type": "object",
-  "properties": {
-    "storeId": {
-      "type": "string"
-    }
-  }
-}

@@ -1,22 +1,10 @@
 import Vue from "vue";
-import Vuex from "vuex";
-import snackbar from "@/store/snackbar";
-import user from "@/store/user";
-import { RootState } from "@/store/types";
-import createPersistedState from "vuex-persistedstate";
+import { createPinia, PiniaVuePlugin } from "pinia";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
-Vue.use(Vuex);
+Vue.use(PiniaVuePlugin);
 
-export default new Vuex.Store<RootState>({
-  plugins: [createPersistedState({ paths: ["user.userProfile"] })],
-  state: {
-    version: "1.0.0",
-  },
-  getters: {},
-  mutations: {},
-  actions: {},
-  modules: {
-    snackbar,
-    user,
-  },
-});
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
+
+export default pinia;

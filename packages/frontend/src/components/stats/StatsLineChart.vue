@@ -18,8 +18,8 @@ import {
   LinearScale,
   ChartDataset,
 } from "chart.js";
-import { computed, defineProps, PropType } from "vue";
-import { DbChartData } from "@/model/db/DbChartData";
+import { computed, PropType } from "vue";
+import { NetworkChartData } from "@/model/network/NetworkChartData";
 import { stringToColor } from "@/helpers/utils";
 import { groupBy, sumBy } from "lodash";
 
@@ -37,7 +37,7 @@ const props = defineProps({
     default: 400,
   },
   data: {
-    type: Object as PropType<DbChartData>,
+    type: Object as PropType<NetworkChartData>,
     required: true,
   },
   global: {
@@ -86,7 +86,7 @@ function getGlobalDataset(): ChartDataset {
   };
 }
 
-function dateToString(date: Date): string {
-  return date.toLocaleDateString();
+function dateToString(date: string): string {
+  return new Date(date).toLocaleDateString();
 }
 </script>

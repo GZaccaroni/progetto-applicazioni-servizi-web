@@ -10,74 +10,58 @@
     </header-view>
     <list-users @onRowEvent="onRowEvent" />
     <user-form-dialog v-model="dialogModel" />
-    <confirm-dialog ref="confirmDialog" />
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 import ListUsers from "@/components/users/ListUsers.vue";
 import {
   TableItemEvent,
   TableItemEventType,
 } from "@/plugins/table-builder/TableItemEventType";
-import { DbUser } from "@/model/db/DbUser";
+import { NetworkUser } from "@/model/network/NetworkUser";
 import HeaderView from "@/components/common/HeaderView.vue";
 import UserFormDialog, {
   UserFormDialogModel,
 } from "@/components/form/user/UserFormDialog.vue";
 import { deleteUser } from "@/repositories/UserRepository";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { ConfirmDialog } from "@/plugins/confirm-dialog/main";
+import i18n from "@/i18n";
+import { showConfirmDialog } from "@/helpers/confirmDialog";
 
-export default defineComponent({
-  components: {
-    UserFormDialog,
-    HeaderView,
-    ListUsers,
-    ConfirmDialog,
-  },
-  setup() {
-    const dialogModel = ref<UserFormDialogModel>({ isVisible: false });
-    const confirmDialog = ref<InstanceType<typeof ConfirmDialog>>();
-    return {
-      confirmDialog,
-      dialogModel,
-    };
-  },
-  methods: {
-    openNewItemDialog() {
-      this.dialogModel = {
+const dialogModel = ref<UserFormDialogModel>({ isVisible: false });
+
+function openNewItemDialog() {
+  dialogModel.value = {
+    isVisible: true,
+  };
+}
+function deleteItem(item: NetworkUser) {
+  showConfirmDialog({
+    title: i18n.t("confirm.delete.user.title").toString(),
+    message: i18n
+      .t("confirm.delete.user.message", {
+        username: item.username,
+      })
+      .toString(),
+  }).then((confirmed) => {
+    if (confirmed) {
+      deleteUser(item.username).catch(repositoryErrorHandler);
+    }
+  });
+}
+function onRowEvent(event: TableItemEvent<NetworkUser>) {
+  switch (event.type) {
+    case TableItemEventType.rowEditAction:
+      dialogModel.value = {
         isVisible: true,
+        userToUpdate: event.item.username,
       };
-    },
-    deleteItem(item: DbUser) {
-      this.confirmDialog
-        ?.open(
-          this.$t("confirm.delete.user.title").toString(),
-          this.$t("confirm.delete.user.message", {
-            username: item.username,
-          }).toString()
-        )
-        .then((confirmed) => {
-          if (confirmed) {
-            deleteUser(item.username).catch(repositoryErrorHandler);
-          }
-        });
-    },
-    onRowEvent(event: TableItemEvent<DbUser>) {
-      switch (event.type) {
-        case TableItemEventType.rowEditAction:
-          this.dialogModel = {
-            isVisible: true,
-            userToUpdate: event.item.username,
-          };
-          break;
-        case TableItemEventType.rowDeleteAction:
-          this.deleteItem(event.item);
-          break;
-      }
-    },
-  },
-});
+      break;
+    case TableItemEventType.rowDeleteAction:
+      deleteItem(event.item);
+      break;
+  }
+}
 </script>

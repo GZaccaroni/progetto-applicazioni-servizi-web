@@ -8,17 +8,21 @@
     @submit="saveForm"
     @close="closeForm"
   >
-    <v-form ref="form" class="pa-4">
-      <v-row>
-        <v-text-field
-          v-model="formData.name"
-          :label="$t('model.store.name')"
-        ></v-text-field>
-      </v-row>
+    <v-row>
+      <v-text-field
+        v-model="formData.name"
+        :label="$t('model.store.name')"
+      ></v-text-field>
+    </v-row>
+    <div role="grid">
       <v-row class="pt-6 pb-4">
-        <div class="text-h5">Utenti</div>
+        <div class="text-h5">{{ $t("word.storeAuthorizedUsers") }}</div>
         <v-spacer />
-        <v-btn @click="addAuthorizedUser" icon>
+        <v-btn
+          @click="addAuthorizedUser"
+          icon
+          :aria-label="$t('components.form.store.addUser')"
+        >
           <v-icon>mdi-plus-circle</v-icon>
         </v-btn>
       </v-row>
@@ -26,15 +30,16 @@
         v-for="(_, index) in formData.authorizations"
         :key="index"
         align="center"
+        role="row"
       >
-        <v-col cols="6">
+        <v-col cols="6" role="gridcell">
           <async-select
             v-model="formData.authorizations[index].userId"
             :label="$t('word.user').toString()"
             :find-items-fn="getSelectUsers"
           />
         </v-col>
-        <v-col cols="4">
+        <v-col cols="4" role="gridcell">
           <async-select
             v-model="formData.authorizations[index].accessLevel"
             :label="$t('model.store.accessLevel.name').toString()"
@@ -43,18 +48,22 @@
           />
         </v-col>
         <v-spacer />
-        <v-btn @click="removeAuthorizedUser(index)" icon>
+        <v-btn
+          @click="removeAuthorizedUser(index)"
+          icon
+          :aria-label="$t('components.form.store.removeUser')"
+        >
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </v-row>
-    </v-form>
+    </div>
   </form-dialog>
 </template>
 
 <script setup lang="ts">
-import { defineProps, PropType, ref, watch } from "vue";
+import { computed, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { clone } from "lodash";
+import { clone, omit } from "lodash";
 import FormDialog, {
   GenericFormDialogModel,
 } from "@/components/common/FormDialog.vue";
@@ -63,17 +72,17 @@ import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
-import { DbStore } from "@/model/db/DbStore";
+import { NetworkStore } from "@/model/network/NetworkStore";
 import {
   addStore,
   findStore,
   updateStore,
 } from "@/repositories/StoreRepository";
-import { UpdateStoreInput } from "@/model/UpdateStoreInput";
 import {
   getSelectStoreAccessLevel,
   getSelectUsers,
 } from "@/helpers/asyncSelectUtils";
+import { CreateUpdateStoreInput } from "@/model/network/CreateUpdateStoreInput";
 
 export type StoreFormDialogModel = GenericFormDialogModel<{
   storeToUpdate?: string;
@@ -88,16 +97,17 @@ const emit = defineEmits(["input"]);
 
 const submitButtonLoading = ref(false);
 const formActionsDisabled = ref(false);
-const formData = ref<RecursivePartial<UpdateStoreInput>>({});
-const create = ref(false);
+const formData = ref<RecursivePartial<CreateUpdateStoreInput>>({});
 const dialogLoading = ref(false);
 const isVisible = ref(false);
-const changePassword = ref(false);
+const itemToUpdateId = ref<string>();
+const create = computed(() => itemToUpdateId.value == undefined);
 
 watch(
   () => props.value,
   (el) => {
     if (el.isVisible) {
+      itemToUpdateId.value = el.customerToUpdate;
       onBecameVisible(el.storeToUpdate);
     }
     isVisible.value = el.isVisible;
@@ -107,17 +117,13 @@ watch(
 async function onBecameVisible(itemToUpdate?: string) {
   dialogLoading.value = true;
   if (itemToUpdate != undefined) {
-    create.value = false;
     const item = await findStore(itemToUpdate).catch(repositoryErrorHandler);
-    console.log("Caricamento?? ", item);
     if (item != undefined) {
       formData.value = mapToFormValue(item);
     }
   } else {
-    create.value = true;
     formData.value = defaultValues;
   }
-  changePassword.value = create.value;
   dialogLoading.value = false;
 }
 async function saveForm() {
@@ -133,10 +139,10 @@ async function saveForm() {
       submitButtonLoading.value = false;
       return;
     }
-    if (create.value) {
-      await addStore(data);
+    if (itemToUpdateId.value != undefined) {
+      await updateStore(itemToUpdateId.value, data);
     } else {
-      await updateStore(data);
+      await addStore(data);
     }
     closeForm();
     const message = create.value
@@ -148,7 +154,7 @@ async function saveForm() {
     });
     closeForm();
   } catch (e) {
-    repositoryErrorHandler(e);
+    await repositoryErrorHandler(e);
   }
   formActionsDisabled.value = false;
   submitButtonLoading.value = false;
@@ -157,8 +163,8 @@ function closeForm() {
   emit("input", { isVisible: false });
 }
 function validateForm(
-  form: RecursivePartial<UpdateStoreInput>
-): form is UpdateStoreInput {
+  form: RecursivePartial<CreateUpdateStoreInput>
+): form is CreateUpdateStoreInput {
   const data = clone(removeBlanks(form));
   return data.name != undefined;
 }
@@ -171,10 +177,12 @@ function removeAuthorizedUser(index: number) {
 }
 // Helpers
 
-function mapToFormValue(item: DbStore): RecursivePartial<UpdateStoreInput> {
-  return item;
+function mapToFormValue(
+  item: NetworkStore
+): RecursivePartial<CreateUpdateStoreInput> {
+  return omit(item, "id");
 }
-const defaultValues: RecursivePartial<UpdateStoreInput> = {
+const defaultValues: RecursivePartial<CreateUpdateStoreInput> = {
   authorizations: [],
 };
 </script>

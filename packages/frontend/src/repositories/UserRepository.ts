@@ -3,16 +3,15 @@ import {
   PaginatedFindInput,
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
-import { omit } from "lodash";
-import { DbUser } from "@/model/db/DbUser";
+import { NetworkUser } from "@/model/network/NetworkUser";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { DbIdentifiable } from "@/model/db/DbIdentifiable";
+import { NetworkIdentifiable } from "@/model/network/NetworkIdentifiable";
 const resource = "/user";
 
 export function observeUsers(
   input: FindUsersInput,
-  onNext: (result: PaginatedResult<DbUser>) => void,
+  onNext: (result: PaginatedResult<NetworkUser>) => void,
   onError: (error: { code: string; message: string }) => void
 ): Cancellable {
   return observePaginatedResult(
@@ -29,17 +28,20 @@ export interface FindUsersInput extends PaginatedFindInput {
 }
 export async function findUsers(
   input: FindUsersInput
-): Promise<PaginatedResult<DbUser>> {
-  const result = await Client.get<PaginatedResult<DbUser>>(`${resource}/find`, {
-    params: input,
-  });
+): Promise<PaginatedResult<NetworkUser>> {
+  const result = await Client.get<PaginatedResult<NetworkUser>>(
+    `${resource}/find`,
+    {
+      params: input,
+    }
+  );
   return result.data;
 }
-export async function findUser(id: string): Promise<DbUser> {
-  const result = await Client.get<DbUser>(`${resource}/${id}`);
+export async function findUser(id: string): Promise<NetworkUser> {
+  const result = await Client.get<NetworkUser>(`${resource}/${id}`);
   return result.data;
 }
-export type AddUserInput = Omit<DbUser, keyof DbIdentifiable> & {
+export type AddUserInput = Omit<NetworkUser, keyof NetworkIdentifiable> & {
   password: string;
 };
 export async function addUser(data: AddUserInput): Promise<void> {
@@ -48,12 +50,12 @@ export async function addUser(data: AddUserInput): Promise<void> {
 }
 export type UpdateUserInput = Omit<AddUserInput, "password"> & {
   password?: string;
-} & DbIdentifiable;
-export async function updateUser(item: UpdateUserInput): Promise<void> {
-  const result = await Client.post<void>(
-    `${resource}/${item.username}`,
-    omit(item, "id")
-  );
+};
+export async function updateUser(
+  username: string,
+  item: UpdateUserInput
+): Promise<void> {
+  const result = await Client.post<void>(`${resource}/${username}`, item);
 
   return result.data;
 }

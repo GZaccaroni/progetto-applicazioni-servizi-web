@@ -1,5 +1,5 @@
-import store from "@/store";
 import { SnackbarStateMessage } from "@/store/snackbar/types";
+import { useSnackbarStore } from "@/store/snackbar";
 
 interface SnackbarStatusMessage {
   type: "error" | "success";
@@ -16,7 +16,8 @@ const showMessage = (payload: SnackbarStatusMessage) => {
     color: messageColor[payload.type].color,
     timeout: payload.timeout ?? 1000,
   };
-  store.commit("snackbar/SHOW_MESSAGE", fullPayload);
+  const store = useSnackbarStore();
+  store.show(fullPayload);
 };
 
 export { SnackbarStatusMessage, showMessage };

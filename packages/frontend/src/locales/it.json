@@ -20,6 +20,11 @@
         "title": "Elimina cliente",
         "message":
         "Sei sicuro di voler davvero eliminare {name}?"
+      },
+      "product": {
+        "title": "Elimina prodotto",
+        "message":
+        "Sei sicuro di voler davvero eliminare {name}?"
       }
     }
   },
@@ -29,7 +34,8 @@
     "confirm": "Ok",
     "cancel": "Annulla",
     "close": "Chiudi",
-    "login": "Accedi",
+    "login": "Accesso",
+    "logout": "Disconnessione",
     "save": "Salva",
     "fromDate": "Da",
     "toDate": "a",
@@ -37,7 +43,14 @@
     "stores": "Punti vendita",
     "user": "Utente",
     "customer": "Cliente",
-    "chartDataType": "Dato da visualizzare"
+    "productKind": "Varietà",
+    "productKinds": "Varietà",
+    "storeAuthorizedUsers": "Utenti autorizzati",
+    "orderEntry": "Voce",
+    "orderEntries": "Voci",
+    "chartDataType": "Dato da visualizzare",
+    "mainMenu": "Menù principale",
+    "userMenu": "Menù utente"
   },
   "model": {
     "user": {
@@ -79,6 +92,7 @@
       "price": "Importo totale",
       "pricePerUnit": "Prezzo unitario",
       "quantity": "Quantità",
+      "varietyName": "Nome varietà",
       "product": "Prodotto",
       "productGrade": "Qualità",
       "note": "Note",
@@ -122,12 +136,59 @@
     "ListProductsFilter": {
       "searchPerName": "Cerca per nome"
     },
+    "ListOrdersFilter": {
+      "fromDateAria": "Filtra ordini fatti dalla data",
+      "toDateAria": "Filtra ordini fatti fino alla data"
+    },
+    "StatsFilter": {
+      "fromDateAria": "Filtra dati dalla data",
+      "toDateAria": "Filtra dati fino alla data"
+    },
+    "ActionsTable": {
+      "actions": {
+        "edit": "Modifica",
+        "delete": "Elimina"
+      }
+    },
+    "AppNavigationDrawer": {
+      "sections": {
+        "admin": "Amministrazione"
+      }
+    },
+    "PaginatedTableBuilder": {
+      "nextPage": "Pagina successiva",
+      "previousPage": "Pagina precedente",
+      "pagination": "Navigazione tra le pagine",
+      "expandRow": "Espandi riga",
+      "collapseRow": "Riduci riga"
+    },
+    "TableBuilder": {
+      "noData": "Non c'è ancora niente qui."
+    },
+    "HeaderView": {
+      "goBack": "Torna indietro"
+    },
     "form": {
       "user": {
         "changePassword": "Cambia password"
       },
       "userLogin": {
-        "title": "Accedi"
+        "title": "Accesso",
+        "submitButton": "Accedi",
+        "passwordMinLength": "Inserisci una password di almeno {length} caratteri",
+        "passwordWeak": "Scegli una password migliore, consiglio: prova a mischiare lettere, numeri e simboli."
+      },
+      "product": {
+        "addKind": "Aggiungi varietà al prodotto",
+        "removeKind": "Rimuovi varietà dal prodotto"
+      },
+      "store": {
+        "addUser": "Aggiungi utente al punto vendita",
+        "removeUser": "Rimuovi utente dal punto vendita"
+      },
+      "order": {
+        "addEntry": "Aggiungi voce all'ordine",
+        "removeEntry": "Rimuovi voce dall'ordine"
       }
     }
   },
@@ -162,6 +223,12 @@
     }
   },
   "error": {
-    "formGeneric": "Compila correttamente tutti i campi"
+    "formGeneric": "Compila correttamente tutti i campi",
+    "invalidUsernameOrPassword": "Nome utente/ Password non validi.",
+    "requestFailed": "La richiesta è fallita.",
+    "itemNotFound": "Elemento non trovato.",
+    "userNotLoggedIn": "Devi effettuare l'accesso per continuare",
+    "unauthorized": "Non hai permessi sufficienti per eseguire questa azione.",
+    "unknown": "Errore sconosciuto"
   }
 }

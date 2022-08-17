@@ -23,25 +23,24 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-import { mapGetters } from "vuex";
+<script setup lang="ts">
+import { computed } from "vue";
+import { storeToRefs } from "pinia";
+import { useUserStore } from "@/store/user";
+import i18n from "@/i18n";
 
-export default defineComponent({
-  computed: {
-    ...mapGetters("user", {
-      isLoggedIn: "isLoggedIn",
-      userProfile: "userProfile",
-    }),
-    welcomeText(): string {
-      if (this.userProfile != undefined) {
-        return this.$t("views.welcome.subtitle.loggedIn", {
-          username: this.userProfile.username,
-        }).toString();
-      } else {
-        return this.$t("views.welcome.subtitle.default").toString();
-      }
-    },
-  },
+const { userProfile } = storeToRefs(useUserStore());
+
+const welcomeText = computed(() => {
+  const userProfileVal = userProfile?.value;
+  if (userProfileVal != undefined) {
+    return i18n
+      .t("views.welcome.subtitle.loggedIn", {
+        username: userProfileVal.username,
+      })
+      .toString();
+  } else {
+    return i18n.t("views.welcome.subtitle.default").toString();
+  }
 });
 </script>

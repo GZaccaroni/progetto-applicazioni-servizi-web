@@ -1,0 +1,36 @@
+import mongoose from "mongoose";
+import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
+
+export type CustomerDocument = {
+  name: string;
+  phoneNumber?: string;
+  address?: string;
+  vatNumber?: string;
+};
+
+const CustomerSchema = new mongoose.Schema<CustomerDocument>({
+  name: {
+    type: String,
+    unique: true,
+  },
+  phoneNumber: String,
+  address: String,
+  vatNumber: String,
+});
+
+CustomerSchema.plugin(mongoosePagination);
+
+export default mongoose.model<CustomerDocument, Pagination<CustomerDocument>>(
+  "customer",
+  CustomerSchema,
+  "customers"
+);
+
+export const CustomerProjection = {
+  _id: 0,
+  id: "$_id",
+  name: 1,
+  phoneNumber: 1,
+  address: 1,
+  vatNumber: 1,
+};

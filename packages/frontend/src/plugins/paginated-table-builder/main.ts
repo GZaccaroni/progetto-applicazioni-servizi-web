@@ -1,4 +1,4 @@
-import PaginatedTableBuilder from "./components/TableBuilder.vue";
+import PaginatedTableBuilder from "./components/PaginatedTableBuilder.vue";
 import _Vue from "vue";
 
 export default {

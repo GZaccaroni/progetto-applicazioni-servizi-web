@@ -1,7 +1,12 @@
 <template>
   <div>
-    <v-snackbar top v-model="isVisible" :color="message?.color">
-      {{ message?.text }}
+    <v-snackbar
+      top
+      v-model="isVisible"
+      :color="snackbarStore.message?.color"
+      role="alert"
+    >
+      {{ snackbarStore.message?.text }}
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="hideSnackbar">
           {{ $t("word.close") }}
@@ -11,31 +16,20 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapGetters, mapMutations } from "vuex";
-import { defineComponent, ref } from "vue";
-import { SnackbarState } from "@/store/snackbar/types";
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import { useSnackbarStore } from "@/store/snackbar";
 
-export default defineComponent({
-  setup() {
-    const isVisible = ref(false);
-    return { isVisible };
-  },
-  computed: {
-    ...mapGetters("snackbar", {
-      message: "getMessage",
-    }),
-  },
-  watch: {
-    message(newValue?: SnackbarState) {
-      this.isVisible = newValue != undefined;
-    },
-  },
-  methods: {
-    ...mapMutations("snackbar", ["HIDE_MESSAGE"]),
-    hideSnackbar() {
-      this.HIDE_MESSAGE();
-    },
-  },
-});
+const isVisible = ref(false);
+const snackbarStore = useSnackbarStore();
+
+watch(
+  () => snackbarStore.message,
+  (newValue) => {
+    isVisible.value = newValue != undefined;
+  }
+);
+function hideSnackbar() {
+  snackbarStore.hide();
+}
 </script>

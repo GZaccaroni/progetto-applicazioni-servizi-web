@@ -6,6 +6,7 @@
       icon
       class="ms-2"
       @click="$router.back()"
+      :aria-label="$t('components.HeaderView.goBack')"
     >
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
@@ -17,19 +18,15 @@
   </v-row>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    showBackButton: {
-      type: Boolean,
-      default: false,
-    },
+<script setup lang="ts">
+defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
+  showBackButton: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>

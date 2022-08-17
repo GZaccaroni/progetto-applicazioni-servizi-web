@@ -19,7 +19,9 @@ function loadLocaleMessages(): LocaleMessages {
   });
   return messages;
 }
-
+export function setDocumentLang(lang: string) {
+  document.documentElement.lang = lang;
+}
 export default new VueI18n({
   locale: "it",
   messages: loadLocaleMessages(),

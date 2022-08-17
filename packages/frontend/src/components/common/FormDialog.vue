@@ -18,7 +18,13 @@
           dark
           color="primary"
         >
-          <v-btn icon dark :disabled="submitButtonLoading" @click="closeForm">
+          <v-btn
+            icon
+            dark
+            :disabled="submitButtonLoading"
+            @click="closeForm"
+            :aria-label="$t('word.cancel')"
+          >
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>{{ title }}</v-toolbar-title>
@@ -49,18 +55,18 @@
         <v-card-actions v-if="!$vuetify.breakpoint.xsOnly && !dialogLoading">
           <v-spacer></v-spacer>
           <v-btn
-            color="blue darken-1"
+            color="grey darken-2"
             :disabled="submitButtonLoading"
             text
             tabindex="-1"
             @click="closeForm"
-            >Chiudi</v-btn
+            >{{ $t("word.cancel") }}</v-btn
           >
           <v-btn
-            color="blue darken-1"
+            color="primary"
+            elevation="0"
             :disabled="submitButtonLoading || !submitButtonEnabled"
             :loading="submitButtonLoading"
-            text
             @click="submitForm"
           >
             {{ submitButtonText }}
@@ -71,9 +77,8 @@
   </v-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { passthroughVModel } from "@/helpers/passthroughVModel";
+<script setup lang="ts">
+import { computed, PropType } from "vue";
 
 export type GenericFormDialogModel<T> =
   | ({ isVisible: true } & T)
@@ -82,63 +87,61 @@ export type GenericFormDialogModel<T> =
 type FormDialogParams = {
   persistent: boolean;
 };
-export default defineComponent({
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    submitButtonText: {
-      type: String,
-      required: true,
-    },
-    submitButtonEnabled: {
-      type: Boolean,
-      default: true,
-    },
-    submitButtonLoading: {
-      type: Boolean,
-      required: true,
-    },
-    customParams: {
-      type: Object as PropType<FormDialogParams>,
-      default: () => {
-        return {
-          persistent: false,
-        };
-      },
-    },
-    value: {
-      type: Boolean,
-      required: true,
-    },
-    dialogLoading: {
-      value: Boolean,
-      default: false,
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
+  submitButtonText: {
+    type: String,
+    required: true,
+  },
+  submitButtonEnabled: {
+    type: Boolean,
+    default: true,
+  },
+  submitButtonLoading: {
+    type: Boolean,
+    required: true,
+  },
+  customParams: {
+    type: Object as PropType<FormDialogParams>,
+    default: () => {
+      return {
+        persistent: false,
+      };
     },
   },
-  setup(props, context) {
-    const isVisibleState = passthroughVModel(props, context, "value");
-    return { isVisibleState };
+  value: {
+    type: Boolean,
+    required: true,
   },
-  computed: {
-    isPersistent(): boolean {
-      return this.$props.customParams.persistent || this.submitButtonLoading;
-    },
-  },
-  methods: {
-    submitForm() {
-      this.$emit("submit");
-    },
-    closeFormIfNotPersistent() {
-      if (!this.isPersistent) {
-        this.closeForm();
-      }
-    },
-    closeForm() {
-      this.isVisibleState = false;
-      this.$emit("close");
-    },
+  dialogLoading: {
+    value: Boolean,
+    default: false,
   },
 });
+const emit = defineEmits(["input", "submit", "close"]);
+
+const isVisibleState = computed({
+  get: () => props.value,
+  set: (value) => emit("input", value),
+});
+
+const isPersistent = computed(() => {
+  return props.customParams.persistent || props.submitButtonLoading;
+});
+
+function submitForm() {
+  emit("submit");
+}
+function closeForm() {
+  isVisibleState.value = false;
+  emit("close");
+}
+function closeFormIfNotPersistent() {
+  if (!isPersistent.value) {
+    closeForm();
+  }
+}
 </script>

@@ -9,31 +9,29 @@
     "
     @submit="saveForm"
   >
-    <v-form ref="form" class="pa-4">
-      <v-text-field
-        v-model="formData.name"
-        :label="$t('model.customer.name')"
-      ></v-text-field>
-      <v-text-field
-        v-model="formData.address"
-        :label="$t('model.customer.address')"
-      ></v-text-field>
-      <v-text-field
-        v-model="formData.phoneNumber"
-        :label="$t('model.customer.phoneNumber')"
-      ></v-text-field>
-      <v-text-field
-        v-model="formData.vatNumber"
-        :label="$t('model.customer.vatNumber')"
-      ></v-text-field>
-    </v-form>
+    <v-text-field
+      v-model="formData.name"
+      :label="$t('model.customer.name')"
+    ></v-text-field>
+    <v-text-field
+      v-model="formData.address"
+      :label="$t('model.customer.address')"
+    ></v-text-field>
+    <v-text-field
+      v-model="formData.phoneNumber"
+      :label="$t('model.customer.phoneNumber')"
+    ></v-text-field>
+    <v-text-field
+      v-model="formData.vatNumber"
+      :label="$t('model.customer.vatNumber')"
+    ></v-text-field>
   </form-dialog>
 </template>
 
 <script setup lang="ts">
-import { defineProps, PropType, ref, watch } from "vue";
+import { computed, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { clone } from "lodash";
+import { clone, omit } from "lodash";
 import FormDialog, {
   GenericFormDialogModel,
 } from "@/components/common/FormDialog.vue";
@@ -41,12 +39,13 @@ import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
-import { DbCustomer } from "@/model/db/DbCustomer";
+import { NetworkCustomer } from "@/model/network/NetworkCustomer";
 import {
   addCustomer,
   findCustomer,
   updateCustomer,
 } from "@/repositories/CustomerRepository";
+import { CreateUpdateCustomerInput } from "@/model/network/CreateUpdateCustomerInput";
 export type CustomerFormDialogModel = GenericFormDialogModel<{
   customerToUpdate?: string;
 }>;
@@ -60,16 +59,17 @@ const emit = defineEmits(["input"]);
 
 const submitButtonLoading = ref(false);
 const formActionsDisabled = ref(false);
-const formData = ref<RecursivePartial<DbCustomer>>({});
-const create = ref(false);
+const formData = ref<RecursivePartial<CreateUpdateCustomerInput>>({});
 const dialogLoading = ref(false);
 const isVisible = ref(false);
-const changePassword = ref(false);
+const itemToUpdateId = ref<string>();
+const create = computed(() => itemToUpdateId.value == undefined);
 
 watch(
   () => props.value,
   (el) => {
     if (el.isVisible) {
+      itemToUpdateId.value = el.customerToUpdate;
       onBecameVisible(el.customerToUpdate);
     }
     isVisible.value = el.isVisible;
@@ -79,16 +79,13 @@ watch(
 async function onBecameVisible(itemToUpdate?: string) {
   dialogLoading.value = true;
   if (itemToUpdate != undefined) {
-    create.value = false;
     const item = await findCustomer(itemToUpdate).catch(repositoryErrorHandler);
     if (item != undefined) {
       formData.value = mapToFormValue(item);
     }
   } else {
-    create.value = true;
     formData.value = defaultValues;
   }
-  changePassword.value = create.value;
   dialogLoading.value = false;
 }
 async function saveForm() {
@@ -104,10 +101,10 @@ async function saveForm() {
       submitButtonLoading.value = false;
       return;
     }
-    if (create.value) {
-      await addCustomer(data);
+    if (itemToUpdateId.value) {
+      await updateCustomer(itemToUpdateId.value, data);
     } else {
-      await updateCustomer(data);
+      await addCustomer(data);
     }
     closeForm();
     const message = create.value
@@ -119,7 +116,7 @@ async function saveForm() {
     });
     closeForm();
   } catch (e) {
-    repositoryErrorHandler(e);
+    await repositoryErrorHandler(e);
   }
   formActionsDisabled.value = false;
   submitButtonLoading.value = false;
@@ -127,15 +124,19 @@ async function saveForm() {
 function closeForm() {
   emit("input", { isVisible: false });
 }
-function validateForm(form: RecursivePartial<DbCustomer>): form is DbCustomer {
+function validateForm(
+  form: RecursivePartial<CreateUpdateCustomerInput>
+): form is CreateUpdateCustomerInput {
   const data = clone(removeBlanks(form));
   return data.name != undefined;
 }
 
 // Helpers
 
-function mapToFormValue(item: DbCustomer): RecursivePartial<DbCustomer> {
-  return item;
+function mapToFormValue(
+  item: NetworkCustomer
+): RecursivePartial<CreateUpdateCustomerInput> {
+  return omit(item, "id");
 }
-const defaultValues: RecursivePartial<DbCustomer> = {};
+const defaultValues: RecursivePartial<NetworkCustomer> = {};
 </script>

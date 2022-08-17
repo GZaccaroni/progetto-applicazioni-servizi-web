@@ -1,5 +1,5 @@
 <template>
-  <v-form class="pa-4" @submit.prevent>
+  <v-form class="pa-4" @submit.prevent role="search">
     <v-text-field
       v-model="form.searchName"
       :label="$t('components.ListStoresFilter.searchPerName')"
@@ -8,20 +8,17 @@
   </v-form>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, watch } from "vue";
+<script setup lang="ts">
+import { reactive, watch } from "vue";
 import { removeBlanks } from "@/helpers/utils";
 import { FindCustomersInput } from "@/repositories/CustomerRepository";
 
-export default defineComponent({
-  setup(props, { emit }) {
-    const form = reactive<FindCustomersInput>({
-      limit: 10,
-    });
-    watch(form, (newValue) => {
-      emit("change", removeBlanks(newValue));
-    });
-    return { form };
-  },
+const emit = defineEmits(["change"]);
+
+const form = reactive<FindCustomersInput>({
+  limit: 10,
+});
+watch(form, (newValue) => {
+  emit("change", removeBlanks(newValue));
 });
 </script>

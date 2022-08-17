@@ -1,5 +1,5 @@
-import { DbUser } from "@/model/db/DbUser";
+import { NetworkUser } from "@/model/network/NetworkUser";
 
 export interface UserState {
-  userProfile?: DbUser;
+  userProfile?: NetworkUser;
 }

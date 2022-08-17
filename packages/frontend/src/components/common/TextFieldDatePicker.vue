@@ -15,6 +15,7 @@
         v-bind="attrs"
         v-on="on"
         :clearable="clearable"
+        :aria-label="buttonAriaLabel"
       ></v-text-field>
     </template>
     <v-date-picker
@@ -25,74 +26,83 @@
     ></v-date-picker>
   </v-menu>
 </template>
-<script lang="ts">
-import { computed, defineComponent, PropType, ref } from "vue";
+<script setup lang="ts">
+import { computed, PropType, ref } from "vue";
 
-export default defineComponent({
-  props: {
-    value: {
-      type: Date as PropType<Date>,
-    },
-    label: {
-      type: String,
-      required: true,
-    },
-    min: {
-      type: Date as PropType<Date>,
-    },
-    max: {
-      type: Date as PropType<Date>,
-    },
-    clearable: {
-      type: Boolean,
-      default: false,
-    },
-    showIcon: {
-      type: Boolean,
-      default: true,
-    },
+const props = defineProps({
+  value: {
+    type: [Date, String] as PropType<Date | string>,
   },
-  setup(props, { emit }) {
-    const menuVisible = ref(false);
-    function toDateString(date?: Date): string | undefined {
-      return date?.toISOString()?.substring(0, 10);
-    }
-    const selectedDate = computed({
-      get: () => {
-        return toDateString(props["value"]);
-      },
-      set: (value) =>
-        emit("input", value != undefined ? new Date(value) : undefined),
-    });
-    const formattedDate = computed({
-      get: () => {
-        return selectedDate.value != undefined
-          ? new Date(selectedDate.value).toLocaleDateString()
-          : undefined;
-      },
-      set: (newValue) => {
-        selectedDate.value = newValue;
-      },
-    });
-    const minStrDate = computed(() => {
-      return props.min != undefined ? toDateString(props.min) : undefined;
-    });
-    const maxStrDate = computed(() => {
-      return props.max != undefined ? toDateString(props.max) : undefined;
-    });
-    return {
-      menuVisible,
-      minStrDate,
-      maxStrDate,
-      formattedDate,
-      selectedDate,
-    };
+  label: {
+    type: String,
+    required: true,
   },
-  methods: {
-    save(date: string) {
-      this.menuVisible = false;
-      this.selectedDate = date;
-    },
+  min: {
+    type: String,
+  },
+  max: {
+    type: String,
+  },
+  clearable: {
+    type: Boolean,
+    default: false,
+  },
+  showIcon: {
+    type: Boolean,
+    default: true,
+  },
+  buttonAriaLabel: {
+    type: String,
+  },
+  returnObject: {
+    type: Boolean,
+    default: false,
   },
 });
+const emit = defineEmits(["input"]);
+
+const menuVisible = ref(false);
+function toDateString(date?: Date): string | undefined {
+  return date?.toISOString()?.substring(0, 10);
+}
+const selectedDate = computed({
+  get: () => {
+    if (props["value"] instanceof Date) {
+      return toDateString(props["value"]);
+    } else {
+      return props["value"]?.split("T")[0];
+    }
+  },
+  set: (value) => {
+    if (value == undefined) {
+      emit("input", undefined);
+      return;
+    }
+    if (props.returnObject) {
+      emit("input", new Date(value));
+    } else {
+      emit("input", value);
+    }
+  },
+});
+const formattedDate = computed({
+  get: () => {
+    return selectedDate.value != undefined
+      ? new Date(selectedDate.value).toLocaleDateString()
+      : undefined;
+  },
+  set: (newValue) => {
+    selectedDate.value = newValue;
+  },
+});
+const minStrDate = computed(() => {
+  return props.min != undefined ? props.min : undefined;
+});
+const maxStrDate = computed(() => {
+  return props.max != undefined ? props.max : undefined;
+});
+function save(date: string) {
+  menuVisible.value = false;
+  selectedDate.value = date;
+}
 </script>

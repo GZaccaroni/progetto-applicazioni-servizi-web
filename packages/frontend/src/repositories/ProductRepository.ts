@@ -3,11 +3,10 @@ import {
   PaginatedFindInput,
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
-import { omit } from "lodash";
-import { DbProduct } from "@/model/db/DbProduct";
+import { NetworkProduct } from "@/model/network/NetworkProduct";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { DbIdentifiable } from "@/model/db/DbIdentifiable";
+import { CreateUpdateProductInput } from "@/model/network/CreateUpdateProductInput";
 
 const resource = "/product";
 
@@ -17,7 +16,7 @@ export interface FindProductsInput extends PaginatedFindInput {
 }
 export function observeProducts(
   input: FindProductsInput,
-  onNext: (result: PaginatedResult<DbProduct>) => void,
+  onNext: (result: PaginatedResult<NetworkProduct>) => void,
   onError: (error: { code: string; message: string }) => void
 ): Cancellable {
   return observePaginatedResult(
@@ -30,8 +29,8 @@ export function observeProducts(
 }
 export async function findProducts(
   input: FindProductsInput
-): Promise<PaginatedResult<DbProduct>> {
-  const result = await Client.get<PaginatedResult<DbProduct>>(
+): Promise<PaginatedResult<NetworkProduct>> {
+  const result = await Client.get<PaginatedResult<NetworkProduct>>(
     `${resource}/find`,
     {
       params: input,
@@ -39,21 +38,21 @@ export async function findProducts(
   );
   return result.data;
 }
-export async function findProduct(id: string): Promise<DbProduct> {
-  const result = await Client.get<DbProduct>(`${resource}/${id}`);
+export async function findProduct(id: string): Promise<NetworkProduct> {
+  const result = await Client.get<NetworkProduct>(`${resource}/${id}`);
   return result.data;
 }
 export async function addProduct(
-  data: Omit<DbProduct, keyof DbIdentifiable>
+  data: CreateUpdateProductInput
 ): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export async function updateProduct(item: DbProduct): Promise<void> {
-  const result = await Client.post<void>(
-    `${resource}/${item.id}`,
-    omit(item, "id")
-  );
+export async function updateProduct(
+  id: string,
+  data: CreateUpdateProductInput
+): Promise<void> {
+  const result = await Client.post<void>(`${resource}/${id}`, data);
   return result.data;
 }
 export async function deleteProduct(id: string): Promise<void> {

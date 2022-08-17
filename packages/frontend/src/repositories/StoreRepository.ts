@@ -3,13 +3,10 @@ import {
   PaginatedFindInput,
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
-import { omit } from "lodash";
-import { DbStore } from "@/model/db/DbStore";
+import { NetworkStore } from "@/model/network/NetworkStore";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { DbIdentifiable } from "@/model/db/DbIdentifiable";
-import { CreateStoreInput } from "@/model/CreateStoreInput";
-import { UpdateStoreInput } from "@/model/UpdateStoreInput";
+import { CreateUpdateStoreInput } from "@/model/network/CreateUpdateStoreInput";
 
 const resource = "/store";
 
@@ -20,7 +17,7 @@ export interface FindStoresInput extends PaginatedFindInput {
 }
 export function observeStores(
   input: FindStoresInput,
-  onNext: (result: PaginatedResult<DbStore>) => void,
+  onNext: (result: PaginatedResult<NetworkStore>) => void,
   onError: (error: { code: string; message: string }) => void
 ): Cancellable {
   return observePaginatedResult(
@@ -33,8 +30,8 @@ export function observeStores(
 }
 export async function findStores(
   input: FindStoresInput
-): Promise<PaginatedResult<DbStore>> {
-  const result = await Client.get<PaginatedResult<DbStore>>(
+): Promise<PaginatedResult<NetworkStore>> {
+  const result = await Client.get<PaginatedResult<NetworkStore>>(
     `${resource}/find`,
     {
       params: input,
@@ -42,19 +39,19 @@ export async function findStores(
   );
   return result.data;
 }
-export async function findStore(id: string): Promise<DbStore> {
-  const result = await Client.get<DbStore>(`${resource}/${id}`);
+export async function findStore(id: string): Promise<NetworkStore> {
+  const result = await Client.get<NetworkStore>(`${resource}/${id}`);
   return result.data;
 }
-export async function addStore(data: CreateStoreInput): Promise<void> {
+export async function addStore(data: CreateUpdateStoreInput): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export async function updateStore(input: UpdateStoreInput): Promise<void> {
-  const result = await Client.post<void>(
-    `${resource}/${input.id}`,
-    omit(input, "id")
-  );
+export async function updateStore(
+  id: string,
+  data: CreateUpdateStoreInput
+): Promise<void> {
+  const result = await Client.post<void>(`${resource}/${id}`, data);
   return result.data;
 }
 export async function deleteStore(id: string): Promise<void> {

@@ -5,18 +5,7 @@
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import HeaderView from "@/components/common/HeaderView.vue";
 import StatsChart from "@/components/stats/StatsCharts.vue";
-
-export default defineComponent({
-  components: {
-    StatsChart,
-    HeaderView,
-  },
-  setup() {
-    return {};
-  },
-});
 </script>

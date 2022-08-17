@@ -8,37 +8,41 @@
     @submit="saveForm"
     @close="closeForm"
   >
-    <v-form ref="form" class="pa-4">
-      <v-row>
+    <v-row>
+      <v-text-field
+        v-model="formData.name"
+        :label="$t('model.product.name')"
+      ></v-text-field>
+    </v-row>
+    <v-row>
+      <v-col cols="5" class="pa-0">
         <v-text-field
-          v-model="formData.name"
-          :label="$t('model.product.name')"
+          type="number"
+          v-model.number="formData.pricePerUnit"
+          :suffix="priceSuffix"
+          :label="$t('model.product.pricePerUnit')"
+          :min="0"
         ></v-text-field>
-      </v-row>
-      <v-row>
-        <v-col cols="5" class="pa-0">
-          <v-text-field
-            type="number"
-            v-model.number="formData.pricePerUnit"
-            :suffix="priceSuffix"
-            :label="$t('model.product.pricePerUnit')"
-            :min="0"
-          ></v-text-field>
-        </v-col>
-        <v-spacer />
-        <v-col cols="5" class="pa-0">
-          <async-select
-            v-model="formData.unitOfMeasure"
-            :label="$t('model.product.unitOfMeasure').toString()"
-            :find-items-fn="getSelectUnitOfMeasure"
-            :lazy="false"
-          />
-        </v-col>
-      </v-row>
+      </v-col>
+      <v-spacer />
+      <v-col cols="5" class="pa-0">
+        <async-select
+          v-model="formData.unitOfMeasure"
+          :label="$t('model.product.unitOfMeasure').toString()"
+          :find-items-fn="getSelectUnitOfMeasure"
+          :lazy="false"
+        />
+      </v-col>
+    </v-row>
+    <div role="grid">
       <v-row class="pt-6 pb-4">
-        <div class="text-h5">Varietà</div>
+        <div class="text-h5">{{ $t("word.productKinds") }}</div>
         <v-spacer />
-        <v-btn @click="addKind" icon>
+        <v-btn
+          @click="addKind"
+          icon
+          :aria-label="$t('components.form.product.addKind')"
+        >
           <v-icon>mdi-plus-circle</v-icon>
         </v-btn>
       </v-row>
@@ -46,14 +50,15 @@
         v-for="(_, index) in formData.kinds"
         :key="formData.kinds[index].id"
         align="center"
+        role="row"
       >
-        <v-col cols="6">
+        <v-col cols="6" role="gridcell">
           <v-text-field
             v-model="formData.kinds[index].name"
             :label="$t('model.product.name')"
           ></v-text-field>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="4" role="gridcell">
           <v-text-field
             type="number"
             v-model.number="formData.kinds[index].pricePerUnit"
@@ -63,17 +68,21 @@
           ></v-text-field>
         </v-col>
         <v-spacer />
-        <v-btn @click="removeKind(index)" icon>
+        <v-btn
+          @click="removeKind(index)"
+          icon
+          :aria-label="$t('components.form.product.removeKind')"
+        >
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </v-row>
-    </v-form>
+    </div>
   </form-dialog>
 </template>
 <script setup lang="ts">
-import { computed, defineProps, PropType, ref, watch } from "vue";
+import { computed, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { clone } from "lodash";
+import { clone, omit } from "lodash";
 import FormDialog, {
   GenericFormDialogModel,
 } from "@/components/common/FormDialog.vue";
@@ -83,12 +92,13 @@ import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
 import { getSelectUnitOfMeasure } from "@/helpers/asyncSelectUtils";
-import { DbProduct } from "@/model/db/DbProduct";
+import { NetworkProduct } from "@/model/network/NetworkProduct";
 import {
   addProduct,
   findProduct,
   updateProduct,
 } from "@/repositories/ProductRepository";
+import { CreateUpdateProductInput } from "@/model/network/CreateUpdateProductInput";
 
 export type ProductFormDialogModel = GenericFormDialogModel<{
   productToUpdate?: string;
@@ -103,11 +113,11 @@ const emit = defineEmits(["input"]);
 
 const submitButtonLoading = ref(false);
 const formActionsDisabled = ref(false);
-const formData = ref<RecursivePartial<DbProduct>>({});
-const create = ref(false);
+const formData = ref<RecursivePartial<CreateUpdateProductInput>>({});
 const dialogLoading = ref(false);
 const isVisible = ref(false);
-const changePassword = ref(false);
+const itemToUpdateId = ref<string>();
+const create = computed(() => itemToUpdateId.value == undefined);
 
 const priceSuffix = computed(() => {
   let suffix = "€";
@@ -122,6 +132,7 @@ watch(
   () => props.value,
   (el) => {
     if (el.isVisible) {
+      itemToUpdateId.value = el.customerToUpdate;
       onBecameVisible(el.productToUpdate);
     }
     isVisible.value = el.isVisible;
@@ -131,16 +142,13 @@ watch(
 async function onBecameVisible(itemToUpdate?: string) {
   dialogLoading.value = true;
   if (itemToUpdate != undefined) {
-    create.value = false;
     const item = await findProduct(itemToUpdate).catch(repositoryErrorHandler);
     if (item != undefined) {
       formData.value = mapToFormValue(item);
     }
   } else {
-    create.value = true;
     formData.value = defaultValues;
   }
-  changePassword.value = create.value;
   dialogLoading.value = false;
 }
 
@@ -163,10 +171,10 @@ async function saveForm() {
       submitButtonLoading.value = false;
       return;
     }
-    if (create.value) {
-      await addProduct(data);
+    if (itemToUpdateId.value != undefined) {
+      await updateProduct(itemToUpdateId.value, data);
     } else {
-      await updateProduct(data);
+      await addProduct(data);
     }
     closeForm();
     const message = create.value
@@ -178,7 +186,7 @@ async function saveForm() {
     });
     closeForm();
   } catch (e) {
-    repositoryErrorHandler(e);
+    await repositoryErrorHandler(e);
   }
   formActionsDisabled.value = false;
   submitButtonLoading.value = false;
@@ -186,17 +194,21 @@ async function saveForm() {
 function closeForm() {
   emit("input", { isVisible: false });
 }
-function validateForm(form: RecursivePartial<DbProduct>): form is DbProduct {
+function validateForm(
+  form: RecursivePartial<CreateUpdateProductInput>
+): form is CreateUpdateProductInput {
   const data = clone(removeBlanks(form));
   return data.name != undefined;
 }
 
 // Helpers
 
-function mapToFormValue(item: DbProduct): RecursivePartial<DbProduct> {
-  return item;
+function mapToFormValue(
+  item: NetworkProduct
+): RecursivePartial<CreateUpdateProductInput> {
+  return omit(item, "id");
 }
-const defaultValues: RecursivePartial<DbProduct> = {
+const defaultValues: RecursivePartial<NetworkProduct> = {
   kinds: [],
 };
 </script>

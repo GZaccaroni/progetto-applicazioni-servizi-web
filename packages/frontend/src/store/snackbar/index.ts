@@ -1,33 +1,17 @@
-import { Module } from "vuex";
-import { SnackbarState } from "@/store/snackbar/types";
-import { RootState } from "@/store/types";
+import { SnackbarState, SnackbarStateMessage } from "@/store/snackbar/types";
+import { defineStore } from "pinia";
 
-const module: Module<SnackbarState, RootState> = {
-  namespaced: true,
-  state: {
-    message: undefined,
-  },
-
-  getters: {
-    getMessage: ({ message }) => message,
-  },
-
-  mutations: {
-    SHOW_MESSAGE(state, payload) {
-      state.message = {
-        text: payload.text,
-        color: payload.color,
-        timeout: payload.timeout,
-      };
-    },
-    HIDE_MESSAGE(state) {
-      state.message = undefined;
-    },
-  },
+export const useSnackbarStore = defineStore("snackbar", {
+  state: () =>
+    ({
+      message: undefined,
+    } as SnackbarState),
   actions: {
-    show({ commit }, payload) {
-      commit("SHOW_MESSAGE", payload);
+    show(message: SnackbarStateMessage) {
+      this.message = message;
+    },
+    hide() {
+      this.message = undefined;
     },
   },
-};
-export default module;
+});

@@ -48,6 +48,9 @@
                 :max="form.toDate"
                 :label="$t('word.fromDate').toString()"
                 :clearable="true"
+                :button-aria-label="
+                  $t('components.StatsFilter.toDateAria').toString()
+                "
               />
             </v-col>
             <v-col cols="6">
@@ -56,6 +59,9 @@
                 :min="form.fromDate"
                 :label="$t('word.toDate').toString()"
                 :clearable="true"
+                :button-aria-label="
+                  $t('components.StatsFilter.toDateAria').toString()
+                "
               />
             </v-col>
           </v-row>
@@ -78,12 +84,12 @@ import {
   PRODUCT_KIND_IDENTIFIER_SEPARATOR,
 } from "@/helpers/asyncSelectUtils";
 import { AnalyticsDataInput } from "@/repositories/AnalyticsRepository";
-import { DbChartDataType } from "@/model/db/DbChartData";
+import { ChartDataType } from "@/model/common/ChartDataType";
 
 const emit = defineEmits(["change"]);
 
 const form = reactive<AnalyticsDataInput>({
-  dataType: DbChartDataType.price,
+  dataType: ChartDataType.price,
   fromDate: undefined,
   toDate: undefined,
 });

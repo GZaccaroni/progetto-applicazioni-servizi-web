@@ -1,7 +1,7 @@
 export const paginateResponse = (result) => {
   const responseBody = {
     results: result.docs,
-    hasNext: result.hasNextPage
+    hasNext: result.hasNextPage,
   };
   if (result.hasPrevPage == false) {
     responseBody["hasPrevious"] = false;
@@ -15,8 +15,15 @@ export const paginateResponse = (result) => {
   }
   return responseBody;
 };
-export const paginateOptions = (query, select, sort, limit, pagingNext, pagingPrevious) => {
-  const options = {limit: limit, select: select, sort: sort};
+export const paginateOptions = (
+  query,
+  select,
+  sort,
+  limit,
+  pagingNext,
+  pagingPrevious
+) => {
+  const options = { limit: limit, select: select, sort: sort };
   if (query) {
     options["query"] = query;
   }
@@ -28,4 +35,4 @@ export const paginateOptions = (query, select, sort, limit, pagingNext, pagingPr
     }
   }
   return options;
-}
+};

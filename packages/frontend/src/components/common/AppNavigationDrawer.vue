@@ -2,7 +2,9 @@
   <div>
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title class="title"> Menu</v-list-item-title>
+        <v-list-item-title class="title">
+          {{ $t("word.mainMenu") }}
+        </v-list-item-title>
         <v-list-item-subtitle>
           {{ userProfile.username }}
         </v-list-item-subtitle>
@@ -12,9 +14,9 @@
     <v-divider></v-divider>
 
     <v-list dense nav>
-      <template v-for="group in menuItems">
+      <template v-for="group in visibleMenuItems">
         <v-subheader :key="group.title" v-if="group.title !== undefined">
-          {{ group.title }}
+          {{ $t(group.title) }}
         </v-subheader>
         <v-list-item
           v-for="item in group.items"
@@ -36,9 +38,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { mapGetters } from "vuex";
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed } from "vue";
+import { storeToRefs } from "pinia";
+import { useUserStore } from "@/store/user";
 
 interface MenuGroup {
   title?: string;
@@ -79,7 +82,7 @@ const menuItems: MenuGroup[] = [
     ],
   },
   {
-    title: "Amministrazione",
+    title: "components.AppNavigationDrawer.sections.admin",
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
@@ -103,24 +106,17 @@ const menuItems: MenuGroup[] = [
     ],
   },
 ];
-export default defineComponent({
-  computed: {
-    ...mapGetters("user", {
-      userProfile: "userProfile",
-    }),
-    menuItems() {
-      const userHasAccess = (group: MenuGroup) => {
-        console.log("User profile", this.userProfile);
-        if (group.meta.requiresAuth) {
-          if (this.userProfile == undefined) return false;
-        }
-        if (group.meta.requiresAdmin) {
-          if (this.userProfile?.isAdmin != true) return false;
-        }
-        return true;
-      };
-      return menuItems.filter((group) => userHasAccess(group));
-    },
-  },
+const { userProfile } = storeToRefs(useUserStore());
+const visibleMenuItems = computed(() => {
+  const userHasAccess = (group: MenuGroup) => {
+    if (group.meta.requiresAuth) {
+      if (userProfile?.value == undefined) return false;
+    }
+    if (group.meta.requiresAdmin) {
+      if (userProfile?.value?.isAdmin != true) return false;
+    }
+    return true;
+  };
+  return menuItems.filter((group) => userHasAccess(group));
 });
 </script>

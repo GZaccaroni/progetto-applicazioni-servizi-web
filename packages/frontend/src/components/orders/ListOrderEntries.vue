@@ -14,39 +14,34 @@
     </template>
   </v-data-table>
 </template>
-<script lang="ts">
-import { defineComponent, PropType, ref } from "vue";
-import { DbOrderEntry } from "@/model/db/DbOrder";
+<script setup lang="ts">
+import { PropType } from "vue";
+import { DbOrderEntry } from "@/model/network/NetworkOrder";
+import i18n from "@/i18n";
 
-export default defineComponent({
-  props: {
-    entries: {
-      type: Array as PropType<DbOrderEntry[]>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      headers: [
-        {
-          text: "Nome",
-          sortable: false,
-          value: "name",
-        },
-        {
-          text: "Quantità",
-          sortable: false,
-          value: "quantity",
-        },
-        {
-          text: "Prezzo Unitario",
-          sortable: false,
-          value: "pricePerUnit",
-        },
-      ],
-    };
+defineProps({
+  entries: {
+    type: Array as PropType<DbOrderEntry[]>,
+    required: true,
   },
 });
+const headers = [
+  {
+    text: i18n.t("model.order.varietyName"),
+    sortable: false,
+    value: "name",
+  },
+  {
+    text: i18n.t("model.order.quantity"),
+    sortable: false,
+    value: "quantity",
+  },
+  {
+    text: i18n.t("model.order.pricePerUnit"),
+    sortable: false,
+    value: "pricePerUnit",
+  },
+];
 </script>
 <style lang="scss" scoped>
 .v-table tr:hover:not(.v-table__expanded__content) {
