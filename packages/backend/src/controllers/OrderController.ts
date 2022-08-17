@@ -169,7 +169,7 @@ export const getOrders = (req: UserRequest, res: Response) => {
     });
     return;
   }
-  getUserStoreRole(req.user._id, req.body.storeId)
+  getUserStoreRole(req.user._id, req.query.storeId)
     .then((storeRole) => {
       if (storeRole == undefined && !req.user.isAdmin) {
         throw {
