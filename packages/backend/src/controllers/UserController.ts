@@ -241,8 +241,10 @@ export const deleteUser = (req: UserRequest, res: Response) => {
             };
           }
           if (req.user.username == user.username) {
-            req.logout((err) => {
-              // TODO: Implement correct logic
+            req.logout(function (err) {
+              if (err) {
+                throw err;
+              }
             });
           }
           Log.create({
