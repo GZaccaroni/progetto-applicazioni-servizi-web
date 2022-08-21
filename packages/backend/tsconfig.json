@@ -9,20 +9,31 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,                        /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
     "target": "esnext",                                /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', 'ES2021', or 'ESNEXT'. */
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "sourceMap": true,
     "rootDir": "./src",                             /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     "outDir": "./dist",                             /* Redirect output structure to the directory. */
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": [
+        "*"
+      ],
+      "@common": ["../common/src"],
+      "@common/*": ["../../common/src/*"]
+    }
   },
   "references": [
     {
       "path": "../common"
     }
   ],
-  "include": ["src/**/*"],
   "lib": ["esnext"],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "ts-node": {
+    // Do not forget to `npm i -D tsconfig-paths`
+    "require": ["tsconfig-paths/register"]
+  }
 }

@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc --build",
-    "start": "npm run lint && npm run build && node dist/app.js",
+    "start": "npm run lint && ts-node src/app.ts",
     "lint": "eslint . --ext .ts",
     "autofix": "eslint --fix --ext .ts .",
     "format": "prettier-eslint --write \"{,!(node_modules)/**/}*.{js,jsx}\""
@@ -22,6 +21,8 @@
     "eslint": "^8.18.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "2.7.1",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.0",
     "typescript": "^4.7.4"
   },
   "dependencies": {
