@@ -8,6 +8,7 @@
     /* Strict Type-Checking Options */
     "moduleResolution": "node",
     "sourceMap": true,
+    "baseUrl": "./src",
     "rootDir": "./src",                             /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     "outDir": "./dist",                             /* Redirect output structure to the directory. */
     "strict": true,
