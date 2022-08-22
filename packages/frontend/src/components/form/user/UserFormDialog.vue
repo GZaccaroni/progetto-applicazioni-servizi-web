@@ -161,7 +161,10 @@ function validateForm(
   if (changePassword.value && data.password == undefined) {
     return false;
   }
-  return data.username != undefined;
+  return (
+    data.username != undefined &&
+    (data.password == undefined || zxcvbn(data.password).score >= 3)
+  );
 }
 
 // Helpers
