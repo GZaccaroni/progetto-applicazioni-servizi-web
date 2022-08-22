@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
-import { NetworkCustomer } from "../network/type/NetworkCustomer";
-import { NetworkIdentifiable } from "../network/type/NetworkIdentifiable";
+import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 import { ProductGrade } from "../common/ProductGrade";
+import { CustomerDocument } from "@/model/db/Customer";
 
 export type OrderDocument = {
-  customer?: NetworkCustomer & NetworkIdentifiable;
+  customer?: CustomerDocument & NetworkIdentifiable;
   store: {
     id: string;
     name: string;

@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { validateRequest } from "@/model/network/validation";
+import { validateRequest } from "@common/validation";
 import Order, { OrderProjection } from "@/model/db/Order";
 import Log from "@/model/db/Log";
 import { paginateOptions, paginateResponse } from "@/paginationUtils";
@@ -9,8 +9,8 @@ import Customer, { CustomerProjection } from "@/model/db/Customer";
 import mongoose from "mongoose";
 import { io } from "@/app";
 import { getUserStoreRole } from "./StoreController";
-import { CreateUpdateOrderInputSchema } from "@/model/network/json_schema/CreateUpdateOrderInput";
-import { GetOrdersInputSchema } from "@/model/network/json_schema/GetOrdersInput";
+import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/CreateUpdateOrderInput";
+import { GetOrdersInputSchema } from "@common/validation/json_schema/GetOrdersInput";
 import { UserRequest } from "@/utils";
 import { StoreAccessLevel } from "@/model/common/StoreAccessLevel";
 

@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
-import { validateRequest } from "@/model/network/validation";
+import { validateRequest } from "@common/validation";
 import passport from "passport";
 import UserDb, { UserProjection } from "@/model/db/User";
 import Log from "@/model/db/Log";
 import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import { io } from "@/app";
 import Store from "@/model/db/Store";
-import { CreateUserInputSchema } from "@/model/network/json_schema/CreateUserInput";
-import { GetUsersInputSchema } from "@/model/network/json_schema/GetUsersInput";
-import { UpdateUserInputSchema } from "@/model/network/json_schema/UpdateUserInput";
-import { UserLoginInputSchema } from "@/model/network/json_schema/UserLoginInput";
+import { CreateUserInputSchema } from "@common/validation/json_schema/CreateUserInput";
+import { GetUsersInputSchema } from "@common/validation/json_schema/GetUsersInput";
+import { UpdateUserInputSchema } from "@common/validation/json_schema/UpdateUserInput";
+import { UserLoginInputSchema } from "@common/validation/json_schema/UserLoginInput";
 import { UserRequest } from "@/utils";
 
 export const createUser = (req: UserRequest, res: Response) => {
