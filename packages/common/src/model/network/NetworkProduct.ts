@@ -1,5 +1,5 @@
-import { QuantityUnitOfMeasure } from "../common/QuantityUnitOfMeasure";
 import { NetworkIdentifiable } from "./NetworkIdentifiable";
+import {QuantityUnitOfMeasure} from "../common/QuantityUnitOfMeasure";
 
 export interface NetworkProduct extends NetworkIdentifiable {
   name: string;
@@ -12,7 +12,8 @@ export interface NetworkProductKind {
   name: string;
   pricePerUnit?: number;
 }
-export interface DbProductKindIdentifier {
+
+export interface NetworkProductKindIdentifier {
   productId: string;
   variantId?: string;
 }

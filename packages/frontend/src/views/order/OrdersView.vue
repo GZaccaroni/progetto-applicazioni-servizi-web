@@ -22,7 +22,7 @@ import {
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import ListOrders from "@/components/orders/ListOrders.vue";
-import { NetworkOrder } from "@/model/network/NetworkOrder";
+import { NetworkOrder } from "@common/model/network/NetworkOrder";
 import { deleteOrder } from "@/repositories/OrderRepository";
 import OrderFormDialog, {
   OrderFormDialogModel,

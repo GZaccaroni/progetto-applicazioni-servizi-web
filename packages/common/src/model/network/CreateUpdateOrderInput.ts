@@ -1,4 +1,4 @@
-import { ProductGrade } from "@/model/common/ProductGrade";
+import {ProductGrade} from "../common/ProductGrade";
 
 export interface CreateUpdateOrderInput {
   customerId: string;

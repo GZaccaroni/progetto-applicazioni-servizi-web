@@ -1,4 +1,4 @@
-import { NetworkIdentifiable } from "@/model/network/NetworkIdentifiable";
+import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 
 export interface AsyncSelectItem<T> extends NetworkIdentifiable {
   id: string;

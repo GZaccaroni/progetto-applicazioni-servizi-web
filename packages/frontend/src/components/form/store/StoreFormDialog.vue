@@ -72,7 +72,7 @@ import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
-import { NetworkStore } from "@/model/network/NetworkStore";
+import { NetworkStore } from "@common/model/network/NetworkStore";
 import {
   addStore,
   findStore,
@@ -82,7 +82,7 @@ import {
   getSelectStoreAccessLevel,
   getSelectUsers,
 } from "@/helpers/asyncSelectUtils";
-import { CreateUpdateStoreInput } from "@/model/network/CreateUpdateStoreInput";
+import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
 
 export type StoreFormDialogModel = GenericFormDialogModel<{
   storeToUpdate?: string;

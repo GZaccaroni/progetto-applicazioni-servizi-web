@@ -3,10 +3,10 @@ import {
   PaginatedFindInput,
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
-import { NetworkUser } from "@/model/network/NetworkUser";
+import { NetworkUser } from "@common/model/network/NetworkUser";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { NetworkIdentifiable } from "@/model/network/NetworkIdentifiable";
+import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 const resource = "/user";
 
 export function observeUsers(

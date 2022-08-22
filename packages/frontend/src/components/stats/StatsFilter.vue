@@ -84,7 +84,7 @@ import {
   PRODUCT_KIND_IDENTIFIER_SEPARATOR,
 } from "@/helpers/asyncSelectUtils";
 import { AnalyticsDataInput } from "@/repositories/AnalyticsRepository";
-import { ChartDataType } from "@/model/common/ChartDataType";
+import { ChartDataType } from "@common/model/common/ChartDataType";
 
 const emit = defineEmits(["change"]);
 

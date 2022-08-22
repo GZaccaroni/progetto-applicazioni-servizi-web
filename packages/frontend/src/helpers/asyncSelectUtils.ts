@@ -4,18 +4,18 @@ import {
   FindSelectItemsInput,
 } from "@/components/common/AsyncSelectTypes";
 import i18n from "@/i18n";
-import { NetworkStore } from "@/model/network/NetworkStore";
-import { QuantityUnitOfMeasure } from "@/model/common/QuantityUnitOfMeasure";
+import { NetworkStore } from "@common/model/network/NetworkStore";
+import { QuantityUnitOfMeasure } from "@common/model/common/QuantityUnitOfMeasure";
 import { findProduct, findProducts } from "@/repositories/ProductRepository";
 import { findCustomer, findCustomers } from "@/repositories/CustomerRepository";
 import { compact } from "lodash";
-import { NetworkCustomer } from "@/model/network/NetworkCustomer";
-import { NetworkUser } from "@/model/network/NetworkUser";
+import { NetworkCustomer } from "@common/model/network/NetworkCustomer";
+import { NetworkUser } from "@common/model/network/NetworkUser";
 import { findUser, findUsers } from "@/repositories/UserRepository";
-import { NetworkProduct } from "@/model/network/NetworkProduct";
-import { StoreAccessLevel } from "@/model/common/StoreAccessLevel";
-import { ChartDataType } from "@/model/common/ChartDataType";
-import { ProductGrade } from "@/model/common/ProductGrade";
+import { NetworkProduct } from "@common/model/network/NetworkProduct";
+import { StoreAccessLevel } from "@common/model/common/StoreAccessLevel";
+import { ChartDataType } from "@common/model/common/ChartDataType";
+import { ProductGrade } from "@common/model/common/ProductGrade";
 
 const selectMaxItems = 10;
 export const PRODUCT_KIND_IDENTIFIER_SEPARATOR = "_$_";

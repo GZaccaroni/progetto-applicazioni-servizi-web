@@ -19,7 +19,7 @@ import {
   ChartDataset,
 } from "chart.js";
 import { computed, PropType } from "vue";
-import { NetworkChartData } from "@/model/network/NetworkChartData";
+import { NetworkChartData } from "@common/model/network/NetworkChartData";
 import { stringToColor } from "@/helpers/utils";
 import { groupBy, sumBy } from "lodash";
 

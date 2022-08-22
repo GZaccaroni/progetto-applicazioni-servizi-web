@@ -1,5 +1,5 @@
 import { UserState } from "@/store/user/types";
-import { UserCredential } from "@/model/UserCredential";
+import { UserCredential } from "@common/model/common/UserCredential";
 import { login, logout } from "@/repositories/AuthenticationService";
 import { findUser } from "@/repositories/UserRepository";
 import { defineStore } from "pinia";

@@ -22,7 +22,7 @@ import {
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import ListProducts from "@/components/products/ListProducts.vue";
-import { NetworkProduct } from "@/model/network/NetworkProduct";
+import { NetworkProduct } from "@common/model/network/NetworkProduct";
 import { deleteProduct } from "@/repositories/ProductRepository";
 import ProductFormDialog, {
   ProductFormDialogModel,

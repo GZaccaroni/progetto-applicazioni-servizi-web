@@ -134,9 +134,9 @@ import {
   findOrder,
   updateOrder,
 } from "@/repositories/OrderRepository";
-import { NetworkOrder } from "@/model/network/NetworkOrder";
+import { NetworkOrder } from "@common/model/network/NetworkOrder";
 import { AsyncSelectItem } from "@/components/common/AsyncSelectTypes";
-import { CreateUpdateOrderInput } from "@/model/network/CreateUpdateOrderInput";
+import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderInput";
 
 export type OrderFormDialogModel = GenericFormDialogModel<{
   orderToUpdate?: string;

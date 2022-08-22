@@ -25,7 +25,7 @@ import {
   observeCustomers,
 } from "@/repositories/CustomerRepository";
 import ListCustomersFilter from "@/components/customers/ListCustomersFilter.vue";
-import { NetworkCustomer } from "@/model/network/NetworkCustomer";
+import { NetworkCustomer } from "@common/model/network/NetworkCustomer";
 
 const emit = defineEmits(["onRowEvent"]);
 

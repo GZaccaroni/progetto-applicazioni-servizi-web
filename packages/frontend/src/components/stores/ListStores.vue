@@ -22,7 +22,7 @@ import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
 import ListStoresFilter from "@/components/stores/ListStoresFilter.vue";
 import { FindStoresInput, observeStores } from "@/repositories/StoreRepository";
-import { NetworkStore } from "@/model/network/NetworkStore";
+import { NetworkStore } from "@common/model/network/NetworkStore";
 
 const emit = defineEmits(["onRowEvent"]);
 

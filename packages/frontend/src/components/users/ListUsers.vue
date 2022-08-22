@@ -25,7 +25,7 @@
 import { ref } from "vue";
 import { FindUsersInput, observeUsers } from "@/repositories/UserRepository";
 import { DataTableHeader } from "vuetify";
-import { NetworkUser } from "@/model/network/NetworkUser";
+import { NetworkUser } from "@common/model/network/NetworkUser";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import ListUsersFilter from "@/components/users/ListUsersFilter.vue";
 import i18n from "@/i18n";

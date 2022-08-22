@@ -29,7 +29,7 @@ import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
-import { UserCredential } from "@/model/UserCredential";
+import { UserCredential } from "@common/model/common/UserCredential";
 import i18n from "@/i18n";
 import FormDialog from "@/components/common/FormDialog.vue";
 import { useUserStore } from "@/store/user";

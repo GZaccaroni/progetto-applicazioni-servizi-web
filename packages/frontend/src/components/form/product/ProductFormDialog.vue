@@ -92,13 +92,13 @@ import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
 import { getSelectUnitOfMeasure } from "@/helpers/asyncSelectUtils";
-import { NetworkProduct } from "@/model/network/NetworkProduct";
+import { NetworkProduct } from "@common/model/network/NetworkProduct";
 import {
   addProduct,
   findProduct,
   updateProduct,
 } from "@/repositories/ProductRepository";
-import { CreateUpdateProductInput } from "@/model/network/CreateUpdateProductInput";
+import { CreateUpdateProductInput } from "@common/model/network/CreateUpdateProductInput";
 
 export type ProductFormDialogModel = GenericFormDialogModel<{
   productToUpdate?: string;

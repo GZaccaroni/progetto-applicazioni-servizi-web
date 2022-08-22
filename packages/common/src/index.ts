@@ -1,8 +1,6 @@
 
-export function test() {
-  console.log("miao");
-}
-export enum ChartDataType {
-  Quantity = "quantity",
-  Price = "price",
+export * as Model from "./model";
+export * as Validation from "./validation";
+export function testFUckingCode() {
+  console.log("Miao");
 }
