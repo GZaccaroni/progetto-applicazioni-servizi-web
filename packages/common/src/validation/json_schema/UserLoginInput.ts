@@ -6,8 +6,8 @@ export const UserLoginInputSchema: JSONSchemaType<UserLoginInput> = {
   type: "object",
   properties: {
     username: {
-      maximum: 50,
       type: "string",
+      maxLength: 50,
     },
     password: {
       type: "string",
