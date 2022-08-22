@@ -11,8 +11,7 @@ import { Server } from "socket.io";
 import * as http from "http";
 import { queryParser } from "express-query-parser";
 import passport from "passport";
-import { validateRequest } from "@common/validation";
-console.log("Validate request", validateRequest);
+
 const app = express();
 const port = 3000;
 const server = http.createServer(app);
