@@ -109,7 +109,7 @@ watch(
   () => props.value,
   (el) => {
     if (el.isVisible) {
-      itemToUpdateId.value = el.customerToUpdate;
+      itemToUpdateId.value = el.storeToUpdate;
       onBecameVisible(el.storeToUpdate);
     }
     isVisible.value = el.isVisible;
