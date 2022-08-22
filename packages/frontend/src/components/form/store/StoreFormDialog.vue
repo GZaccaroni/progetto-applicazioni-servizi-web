@@ -83,6 +83,8 @@ import {
   getSelectUsers,
 } from "@/helpers/asyncSelectUtils";
 import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
+import { validateRequest } from "@common/validation";
+import { CreateUpdateStoreInputSchema } from "@common/validation/json_schema/CreateUpdateStoreInput";
 
 export type StoreFormDialogModel = GenericFormDialogModel<{
   storeToUpdate?: string;
@@ -165,8 +167,7 @@ function closeForm() {
 function validateForm(
   form: RecursivePartial<CreateUpdateStoreInput>
 ): form is CreateUpdateStoreInput {
-  const data = clone(removeBlanks(form));
-  return data.name != undefined;
+  return validateRequest(CreateUpdateStoreInputSchema, form);
 }
 
 function addAuthorizedUser() {
