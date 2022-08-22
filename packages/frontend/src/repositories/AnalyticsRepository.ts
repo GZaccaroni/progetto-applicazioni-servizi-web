@@ -16,7 +16,7 @@ export interface AnalyticsDataInput {
 export async function getAnalyticsData(
   input: AnalyticsDataInput
 ): Promise<NetworkChartData> {
-  const result = await Client.get<NetworkChartData>(`${resource}/find`, {
+  const result = await Client.get<NetworkChartData>(`${resource}`, {
     params: input,
   });
   return result.data;
