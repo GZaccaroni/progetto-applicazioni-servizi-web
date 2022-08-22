@@ -16,7 +16,7 @@ export const CreateUpdateOrderInputSchema: JSONSchemaType<CreateUpdateOrderInput
       },
       date: {
         type: "string",
-        format: "date-time",
+        format: "date",
       },
       entries: {
         type: "array",

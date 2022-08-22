@@ -6,12 +6,12 @@ export const FilterByDateSchema: JSONSchemaType<FilterByDate> = {
   properties: {
     fromDate: {
       type: "string",
-      format: "date-time",
+      format: "date",
       nullable: true,
     },
     toDate: {
       type: "string",
-      format: "date-time",
+      format: "date",
       nullable: true,
     },
   },
