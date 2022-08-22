@@ -7,20 +7,23 @@ export const CreateUpdateCustomerInputSchema: JSONSchemaType<CreateUpdateCustome
     type: "object",
     properties: {
       name: {
-        maximum: 250,
-        minimum: 3,
+        minLength: 3,
+        maxLength: 250,
         type: "string",
       },
       phoneNumber: {
         type: "string",
+        maxLength: 30,
         nullable: true,
       },
       address: {
         type: "string",
+        maxLength: 250,
         nullable: true,
       },
       vatNumber: {
         type: "string",
+        maxLength: 50,
         nullable: true,
       },
     },
