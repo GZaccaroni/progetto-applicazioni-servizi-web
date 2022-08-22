@@ -137,6 +137,8 @@ import {
 import { NetworkOrder } from "@common/model/network/NetworkOrder";
 import { AsyncSelectItem } from "@/components/common/AsyncSelectTypes";
 import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderInput";
+import { validateRequest } from "@common/validation";
+import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/CreateUpdateOrderInput";
 
 export type OrderFormDialogModel = GenericFormDialogModel<{
   orderToUpdate?: string;
@@ -281,8 +283,7 @@ function closeForm() {
 function validateForm(
   form: RecursivePartial<CreateUpdateOrderInput>
 ): form is CreateUpdateOrderInput {
-  const data = clone(removeBlanks(form));
-  return data.date != undefined;
+  return validateRequest(CreateUpdateOrderInputSchema, form);
 }
 
 // Helpers
