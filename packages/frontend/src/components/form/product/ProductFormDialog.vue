@@ -99,6 +99,8 @@ import {
   updateProduct,
 } from "@/repositories/ProductRepository";
 import { CreateUpdateProductInput } from "@common/model/network/CreateUpdateProductInput";
+import { validateRequest } from "@common/validation";
+import { CreateUpdateProductInputSchema } from "@common/validation/json_schema/CreateUpdateProductInput";
 
 export type ProductFormDialogModel = GenericFormDialogModel<{
   productToUpdate?: string;
@@ -197,8 +199,7 @@ function closeForm() {
 function validateForm(
   form: RecursivePartial<CreateUpdateProductInput>
 ): form is CreateUpdateProductInput {
-  const data = clone(removeBlanks(form));
-  return data.name != undefined;
+  return validateRequest(CreateUpdateProductInputSchema, form);
 }
 
 // Helpers
