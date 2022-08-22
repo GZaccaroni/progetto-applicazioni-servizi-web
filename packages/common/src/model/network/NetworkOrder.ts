@@ -1,6 +1,6 @@
 import { NetworkCustomer } from "./NetworkCustomer";
 import { NetworkIdentifiable } from "./NetworkIdentifiable";
-import {ProductGrade} from "../common";
+import {ProductGrade} from "../common/ProductGrade";
 
 export interface DbOrderEntry {
   productId: string;

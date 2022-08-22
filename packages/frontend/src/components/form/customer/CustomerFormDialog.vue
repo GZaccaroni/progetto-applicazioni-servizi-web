@@ -47,7 +47,7 @@ import {
 } from "@/repositories/CustomerRepository";
 import { CreateUpdateCustomerInput } from "@common/model/network/CreateUpdateCustomerInput";
 import { validateRequest } from "@common/validation";
-import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema";
+import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";
 
 export type CustomerFormDialogModel = GenericFormDialogModel<{
   customerToUpdate?: string;
