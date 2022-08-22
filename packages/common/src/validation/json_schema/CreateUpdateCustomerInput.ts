@@ -10,21 +10,25 @@ export const CreateUpdateCustomerInputSchema: JSONSchemaType<CreateUpdateCustome
         minLength: 3,
         maxLength: 250,
         type: "string",
+        transform: ["trim"],
       },
       phoneNumber: {
         type: "string",
         maxLength: 30,
         nullable: true,
+        transform: ["trim"],
       },
       address: {
         type: "string",
         maxLength: 250,
         nullable: true,
+        transform: ["trim"],
       },
       vatNumber: {
         type: "string",
         maxLength: 50,
         nullable: true,
+        transform: ["trim"],
       },
     },
   };

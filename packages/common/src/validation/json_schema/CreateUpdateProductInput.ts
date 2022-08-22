@@ -9,8 +9,10 @@ export const CreateUpdateProductInputSchema: JSONSchemaType<CreateUpdateProductI
     type: "object",
     properties: {
       name: {
-        maximum: 250,
+        minLength: 1,
+        maxLength: 250,
         type: "string",
+        transform: ["trim"],
       },
       pricePerUnit: {
         exclusiveMinimum: 0,

@@ -10,6 +10,7 @@ export const CreateUpdateStoreInputSchema: JSONSchemaType<CreateUpdateStoreInput
       name: {
         maximum: 250,
         type: "string",
+        transform: ["trim"],
       },
       authorizations: {
         type: "array",

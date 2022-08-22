@@ -7,11 +7,12 @@ export const ProductKindSchema: JSONSchemaType<NetworkProductKind> = {
   properties: {
     id: {
       type: "string",
-      format: "uuid",
     },
     name: {
-      maximum: 250,
+      minLength: 1,
+      maxLength: 250,
       type: "string",
+      transform: ["trim"],
     },
     pricePerUnit: {
       exclusiveMinimum: 0,

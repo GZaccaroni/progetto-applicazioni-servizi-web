@@ -6,8 +6,11 @@ export const CreateUserInputSchema: JSONSchemaType<CreateUserInput> = {
   type: "object",
   properties: {
     username: {
-      maximum: 50,
+      minLength: 1,
+      maxLength: 50,
       type: "string",
+      regexp: "/^[a-z0-9_]*$/",
+      transform: ["trim", "toLowerCase"],
     },
     password: {
       type: "string",

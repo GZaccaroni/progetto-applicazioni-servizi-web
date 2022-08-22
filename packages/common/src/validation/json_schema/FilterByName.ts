@@ -7,6 +7,7 @@ export const FilterByNameSchema: JSONSchemaType<FilterByName> = {
     searchName: {
       type: "string",
       nullable: true,
+      transform: ["trim"],
     },
   },
 };

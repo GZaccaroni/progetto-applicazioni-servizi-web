@@ -26,6 +26,7 @@ export const CreateUpdateOrderInputSchema: JSONSchemaType<CreateUpdateOrderInput
       note: {
         type: "string",
         nullable: true,
+        transform: ["trim"],
       },
     },
   };
