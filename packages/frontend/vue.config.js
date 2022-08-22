@@ -33,4 +33,5 @@ module.exports = defineConfig({
       enableBridge: false,
     },
   },
+  parallel: false,
 });
