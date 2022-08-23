@@ -72,7 +72,7 @@ import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
-import { NetworkStore } from "@/model/network/NetworkStore";
+import { NetworkStore } from "@common/model/network/NetworkStore";
 import {
   addStore,
   findStore,
@@ -82,7 +82,9 @@ import {
   getSelectStoreAccessLevel,
   getSelectUsers,
 } from "@/helpers/asyncSelectUtils";
-import { CreateUpdateStoreInput } from "@/model/network/CreateUpdateStoreInput";
+import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
+import { validateRequest } from "@common/validation";
+import { CreateUpdateStoreInputSchema } from "@common/validation/json_schema/CreateUpdateStoreInput";
 
 export type StoreFormDialogModel = GenericFormDialogModel<{
   storeToUpdate?: string;
@@ -107,7 +109,7 @@ watch(
   () => props.value,
   (el) => {
     if (el.isVisible) {
-      itemToUpdateId.value = el.customerToUpdate;
+      itemToUpdateId.value = el.storeToUpdate;
       onBecameVisible(el.storeToUpdate);
     }
     isVisible.value = el.isVisible;
@@ -165,8 +167,7 @@ function closeForm() {
 function validateForm(
   form: RecursivePartial<CreateUpdateStoreInput>
 ): form is CreateUpdateStoreInput {
-  const data = clone(removeBlanks(form));
-  return data.name != undefined;
+  return validateRequest(CreateUpdateStoreInputSchema, form);
 }
 
 function addAuthorizedUser() {

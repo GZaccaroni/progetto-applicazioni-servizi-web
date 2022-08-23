@@ -57,7 +57,7 @@ import {
 } from "@/repositories/UserRepository";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
-import { NetworkUser } from "@/model/network/NetworkUser";
+import { NetworkUser } from "@common/model/network/NetworkUser";
 import i18n from "@/i18n";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import { useUserStore } from "@/store/user";
@@ -161,7 +161,10 @@ function validateForm(
   if (changePassword.value && data.password == undefined) {
     return false;
   }
-  return data.username != undefined;
+  return (
+    data.username != undefined &&
+    (data.password == undefined || zxcvbn(data.password).score >= 3)
+  );
 }
 
 // Helpers

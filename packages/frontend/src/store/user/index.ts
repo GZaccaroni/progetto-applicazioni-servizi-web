@@ -1,8 +1,8 @@
 import { UserState } from "@/store/user/types";
-import { UserCredential } from "@/model/UserCredential";
 import { login, logout } from "@/repositories/AuthenticationService";
 import { findUser } from "@/repositories/UserRepository";
 import { defineStore } from "pinia";
+import { UserLoginInput } from "@common/model/network/UserLoginInput";
 
 export const useUserStore = defineStore("user", {
   persist: true,
@@ -14,7 +14,7 @@ export const useUserStore = defineStore("user", {
     isLoggedIn: ({ userProfile }) => userProfile != undefined,
   },
   actions: {
-    async login(userCredential: UserCredential): Promise<void> {
+    async login(userCredential: UserLoginInput): Promise<void> {
       if (this.isLoggedIn) return;
       await login(userCredential.username, userCredential.password);
       this.userProfile = await findUser(userCredential.username);

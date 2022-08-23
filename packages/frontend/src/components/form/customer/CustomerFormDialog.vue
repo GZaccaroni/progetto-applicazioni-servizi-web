@@ -39,13 +39,16 @@ import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
-import { NetworkCustomer } from "@/model/network/NetworkCustomer";
+import { NetworkCustomer } from "@common/model/network/NetworkCustomer";
 import {
   addCustomer,
   findCustomer,
   updateCustomer,
 } from "@/repositories/CustomerRepository";
-import { CreateUpdateCustomerInput } from "@/model/network/CreateUpdateCustomerInput";
+import { CreateUpdateCustomerInput } from "@common/model/network/CreateUpdateCustomerInput";
+import { validateRequest } from "@common/validation";
+import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";
+
 export type CustomerFormDialogModel = GenericFormDialogModel<{
   customerToUpdate?: string;
 }>;
@@ -127,8 +130,7 @@ function closeForm() {
 function validateForm(
   form: RecursivePartial<CreateUpdateCustomerInput>
 ): form is CreateUpdateCustomerInput {
-  const data = clone(removeBlanks(form));
-  return data.name != undefined;
+  return validateRequest(CreateUpdateCustomerInputSchema, form);
 }
 
 // Helpers

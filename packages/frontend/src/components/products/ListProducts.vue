@@ -24,7 +24,7 @@ import {
   FindProductsInput,
   observeProducts,
 } from "@/repositories/ProductRepository";
-import { NetworkProduct } from "@/model/network/NetworkProduct";
+import { NetworkProduct } from "@common/model/network/NetworkProduct";
 import ListProductsFilter from "@/components/products/ListProductsFilter.vue";
 
 const emit = defineEmits(["onRowEvent"]);

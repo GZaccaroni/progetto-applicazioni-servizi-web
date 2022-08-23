@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig-base.json",
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
@@ -20,7 +20,9 @@
     "paths": {
       "@/*": [
         "src/*"
-      ]
+      ],
+      "@common": ["../common/src"],
+      "@common/*": ["../common/src/*"]
     },
     "lib": [
       "esnext",

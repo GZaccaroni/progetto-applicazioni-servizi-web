@@ -22,7 +22,7 @@ import {
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import ListStores from "@/components/stores/ListStores.vue";
-import { NetworkStore } from "@/model/network/NetworkStore";
+import { NetworkStore } from "@common/model/network/NetworkStore";
 import { deleteStore } from "@/repositories/StoreRepository";
 import StoreFormDialog, {
   StoreFormDialogModel,

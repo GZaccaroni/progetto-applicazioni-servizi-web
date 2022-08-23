@@ -7,8 +7,8 @@ import {
   updateUser,
   userLogin,
   userLogout,
-} from "../controllers/UserController";
-import { isUserLoggedIn } from "../utils";
+} from "@/controllers/UserController";
+import { isUserLoggedIn } from "@/utils";
 
 const UserRoutes = Router();
 

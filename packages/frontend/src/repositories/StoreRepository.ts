@@ -3,10 +3,10 @@ import {
   PaginatedFindInput,
   PaginatedResult,
 } from "@/repositories/common/PaginatedResult";
-import { NetworkStore } from "@/model/network/NetworkStore";
+import { NetworkStore } from "@common/model/network/NetworkStore";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { CreateUpdateStoreInput } from "@/model/network/CreateUpdateStoreInput";
+import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
 
 const resource = "/store";
 

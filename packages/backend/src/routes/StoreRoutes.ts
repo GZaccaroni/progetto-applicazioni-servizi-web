@@ -5,7 +5,7 @@ import {
   getStoreById,
   getStores,
   updateStore,
-} from "../controllers/StoreController";
+} from "@/controllers/StoreController";
 
 const StoreRoutes = Router();
 

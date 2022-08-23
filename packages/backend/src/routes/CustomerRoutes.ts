@@ -5,7 +5,7 @@ import {
   getCustomerById,
   getCustomers,
   updateCustomer,
-} from "../controllers/CustomerController";
+} from "@/controllers/CustomerController";
 
 const CustomerRoutes = Router();
 

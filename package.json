@@ -3,12 +3,10 @@
   "private": true,
   "scripts": {
     "clean": "rimraf \"packages/**/dist\" \"packages/**/*.tsbuildinfo\"",
-    "compile": "tsc -b tsconfig.build.json",
     "prettier": "prettier \"*.{js,json,yml,md}\" \"packages/**/*\"",
     "format": "npm run prettier -- --write",
     "format:check": "npm run prettier -- --check",
-    "lint": "npm run format:check",
-    "prepare": "npm run compile"
+    "lint": "npm run format:check"
   },
   "workspaces": [
     "packages/*"

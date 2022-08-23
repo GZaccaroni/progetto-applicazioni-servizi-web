@@ -21,7 +21,7 @@ import {
 } from "@/plugins/table-builder/TableItemEventType";
 import HeaderView from "@/components/common/HeaderView.vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { NetworkCustomer } from "@/model/network/NetworkCustomer";
+import { NetworkCustomer } from "@common/model/network/NetworkCustomer";
 import { deleteCustomer } from "@/repositories/CustomerRepository";
 import ListCustomers from "@/components/customers/ListCustomers.vue";
 import CustomerFormDialog, {

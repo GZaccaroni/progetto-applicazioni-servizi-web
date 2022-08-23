@@ -5,6 +5,7 @@
       $t('components.form.userLogin.submitButton').toString()
     "
     :submit-button-loading="submitButtonLoading"
+    :submit-button-enabled="validateForm(formData)"
     :title="$t('components.form.userLogin.title').toString()"
     @submit="saveForm"
     @close="closeForm"
@@ -29,10 +30,12 @@ import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { clone } from "lodash";
 import { showMessage } from "@/helpers/snackbar";
 import { removeBlanks } from "@/helpers/utils";
-import { UserCredential } from "@/model/UserCredential";
 import i18n from "@/i18n";
 import FormDialog from "@/components/common/FormDialog.vue";
 import { useUserStore } from "@/store/user";
+import { UserLoginInput } from "@common/model/network/UserLoginInput";
+import { validateRequest } from "@common/validation";
+import { UserLoginInputSchema } from "@common/validation/json_schema/UserLoginInput";
 
 const props = defineProps({
   value: {
@@ -43,7 +46,7 @@ const props = defineProps({
 const emit = defineEmits(["input"]);
 
 const submitButtonLoading = ref(false);
-const formData = ref<Partial<UserCredential>>({});
+const formData = ref<Partial<UserLoginInput>>({});
 const isVisible = ref(false);
 
 watch(
@@ -71,12 +74,11 @@ async function saveForm() {
     await store.login(data);
     closeForm();
   } catch (e) {
-    repositoryErrorHandler(e);
+    await repositoryErrorHandler(e);
   }
   submitButtonLoading.value = false;
 }
-function validateForm(form: Partial<UserCredential>): form is UserCredential {
-  const data = clone(removeBlanks(form));
-  return data.username != undefined && data.password != undefined;
+function validateForm(form: Partial<UserLoginInput>): form is UserLoginInput {
+  return validateRequest(UserLoginInputSchema, form);
 }
 </script>

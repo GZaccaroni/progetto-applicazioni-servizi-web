@@ -1,4 +1,4 @@
-import { NetworkIdentifiable } from "@/model/network/NetworkIdentifiable";
+import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 import {
   PaginatedFindInput,
   PaginatedResult,

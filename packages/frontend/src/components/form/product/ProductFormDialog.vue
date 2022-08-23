@@ -92,13 +92,15 @@ import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import i18n from "@/i18n";
 import { getSelectUnitOfMeasure } from "@/helpers/asyncSelectUtils";
-import { NetworkProduct } from "@/model/network/NetworkProduct";
+import { NetworkProduct } from "@common/model/network/NetworkProduct";
 import {
   addProduct,
   findProduct,
   updateProduct,
 } from "@/repositories/ProductRepository";
-import { CreateUpdateProductInput } from "@/model/network/CreateUpdateProductInput";
+import { CreateUpdateProductInput } from "@common/model/network/CreateUpdateProductInput";
+import { validateRequest } from "@common/validation";
+import { CreateUpdateProductInputSchema } from "@common/validation/json_schema/CreateUpdateProductInput";
 
 export type ProductFormDialogModel = GenericFormDialogModel<{
   productToUpdate?: string;
@@ -132,7 +134,7 @@ watch(
   () => props.value,
   (el) => {
     if (el.isVisible) {
-      itemToUpdateId.value = el.customerToUpdate;
+      itemToUpdateId.value = el.productToUpdate;
       onBecameVisible(el.productToUpdate);
     }
     isVisible.value = el.isVisible;
@@ -197,8 +199,7 @@ function closeForm() {
 function validateForm(
   form: RecursivePartial<CreateUpdateProductInput>
 ): form is CreateUpdateProductInput {
-  const data = clone(removeBlanks(form));
-  return data.name != undefined;
+  return validateRequest(CreateUpdateProductInputSchema, form);
 }
 
 // Helpers

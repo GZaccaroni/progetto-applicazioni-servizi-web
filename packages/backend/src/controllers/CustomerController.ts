@@ -1,14 +1,14 @@
 import { Response } from "express";
-import { validateRequest } from "../model/network/validation";
-import Customer, { CustomerProjection } from "../model/db/Customer";
-import Log from "../model/db/Log";
-import { paginateOptions, paginateResponse } from "../paginationUtils";
+import { validateRequest } from "@common/validation";
+import Customer, { CustomerProjection } from "@/model/db/Customer";
+import Log from "@/model/db/Log";
+import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import mongoose from "mongoose";
-import { io } from "../app";
-import Order from "../model/db/Order";
-import { CreateUpdateCustomerInputSchema } from "../model/network/json_schema/CreateUpdateCustomerInput";
-import { GetCustomersInputSchema } from "../model/network/json_schema/GetCustomersInput";
-import { UserRequest } from "../utils";
+import { io } from "@/app";
+import Order from "@/model/db/Order";
+import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";
+import { GetCustomersInputSchema } from "@common/validation/json_schema/GetCustomersInput";
+import { UserRequest } from "@/utils";
 
 const checkCustomerConsistence = async (customer, customerId?) => {
   await Customer.findOne({ name: customer.name }).then((customer) => {

@@ -20,7 +20,7 @@ import {
   TableItemEvent,
   TableItemEventType,
 } from "@/plugins/table-builder/TableItemEventType";
-import { NetworkUser } from "@/model/network/NetworkUser";
+import { NetworkUser } from "@common/model/network/NetworkUser";
 import HeaderView from "@/components/common/HeaderView.vue";
 import UserFormDialog, {
   UserFormDialogModel,

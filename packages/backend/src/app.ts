@@ -5,7 +5,7 @@ import express from "express";
 import session from "express-session";
 import User from "./model/db/User";
 import cors from "cors";
-import routes from "./routes/Routes";
+import routes from "@/routes/Routes";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
 import * as http from "http";

@@ -9,7 +9,6 @@
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
   },
   "dependencies": {
-    "@colture-in-cloud/common": "^1.0.0",
     "@zxcvbn-ts/core": "^2.0.4",
     "@zxcvbn-ts/language-common": "^2.0.1",
     "@zxcvbn-ts/language-it": "^2.0.1",

@@ -1,15 +1,15 @@
 import { Response } from "express";
-import { validateRequest } from "../model/network/validation";
-import Store, { StoreProjection } from "../model/db/Store";
-import Log from "../model/db/Log";
-import { paginateOptions, paginateResponse } from "../paginationUtils";
+import { validateRequest } from "@common/validation";
+import Store, { StoreProjection } from "@/model/db/Store";
+import Log from "@/model/db/Log";
+import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import mongoose from "mongoose";
-import { io } from "../app";
-import User from "../model/db/User";
-import Order from "../model/db/Order";
-import { CreateUpdateStoreInputSchema } from "../model/network/json_schema/CreateUpdateStoreInput";
-import { GetStoresInputSchema } from "../model/network/json_schema/GetStoresInput";
-import { UserRequest } from "../utils";
+import { io } from "@/app";
+import User from "@/model/db/User";
+import Order from "@/model/db/Order";
+import { CreateUpdateStoreInputSchema } from "@common/validation/json_schema/CreateUpdateStoreInput";
+import { GetStoresInputSchema } from "@common/validation/json_schema/GetStoresInput";
+import { UserRequest } from "@/utils";
 
 const checkStoreConsistence = async (store, storeId?) => {
   const invalidAuthorizationError = {
