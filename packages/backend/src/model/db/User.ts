@@ -1,6 +1,7 @@
 import mongoose, {
   PassportLocalDocument,
   PassportLocalModel,
+  ProjectionType,
   Types,
 } from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
@@ -27,4 +28,9 @@ export default mongoose.model<
   UserDocument,
   Pagination<UserDocument> & PassportLocalModel<UserDocument>
 >("user", UserSchema, "users");
-export const UserProjection = { _id: 0, id: "$_id", username: 1, isAdmin: 1 };
+export const UserProjection: ProjectionType<UserDocument> = {
+  _id: 0,
+  id: "$_id",
+  username: 1,
+  isAdmin: 1,
+};

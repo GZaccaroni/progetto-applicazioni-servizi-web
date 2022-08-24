@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ProjectionType } from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 import { QuantityUnitOfMeasure } from "../common/QuantityUnitOfMeasure";
 
@@ -35,7 +35,7 @@ const ProductSchema = new mongoose.Schema<ProductDocument>({
   },
 });
 
-export const ProductProjection = {
+export const ProductProjection: ProjectionType<ProductDocument> = {
   _id: 0,
   id: "$_id",
   name: 1,

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ProjectionType } from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 import { ProductGrade } from "../common/ProductGrade";
@@ -67,7 +67,7 @@ export default mongoose.model<OrderDocument, Pagination<OrderDocument>>(
   "orders"
 );
 
-export const OrderProjection = {
+export const OrderProjection: ProjectionType<OrderDocument> = {
   _id: 0,
   id: "$_id",
   customer: {

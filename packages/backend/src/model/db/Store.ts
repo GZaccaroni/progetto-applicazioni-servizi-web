@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ProjectionType } from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 import { StoreAccessLevel } from "../common/StoreAccessLevel";
 
@@ -35,7 +35,7 @@ export default mongoose.model<StoreDocument, Pagination<StoreDocument>>(
   "stores"
 );
 
-export const StoreProjection = {
+export const StoreProjection: ProjectionType<StoreDocument> = {
   _id: 0,
   id: "$_id",
   name: 1,

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ProjectionType } from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 
 export type CustomerDocument = {
@@ -26,7 +26,7 @@ export default mongoose.model<CustomerDocument, Pagination<CustomerDocument>>(
   "customers"
 );
 
-export const CustomerProjection = {
+export const CustomerProjection: ProjectionType<CustomerDocument> = {
   _id: 0,
   id: "$_id",
   name: 1,
