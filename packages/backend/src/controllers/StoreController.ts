@@ -3,15 +3,19 @@ import { validateRequest } from "@common/validation";
 import Store, { StoreDocument, StoreProjection } from "@/model/db/Store";
 import Log from "@/model/db/Log";
 import { paginateOptions, paginateResponse } from "@/paginationUtils";
-import mongoose, { FilterQuery } from "mongoose";
+import mongoose, { FilterQuery, Types } from "mongoose";
 import { io } from "@/app";
 import User from "@/model/db/User";
 import Order from "@/model/db/Order";
 import { CreateUpdateStoreInputSchema } from "@common/validation/json_schema/CreateUpdateStoreInput";
 import { GetStoresInputSchema } from "@common/validation/json_schema/GetStoresInput";
 import { UserRequest } from "@/utils";
+import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
 
-const checkStoreConsistence = async (store, storeId?) => {
+const checkStoreConsistence = async (
+  input: CreateUpdateStoreInput,
+  storeId?: string
+) => {
   const invalidAuthorizationError = {
     code: 400,
     error: {
@@ -20,9 +24,9 @@ const checkStoreConsistence = async (store, storeId?) => {
     },
   };
   const userSet = new Set(
-    store.authorizations.map((authorization) => authorization.userId)
+    input.authorizations.map((authorization) => authorization.userId)
   );
-  if (userSet.size != store.authorizations.length) {
+  if (userSet.size != input.authorizations.length) {
     throw invalidAuthorizationError;
   }
   const promises = new Array<Promise<unknown>>();
@@ -39,8 +43,8 @@ const checkStoreConsistence = async (store, storeId?) => {
     );
   });
   promises.push(
-    Store.findOne({ name: store.name }).then((store) => {
-      if (store && !(storeId && store._id == storeId)) {
+    Store.findOne({ name: input.name }).then((store) => {
+      if (store && !(storeId && store._id.toString() == storeId)) {
         throw {
           code: 400,
           error: { errCode: "nameAlreadyInUse", message: "Invalid Store name" },
@@ -51,7 +55,10 @@ const checkStoreConsistence = async (store, storeId?) => {
   await Promise.all(promises);
 };
 
-export const getUserStoreRole = async (userId, storeId) => {
+export const getUserStoreRole = async (
+  userId: Types.ObjectId,
+  storeId: string
+) => {
   const store = await Store.findById(storeId, {});
   if (!store) {
     throw {
@@ -63,7 +70,7 @@ export const getUserStoreRole = async (userId, storeId) => {
     };
   }
   const userAuthorization = store.authorizations.find(
-    (x) => x.userId.toString() == userId
+    (x) => x.userId == userId.toString()
   );
   if (userAuthorization) {
     return userAuthorization.accessLevel;
