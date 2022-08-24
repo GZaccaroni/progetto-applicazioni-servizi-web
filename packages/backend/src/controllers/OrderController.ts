@@ -13,8 +13,12 @@ import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/Cre
 import { GetOrdersInputSchema } from "@common/validation/json_schema/GetOrdersInput";
 import { UserRequest } from "@/utils";
 import { StoreAccessLevel } from "@/model/common/StoreAccessLevel";
+import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderInput";
 
-const enrichOrder = async (order, creatorId) => {
+const enrichOrder = async (
+  order: CreateUpdateOrderInput,
+  creatorId: string
+) => {
   const enrichedOrder = {
     date: order.date,
     entries: new Array<any>(),
@@ -129,7 +133,7 @@ export const addOrder = (req: UserRequest, res: Response) => {
           },
         };
       }
-      enrichOrder(req.body, req.user._id).then((newOrder) => {
+      enrichOrder(req.body, req.user._id.toString()).then((newOrder) => {
         Order.create(newOrder).then((order) => {
           Log.create({
             username: req.user.username,

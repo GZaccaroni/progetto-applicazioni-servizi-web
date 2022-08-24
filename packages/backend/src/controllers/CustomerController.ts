@@ -15,10 +15,10 @@ import { UserRequest } from "@/utils";
 import { CreateUpdateCustomerInput } from "@common/model/network/CreateUpdateCustomerInput";
 
 const checkCustomerConsistence = async (
-  customerInput: CreateUpdateCustomerInput,
+  input: CreateUpdateCustomerInput,
   customerId?: string
 ) => {
-  const customer = await Customer.findOne({ name: customerInput.name });
+  const customer = await Customer.findOne({ name: input.name });
   if (customer && !(customerId && customer._id.toString() == customerId)) {
     throw {
       code: 400,
