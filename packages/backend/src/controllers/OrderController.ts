@@ -1,12 +1,12 @@
 import { Response } from "express";
 import { validateRequest } from "@common/validation";
-import Order, { OrderProjection } from "@/model/db/Order";
+import Order, { OrderDocument, OrderProjection } from "@/model/db/Order";
 import Log from "@/model/db/Log";
 import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import Store from "@/model/db/Store";
 import Product from "@/model/db/Product";
 import Customer, { CustomerProjection } from "@/model/db/Customer";
-import mongoose from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import { getUserStoreRole } from "./StoreController";
 import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/CreateUpdateOrderInput";
@@ -185,7 +185,7 @@ export const getOrders = async (req: UserRequest, res: Response) => {
         }
       );
     }
-    const query = {};
+    const query: FilterQuery<OrderDocument> = {};
     if (requestQuery.storeId != undefined) {
       query["store.id"] = requestQuery.storeId;
     } else {
