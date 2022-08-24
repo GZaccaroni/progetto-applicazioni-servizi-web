@@ -1,9 +1,12 @@
 import { Response } from "express";
 import { validateRequest } from "@common/validation";
-import Customer, { CustomerProjection } from "@/model/db/Customer";
+import Customer, {
+  CustomerDocument,
+  CustomerProjection,
+} from "@/model/db/Customer";
 import Log from "@/model/db/Log";
 import { paginateOptions, paginateResponse } from "@/paginationUtils";
-import mongoose from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import Order from "@/model/db/Order";
 import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";
@@ -64,7 +67,7 @@ export const getCustomers = (req: UserRequest, res: Response) => {
     });
     return;
   }
-  const query = {};
+  const query: FilterQuery<CustomerDocument> = {};
   if (req.query.searchName) {
     query["name"] = { $regex: req.query.searchName, $options: "i" };
   }

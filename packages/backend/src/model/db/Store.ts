@@ -2,7 +2,7 @@ import mongoose, { ProjectionType } from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 import { StoreAccessLevel } from "../common/StoreAccessLevel";
 
-type StoreDocument = {
+export type StoreDocument = {
   name: string;
   authorizations: Array<StoreDocumentAuthorization>;
 };

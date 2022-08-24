@@ -1,9 +1,12 @@
 import { Response } from "express";
 import { validateRequest } from "@common/validation";
-import Product, { ProductProjection } from "../model/db/Product";
+import Product, {
+  ProductDocument,
+  ProductProjection,
+} from "../model/db/Product";
 import Log from "../model/db/Log";
 import { paginateOptions, paginateResponse } from "@/paginationUtils";
-import mongoose from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import Order from "../model/db/Order";
 import { GetProductsInputSchema } from "@common/validation/json_schema/GetProductsInput";
@@ -87,7 +90,7 @@ export const getProducts = (req: UserRequest, res: Response) => {
     });
     return;
   }
-  const query = {};
+  const query: FilterQuery<ProductDocument> = {};
   if (req.query.searchName) {
     query["$or"] = [
       { name: { $regex: req.query.searchName, $options: "i" } },

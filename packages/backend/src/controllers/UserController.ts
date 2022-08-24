@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { validateRequest } from "@common/validation";
 import passport from "passport";
-import UserDb, { UserProjection } from "@/model/db/User";
+import UserDb, { UserDocument, UserProjection } from "@/model/db/User";
 import Log from "@/model/db/Log";
 import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import { io } from "@/app";
@@ -11,6 +11,7 @@ import { GetUsersInputSchema } from "@common/validation/json_schema/GetUsersInpu
 import { UpdateUserInputSchema } from "@common/validation/json_schema/UpdateUserInput";
 import { UserLoginInputSchema } from "@common/validation/json_schema/UserLoginInput";
 import { UserRequest } from "@/utils";
+import { FilterQuery } from "mongoose";
 
 export const createUser = (req: UserRequest, res: Response) => {
   if (!validateRequest(CreateUserInputSchema, req.body)) {
@@ -87,7 +88,7 @@ export const getUsers = (req: UserRequest, res: Response) => {
     });
     return;
   }
-  const query = {};
+  const query: FilterQuery<UserDocument> = {};
   if (req.query.searchName) {
     query["username"] = { $regex: req.query.searchName, $options: "i" };
   }

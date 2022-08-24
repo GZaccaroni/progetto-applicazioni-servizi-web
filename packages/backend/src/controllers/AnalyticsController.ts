@@ -1,6 +1,6 @@
 import { Response } from "express";
-import mongoose from "mongoose";
-import Order from "@/model/db/Order";
+import mongoose, { FilterQuery } from "mongoose";
+import Order, { OrderDocument } from "@/model/db/Order";
 import { validateRequest } from "@common/validation";
 import { GetAnalyticsInputSchema } from "@common/validation/json_schema/GetAnalyticsInput";
 import { UserRequest } from "@/utils";
@@ -14,7 +14,7 @@ export const getAnalytics = (req: UserRequest, res: Response) => {
     });
     return;
   }
-  const query = {};
+  const query: FilterQuery<OrderDocument> = {};
   if (req.query.storeId) {
     if (mongoose.isValidObjectId(req.query.storeId)) {
       query["store.id"] = req.query.storeId;

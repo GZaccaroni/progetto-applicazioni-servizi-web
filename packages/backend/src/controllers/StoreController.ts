@@ -1,9 +1,9 @@
 import { Response } from "express";
 import { validateRequest } from "@common/validation";
-import Store, { StoreProjection } from "@/model/db/Store";
+import Store, { StoreDocument, StoreProjection } from "@/model/db/Store";
 import Log from "@/model/db/Log";
 import { paginateOptions, paginateResponse } from "@/paginationUtils";
-import mongoose from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import User from "@/model/db/User";
 import Order from "@/model/db/Order";
@@ -119,7 +119,7 @@ export const getStores = (req: UserRequest, res: Response) => {
     });
     return;
   }
-  const query = {};
+  const query: FilterQuery<StoreDocument> = {};
   if (req.query.authorized) {
     query["authorizations.userId"] = req.user.id;
   }
@@ -134,6 +134,7 @@ export const getStores = (req: UserRequest, res: Response) => {
     req.query.pagingNext,
     req.query.paginatePrevious
   );
+  Store.find();
   Store.paginate(options, (err) => res.status(500).json(err)).then((result) => {
     res.json(paginateResponse(result));
   });
