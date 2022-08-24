@@ -153,7 +153,7 @@ export const addOrder = (req: UserRequest, res: Response) => {
       }
     });
 };
-export const getOrders = (req: UserRequest, res: Response) => {
+export const getOrders = async (req: UserRequest, res: Response) => {
   const requestQuery = req.query;
   if (!validateRequest(GetOrdersInputSchema, requestQuery)) {
     res.status(400).json({
@@ -162,56 +162,73 @@ export const getOrders = (req: UserRequest, res: Response) => {
     });
     return;
   }
-  if (!mongoose.isValidObjectId(requestQuery.storeId)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Bad request",
-    });
-    return;
-  }
-  getUserStoreRole(req.user._id, req.query.storeId)
-    .then((storeRole) => {
-      if (storeRole == undefined && !req.user.isAdmin) {
-        throw {
-          code: 403,
-          error: {
-            errCode: "notAuthorized",
-            message: "User not authorized",
-          },
-        };
+  try {
+    if (requestQuery.storeId != undefined) {
+      if (!mongoose.isValidObjectId(requestQuery.storeId)) {
+        res.status(400).json({
+          errCode: "invalidArgument",
+          message: "Bad request",
+        });
+        return;
       }
-      const query = { "store.id": requestQuery.storeId };
-      if (requestQuery.fromDate != undefined) {
-        if (!query["date"]) {
-          query["date"] = {};
+      await getUserStoreRole(req.user._id, requestQuery.storeId).then(
+        (storeRole) => {
+          if (storeRole == undefined && !req.user.isAdmin) {
+            throw {
+              code: 403,
+              error: {
+                errCode: "notAuthorized",
+                message: "User not authorized",
+              },
+            };
+          }
         }
-        query["date"]["$gte"] = new Date(requestQuery.fromDate);
-      }
-      if (requestQuery.toDate != undefined) {
-        if (!query["date"]) {
-          query["date"] = {};
-        }
-        query["date"]["$lte"] = new Date(requestQuery.toDate);
-      }
-      const options = paginateOptions(
-        query,
-        OrderProjection,
-        { date: -1 },
-        req.query.limit,
-        req.query.pagingNext,
-        req.query.paginatePrevious
       );
-      Order.paginate(options).then((result) => {
-        res.json(paginateResponse(result));
-      });
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
+    }
+    const query = {};
+    if (requestQuery.storeId != undefined) {
+      query["store.id"] = requestQuery.storeId;
+    } else {
+      await Store.find({ "authorizations.userId": req.user._id }, "_id").then(
+        (storeIds) => {
+          query["store.id"] = {
+            $in: storeIds.map((elem) => elem._id),
+          };
+        }
+      );
+    }
+    if (requestQuery.fromDate != undefined) {
+      if (!query["date"]) {
+        query["date"] = {};
       }
+      query["date"]["$gte"] = new Date(requestQuery.fromDate);
+    }
+    if (requestQuery.toDate != undefined) {
+      if (!query["date"]) {
+        query["date"] = {};
+      }
+      query["date"]["$lte"] = new Date(requestQuery.toDate);
+    }
+    const options = paginateOptions(
+      query,
+      OrderProjection,
+      { date: -1 },
+      req.query.limit,
+      req.query.pagingNext,
+      req.query.paginatePrevious
+    );
+    Order.paginate(options, (err) => {
+      throw err;
+    }).then((result) => {
+      res.json(paginateResponse(result));
     });
+  } catch (err) {
+    if (err.code && err.error) {
+      res.status(err.code).json(err.error);
+    } else {
+      res.status(500).json(err);
+    }
+  }
 };
 export const getOrderById = (req: UserRequest, res: Response) => {
   if (!mongoose.isValidObjectId(req.params.orderId)) {
