@@ -12,26 +12,29 @@ import Order from "../model/db/Order";
 import { GetProductsInputSchema } from "@common/validation/json_schema/GetProductsInput";
 import { UserRequest } from "@/utils";
 import { CreateUpdateProductInputSchema } from "@common/validation/json_schema/CreateUpdateProductInput";
+import { CreateUpdateProductInput } from "@common/model/network/CreateUpdateProductInput";
 
-const checkProductConsistence = async (product, productId?) => {
+const checkProductConsistence = async (
+  input: CreateUpdateProductInput,
+  productId?: string
+) => {
   const productKindSet = new Set(
-    product.kinds.map((productKind) => productKind.name)
+    input.kinds.map((productKind) => productKind.name)
   );
-  if (productKindSet.size != product.kinds.length) {
+  if (productKindSet.size != input.kinds.length) {
     throw {
       code: 400,
       error: { errCode: "invalidArgument", message: "Invalid product kinds" },
     };
   }
 
-  await Product.findOne({ name: product.name }).then((product) => {
-    if (product && !(productId && product._id == productId)) {
-      throw {
-        code: 400,
-        error: { errCode: "nameAlreadyInUse", message: "Invalid Product name" },
-      };
-    }
-  });
+  const product = await Product.findOne({ name: input.name });
+  if (product && !(productId && product._id.toString() == productId)) {
+    throw {
+      code: 400,
+      error: { errCode: "nameAlreadyInUse", message: "Invalid Product name" },
+    };
+  }
 };
 
 const enrichProduct = (product) => {
