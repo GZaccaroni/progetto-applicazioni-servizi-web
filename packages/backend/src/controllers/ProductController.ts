@@ -37,12 +37,12 @@ const checkProductConsistence = async (
   }
 };
 
-const enrichProduct = (product) => {
-  product.kinds.forEach(
-    (k, i, self) => (self[i]["fullName"] = product.name + " " + k.name)
+function enrichProduct(product: CreateUpdateProductInput): ProductDocument {
+  const kinds: ProductDocument["kinds"] = product.kinds.map((kind) =>
+    Object.assign({ fullName: `${product.name} ${kind.name}` }, kind)
   );
-  return product;
-};
+  return Object.assign({ kinds }, product);
+}
 
 export const addProduct = (req: UserRequest, res: Response) => {
   if (!req.user.isAdmin) {

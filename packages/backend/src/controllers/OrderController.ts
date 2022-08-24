@@ -58,7 +58,6 @@ const enrichOrder = async (
 
   //generate product name
   const entryPromises = order.entries.map(async (entry) => {
-    entry["price"] = entry.pricePerUnit * entry.quantity;
     const product = await Product.findById(entry.productId);
     if (product == null) {
       throw {
@@ -86,14 +85,14 @@ const enrichOrder = async (
     } else {
       entryName = product.name;
     }
-    const order: OrderDocumentEntry = Object.assign(
+    const enrichedEntry: OrderDocumentEntry = Object.assign(
       {
         name: entryName,
         price: entry.pricePerUnit * entry.quantity,
       },
       entry
     );
-    return order;
+    return enrichedEntry;
   });
   const entries = await Promise.all(entryPromises);
 

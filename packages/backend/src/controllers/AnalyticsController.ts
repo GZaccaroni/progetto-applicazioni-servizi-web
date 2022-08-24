@@ -57,8 +57,8 @@ export const getAnalytics = (req: UserRequest, res: Response) => {
     }
     query["date"]["$lte"] = new Date(req.query.toDate);
   }
-  const productAndVariant = new Array<any>();
-  const products = new Array<any>();
+  const productAndVariantConditions = new Array<FilterQuery<OrderDocument>>();
+  const productsConditions = new Array<FilterQuery<OrderDocument>>();
   if (req.query.products?.length) {
     req.query.products.forEach((p) => {
       const productCondition = {
@@ -66,12 +66,12 @@ export const getAnalytics = (req: UserRequest, res: Response) => {
       };
       if (p.variantId) {
         productCondition["entries.variantId"] = p.variantId;
-        productAndVariant.push(productCondition);
+        productAndVariantConditions.push(productCondition);
       } else {
-        products.push(productCondition);
+        productsConditions.push(productCondition);
       }
     });
-    query["$or"] = products.concat(productAndVariant);
+    query["$or"] = productsConditions.concat(productAndVariantConditions);
   }
   const projection = {
     date: 1,
@@ -94,8 +94,8 @@ export const getAnalytics = (req: UserRequest, res: Response) => {
       $facet: {
         CategorizedByVariant: [
           {
-            $match: productAndVariant?.length
-              ? { $or: productAndVariant }
+            $match: productAndVariantConditions?.length
+              ? { $or: productAndVariantConditions }
               : { _id: null },
           },
           {
@@ -116,7 +116,9 @@ export const getAnalytics = (req: UserRequest, res: Response) => {
         ],
         CategorizedByProduct: [
           {
-            $match: products?.length ? { $or: products } : { _id: null },
+            $match: productsConditions?.length
+              ? { $or: productsConditions }
+              : { _id: null },
           },
           {
             $group: {
