@@ -1,6 +1,10 @@
 import { Response } from "express";
 import { validateRequest } from "@common/validation";
-import Order, { OrderDocument, OrderProjection } from "@/model/db/Order";
+import Order, {
+  OrderDocument,
+  OrderDocumentEntry,
+  OrderProjection,
+} from "@/model/db/Order";
 import Log from "@/model/db/Log";
 import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import Store from "@/model/db/Store";
@@ -18,100 +22,93 @@ import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderI
 const enrichOrder = async (
   order: CreateUpdateOrderInput,
   creatorId: string
-) => {
-  const enrichedOrder = {
-    date: order.date,
-    entries: new Array<any>(),
-    createdBy: creatorId,
-  };
-  if (order.note) {
-    enrichedOrder["note"] = order.note;
-  }
-  const promises = new Array<Promise<unknown>>();
+): Promise<OrderDocument> => {
   //get Store data
-  promises.push(
-    Store.findById(order.storeId, { id: "$_id", name: 1 }).then((store) => {
-      if (store != null) {
-        enrichedOrder["store"] = store;
+  const store: OrderDocument["store"] | null = await Store.findById(
+    order.storeId,
+    {
+      id: "$_id",
+      name: 1,
+    }
+  );
+  if (store == null) {
+    throw {
+      code: 400,
+      error: {
+        errCode: "itemNotFound",
+        message: "Invalid Input: Store not found",
+      },
+    };
+  }
+
+  //get Customer data
+  const customer: OrderDocument["customer"] | null = await Customer.findById(
+    order.customerId,
+    CustomerProjection
+  );
+  if (customer == null) {
+    throw {
+      code: 400,
+      error: {
+        errCode: "itemNotFound",
+        message: "Invalid Input: Customer not found",
+      },
+    };
+  }
+
+  //generate product name
+  const entryPromises = order.entries.map(async (entry) => {
+    entry["price"] = entry.pricePerUnit * entry.quantity;
+    const product = await Product.findById(entry.productId);
+    if (product == null) {
+      throw {
+        code: 400,
+        error: {
+          errCode: "itemNotFound",
+          message: "Invalid Input: Product not found",
+        },
+      };
+    }
+    let entryName: string;
+    if (entry.variantId) {
+      const kind = product.kinds.find((x) => x.id == entry.variantId);
+      if (kind) {
+        entryName = kind.fullName;
       } else {
         throw {
           code: 400,
           error: {
             errCode: "itemNotFound",
-            message: "Invalid Input: Store not found",
+            message: "Invalid Input: Product kind not found",
           },
         };
       }
-    })
-  );
-  //generate product name
-  const entryPromises = new Array<Promise<unknown>>();
-  order.entries.forEach((entry) => {
-    entry["price"] = entry.pricePerUnit * entry.quantity;
-    entryPromises.push(
-      Product.findById(entry.productId)
-        .then((product) => {
-          if (product == null) {
-            throw {
-              code: 400,
-              error: {
-                errCode: "itemNotFound",
-                message: "Invalid Input: Product not found",
-              },
-            };
-          }
-          if (entry.variantId) {
-            const kind = product.kinds.find((x) => x.id == entry.variantId);
-            if (kind) {
-              entry["name"] = kind.fullName;
-            } else {
-              throw {
-                code: 400,
-                error: {
-                  errCode: "itemNotFound",
-                  message: "Invalid Input: Product kind not found",
-                },
-              };
-            }
-          } else {
-            entry["name"] = product.name;
-          }
-        })
-        .then(() => enrichedOrder["entries"].push(entry))
+    } else {
+      entryName = product.name;
+    }
+    const order: OrderDocumentEntry = Object.assign(
+      {
+        name: entryName,
+        price: entry.pricePerUnit * entry.quantity,
+      },
+      entry
     );
+    return order;
   });
+  const entries = await Promise.all(entryPromises);
+
   //compute tot
-  promises.push(
-    Promise.all(entryPromises).then(
-      () =>
-        (enrichedOrder["price"] = enrichedOrder.entries.reduce(
-          (sum, entry) => sum + entry.price,
-          0
-        ))
-    )
-  );
-  //get Customer data
-  if (order.customerId) {
-    promises.push(
-      Customer.findById(order.customerId, CustomerProjection).then(
-        (customer) => {
-          if (customer != null) {
-            enrichedOrder["customer"] = customer;
-          } else {
-            throw {
-              code: 400,
-              error: {
-                errCode: "itemNotFound",
-                message: "Invalid Input: Customer not found",
-              },
-            };
-          }
-        }
-      )
-    );
-  }
-  await Promise.all(promises);
-  return enrichedOrder;
+  const price = entries.reduce((sum, entry) => sum + entry.price, 0);
+
+  return {
+    date: new Date(order.date),
+    store: store,
+    customer: customer,
+    entries: entries,
+    createdBy: creatorId,
+    price: price,
+    note: order.note,
+  };
 };
 
 export const addOrder = (req: UserRequest, res: Response) => {

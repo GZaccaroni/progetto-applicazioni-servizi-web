@@ -1,4 +1,4 @@
-import mongoose, { ProjectionType } from "mongoose";
+import mongoose, { ProjectionType, Schema } from "mongoose";
 import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
 import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 import { ProductGrade } from "../common/ProductGrade";
@@ -11,22 +11,20 @@ export type OrderDocument = {
     name: string;
   };
   date: Date;
-  entries: [
-    {
-      productId: string;
-      variantId?: string;
-      grade?: string;
-      name: string;
-      quantity: number;
-      pricePerUnit: number;
-      price: number;
-    }
-  ];
+  entries: OrderDocumentEntry[];
   price: number;
   note?: string;
   createdBy: string;
 };
-
+export type OrderDocumentEntry = {
+  productId: string;
+  variantId?: string;
+  grade?: string;
+  name: string;
+  quantity: number;
+  pricePerUnit: number;
+  price: number;
+};
 const OrderSchema = new mongoose.Schema<OrderDocument>({
   customer: {
     id: String,
@@ -39,7 +37,7 @@ const OrderSchema = new mongoose.Schema<OrderDocument>({
     id: String,
     name: String,
   },
-  date: Date,
+  date: Schema.Types.Date,
   entries: [
     {
       productId: String,

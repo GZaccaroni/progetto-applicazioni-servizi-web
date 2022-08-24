@@ -3,7 +3,7 @@ import { validateRequest } from "@common/validation";
 import Store, { StoreDocument, StoreProjection } from "@/model/db/Store";
 import Log from "@/model/db/Log";
 import { paginateOptions, paginateResponse } from "@/paginationUtils";
-import mongoose, { FilterQuery, Types } from "mongoose";
+import mongoose, { FilterQuery, ObjectId } from "mongoose";
 import { io } from "@/app";
 import User from "@/model/db/User";
 import Order from "@/model/db/Order";
@@ -55,10 +55,7 @@ const checkStoreConsistence = async (
   await Promise.all(promises);
 };
 
-export const getUserStoreRole = async (
-  userId: Types.ObjectId,
-  storeId: string
-) => {
+export const getUserStoreRole = async (userId: ObjectId, storeId: string) => {
   const store = await Store.findById(storeId, {});
   if (!store) {
     throw {
