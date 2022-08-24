@@ -12,19 +12,22 @@ import Order from "@/model/db/Order";
 import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";
 import { GetCustomersInputSchema } from "@common/validation/json_schema/GetCustomersInput";
 import { UserRequest } from "@/utils";
+import { CreateUpdateCustomerInput } from "@common/model/network/CreateUpdateCustomerInput";
 
-const checkCustomerConsistence = async (customer, customerId?) => {
-  await Customer.findOne({ name: customer.name }).then((customer) => {
-    if (customer && !(customerId && customer._id == customerId)) {
-      throw {
-        code: 400,
-        error: {
-          errCode: "nameAlreadyInUse",
-          message: "Invalid Customer name",
-        },
-      };
-    }
-  });
+const checkCustomerConsistence = async (
+  customerInput: CreateUpdateCustomerInput,
+  customerId?: string
+) => {
+  const customer = await Customer.findOne({ name: customerInput.name });
+  if (customer && !(customerId && customer._id.toString() == customerId)) {
+    throw {
+      code: 400,
+      error: {
+        errCode: "nameAlreadyInUse",
+        message: "Invalid Customer name",
+      },
+    };
+  }
 };
 
 export const addCustomer = (req: UserRequest, res: Response) => {
