@@ -1,4 +1,3 @@
-import { Response } from "express";
 import { validateRequest } from "@common/validation";
 import Product, {
   ProductDocument,
@@ -10,9 +9,10 @@ import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import Order from "../model/db/Order";
 import { GetProductsInputSchema } from "@common/validation/json_schema/GetProductsInput";
-import { UserRequest } from "@/utils";
+import { callableUserFunction } from "@/utils";
 import { CreateUpdateProductInputSchema } from "@common/validation/json_schema/CreateUpdateProductInput";
 import { CreateUpdateProductInput } from "@common/model/network/CreateUpdateProductInput";
+import { BackendError } from "@/model/common/BackendError";
 
 const checkProductConsistence = async (
   input: CreateUpdateProductInput,
@@ -22,18 +22,12 @@ const checkProductConsistence = async (
     input.kinds.map((productKind) => productKind.name)
   );
   if (productKindSet.size != input.kinds.length) {
-    throw {
-      code: 400,
-      error: { errCode: "invalidArgument", message: "Invalid product kinds" },
-    };
+    throw new BackendError("invalidArgument");
   }
 
   const product = await Product.findOne({ name: input.name });
   if (product && !(productId && product._id.toString() == productId)) {
-    throw {
-      code: 400,
-      error: { errCode: "nameAlreadyInUse", message: "Invalid Product name" },
-    };
+    throw new BackendError("nameAlreadyInUse");
   }
 };
 
@@ -44,54 +38,31 @@ function enrichProduct(product: CreateUpdateProductInput): ProductDocument {
   return Object.assign({ kinds }, product);
 }
 
-export const addProduct = (req: UserRequest, res: Response) => {
+export const addProduct = callableUserFunction(async (req) => {
   if (!req.user.isAdmin) {
-    res.status(403).json({
-      errCode: "notAuthorized",
-      message: "User not authorized",
-    });
+    throw new BackendError("notAuthorized");
   }
   if (!validateRequest(CreateUpdateProductInputSchema, req.body)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
 
   const enrichedProduct = enrichProduct(req.body);
-  checkProductConsistence(enrichedProduct)
-    .then(() => {
-      Product.create(enrichedProduct).then((product) => {
-        Log.create({
-          username: req.user.username,
-          action: "Create",
-          object: {
-            id: product._id,
-            type: "Product",
-          },
-        }).then(() => {
-          io.emit("productChanged", { id: product._id, action: "create" });
-          res.json("Add Product");
-        });
-      });
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
+  await checkProductConsistence(enrichedProduct);
+  const newProduct = await Product.create(enrichedProduct);
+  await Log.create({
+    username: req.user.username,
+    action: "Create",
+    object: {
+      id: newProduct._id,
+      type: "Product",
+    },
+  });
+  io.emit("productChanged", { id: newProduct._id, action: "create" });
+});
 
-export const getProducts = (req: UserRequest, res: Response) => {
+export const getProducts = callableUserFunction(async (req) => {
   if (!validateRequest(GetProductsInputSchema, req.query)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<ProductDocument> = {};
   if (req.query.searchName) {
@@ -108,191 +79,97 @@ export const getProducts = (req: UserRequest, res: Response) => {
     req.query.pagingNext,
     req.query.paginatePrevious
   );
-  Product.paginate(options, (err) => res.status(500).json(err)).then(
-    (result) => {
-      res.json(paginateResponse(result));
-    }
-  );
-};
+  const result = await Product.paginate(options);
+  return paginateResponse(result);
+});
 
-export const getProductById = (req: UserRequest, res: Response) => {
+export const getProductById = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.productId)) {
-    res.status(400).json({
-      errCode: "invaliArgument",
-      message: "Invalid ID supplied",
-    });
-    return;
+    throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  Product.findById(req.params.productId, ProductProjection)
-    .then((product) => {
-      if (product == null) {
-        throw {
-          code: 404,
-          error: {
-            errCode: "itemNotFound",
-            message: "Product not found",
-          },
-        };
-      } else {
-        res.json(product);
-      }
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const updateProduct = (req: UserRequest, res: Response) => {
+  const item = await Product.findById(req.params.productId, ProductProjection);
+  if (item == null) {
+    throw new BackendError("itemNotFound");
+  }
+  return item;
+});
+export const updateProduct = callableUserFunction(async (req) => {
   if (!req.user.isAdmin) {
-    res.status(403).json({
-      errCode: "notAuthorized",
-      message: "User not authorized",
-    });
-    return;
+    throw new BackendError("notAuthorized");
   }
   if (
     !validateRequest(CreateUpdateProductInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.productId)
   ) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
   const enrichedProduct = enrichProduct(req.body);
-  checkProductConsistence(enrichedProduct, req.params.productId)
-    .then(() => {
-      Product.findById(req.params.productId).then((product) => {
-        if (product == null) {
-          throw {
-            code: 404,
-            error: {
-              errCode: "itemNotFound",
-              message: "Product not found",
-            },
-          };
-        } else {
-          const deletedKindId = product.kinds
-            .filter(
-              (k) => enrichedProduct.kinds.find((x) => x.id == k.id) == null
-            )
-            .map((k) => k.id);
-          Order.findOne({ "entries.variantId": deletedKindId })
-            .then((order) => {
-              if (order) {
-                throw {
-                  code: 403,
-                  error: {
-                    errCode: "cannotDelete",
-                    message:
-                      "Can't delete product kind: the product kind has associated orders",
-                  },
-                };
-              }
-            })
-            .then(() => {
-              Product.findByIdAndUpdate(req.params.productId, enrichedProduct, {
-                new: true,
-              }).then((product) => {
-                if (product == null) {
-                  throw {
-                    code: 404,
-                    error: {
-                      errCode: "itemNotFound",
-                      message: "Product not found",
-                    },
-                  };
-                } else {
-                  Log.create({
-                    username: req.user.username,
-                    action: "Update",
-                    object: {
-                      id: product._id,
-                      type: "Product",
-                    },
-                  }).then(() => {
-                    io.emit("productChanged", {
-                      id: product._id,
-                      action: "update",
-                    });
-                    res.json({ message: "Product updated" });
-                  });
-                }
-              });
-            });
-        }
-      });
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const deleteProduct = (req: UserRequest, res: Response) => {
+  await checkProductConsistence(enrichedProduct, req.params.productId);
+  const product = await Product.findById(req.params.productId);
+  if (product == null) {
+    throw new BackendError("itemNotFound");
+  }
+  const deletedKindId = product.kinds
+    .filter((k) => enrichedProduct.kinds.find((x) => x.id == k.id) == null)
+    .map((k) => k.id);
+  const order = await Order.findOne({ "entries.variantId": deletedKindId });
+  if (order) {
+    throw new BackendError(
+      "nonDeletable",
+      "Can't delete product kind: the product kind has associated orders"
+    );
+  }
+  const updatedProduct = Product.findByIdAndUpdate(
+    req.params.productId,
+    enrichedProduct,
+    {
+      new: true,
+    }
+  );
+  if (updatedProduct == null) {
+    throw new BackendError("itemNotFound");
+  }
+  await Log.create({
+    username: req.user.username,
+    action: "Update",
+    object: {
+      id: product._id,
+      type: "Product",
+    },
+  });
+  io.emit("productChanged", {
+    id: product._id,
+    action: "update",
+  });
+});
+export const deleteProduct = callableUserFunction(async (req) => {
   if (!req.user.isAdmin) {
-    res.status(403).json({
-      errCode: "notAuthorized",
-      message: "User not authorized",
-    });
-    return;
+    throw new BackendError("notAuthorized");
   }
   if (!mongoose.isValidObjectId(req.params.productId)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid ID supplied",
-    });
-    return;
+    throw new BackendError("invalidArgument", "Invalid id supplied");
   }
 
-  Order.findOne({ "entries.productId": req.params.productId })
-    .then((order) => {
-      if (order) {
-        throw {
-          code: 403,
-          error: {
-            errCode: "cannotDelete",
-            message: "Can't delete product: the product has associated orders",
-          },
-        };
-      }
-    })
-    .then(() => {
-      Product.findByIdAndDelete(req.params.productId).then((product) => {
-        if (product == null) {
-          throw {
-            code: 404,
-            error: {
-              errCode: "itemNotFound",
-              message: "Product not found",
-            },
-          };
-        } else {
-          Log.create({
-            username: req.user.username,
-            action: "Delete",
-            object: {
-              id: product._id,
-              type: "Product",
-            },
-          }).then(() => {
-            io.emit("productChanged", { id: product._id, action: "delete" });
-            res.json({ message: "Product deleted" });
-          });
-        }
-      });
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
+  const order = await Order.findOne({
+    "entries.productId": req.params.productId,
+  });
+  if (order) {
+    throw new BackendError(
+      "nonDeletable",
+      "Can't delete product: the product has associated orders"
+    );
+  }
+  const product = await Product.findByIdAndDelete(req.params.productId);
+  if (product == null) {
+    throw new BackendError("itemNotFound");
+  }
+  await Log.create({
+    username: req.user.username,
+    action: "Delete",
+    object: {
+      id: product._id,
+      type: "Product",
+    },
+  });
+  io.emit("productChanged", { id: product._id, action: "delete" });
+});

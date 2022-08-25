@@ -1,4 +1,3 @@
-import { Response } from "express";
 import { validateRequest } from "@common/validation";
 import Order, {
   OrderDocument,
@@ -15,9 +14,10 @@ import { io } from "@/app";
 import { getUserStoreRole } from "./StoreController";
 import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/CreateUpdateOrderInput";
 import { GetOrdersInputSchema } from "@common/validation/json_schema/GetOrdersInput";
-import { UserRequest } from "@/utils";
+import { callableUserFunction } from "@/utils";
 import { StoreAccessLevel } from "@/model/common/StoreAccessLevel";
 import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderInput";
+import { BackendError } from "@/model/common/BackendError";
 
 const enrichOrder = async (
   order: CreateUpdateOrderInput,
@@ -32,13 +32,7 @@ const enrichOrder = async (
     }
   );
   if (store == null) {
-    throw {
-      code: 400,
-      error: {
-        errCode: "itemNotFound",
-        message: "Invalid Input: Store not found",
-      },
-    };
+    throw new BackendError("invalidArgument", "Store not found");
   }
 
   //get Customer data
@@ -47,41 +41,22 @@ const enrichOrder = async (
     CustomerProjection
   );
   if (customer == null) {
-    throw {
-      code: 400,
-      error: {
-        errCode: "itemNotFound",
-        message: "Invalid Input: Customer not found",
-      },
-    };
+    throw new BackendError("invalidArgument", "Customer not found");
   }
 
   //generate product name
   const entryPromises = order.entries.map(async (entry) => {
     const product = await Product.findById(entry.productId);
     if (product == null) {
-      throw {
-        code: 400,
-        error: {
-          errCode: "itemNotFound",
-          message: "Invalid Input: Product not found",
-        },
-      };
+      throw new BackendError("invalidArgument", "Product not found");
     }
     let entryName: string;
     if (entry.variantId) {
       const kind = product.kinds.find((x) => x.id == entry.variantId);
-      if (kind) {
-        entryName = kind.fullName;
-      } else {
-        throw {
-          code: 400,
-          error: {
-            errCode: "itemNotFound",
-            message: "Invalid Input: Product kind not found",
-          },
-        };
+      if (kind == null) {
+        throw new BackendError("invalidArgument", "Product kind not found");
       }
+      entryName = kind.fullName;
     } else {
       entryName = product.name;
     }
@@ -110,303 +85,168 @@ const enrichOrder = async (
   };
 };
 
-export const addOrder = (req: UserRequest, res: Response) => {
+export const addOrder = callableUserFunction(async (req) => {
   if (!validateRequest(CreateUpdateOrderInputSchema, req.body)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
-  getUserStoreRole(req.user._id, req.body.storeId)
-    .then((storeRole) => {
-      if (storeRole == undefined && !req.user.isAdmin) {
-        throw {
-          code: 403,
-          error: {
-            errCode: "notAuthorized",
-            message: "User not authorized",
-          },
-        };
-      }
-      enrichOrder(req.body, req.user._id.toString()).then((newOrder) => {
-        Order.create(newOrder).then((order) => {
-          Log.create({
-            username: req.user.username,
-            action: "Create",
-            object: {
-              id: order._id,
-              type: "Order",
-            },
-          }).then(() => {
-            io.emit("orderChanged", { id: order._id, action: "create" });
-            res.json("Add Order");
-          });
-        });
-      });
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const getOrders = async (req: UserRequest, res: Response) => {
+  const storeRole = await getUserStoreRole(req.user._id, req.body.storeId);
+  if (storeRole == undefined && !req.user.isAdmin) {
+    throw new BackendError("notAuthorized");
+  }
+  const enrichedOrder = await enrichOrder(req.body, req.user._id.toString());
+  const newOrder = await Order.create(enrichedOrder);
+  await Log.create({
+    username: req.user.username,
+    action: "Create",
+    object: {
+      id: newOrder._id,
+      type: "Order",
+    },
+  });
+  io.emit("orderChanged", { id: newOrder._id, action: "create" });
+});
+export const getOrders = callableUserFunction(async (req) => {
   const requestQuery = req.query;
   if (!validateRequest(GetOrdersInputSchema, requestQuery)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
-  try {
-    if (requestQuery.storeId != undefined) {
-      if (!mongoose.isValidObjectId(requestQuery.storeId)) {
-        res.status(400).json({
-          errCode: "invalidArgument",
-          message: "Bad request",
-        });
-        return;
-      }
-      await getUserStoreRole(req.user._id, requestQuery.storeId).then(
-        (storeRole) => {
-          if (storeRole == undefined && !req.user.isAdmin) {
-            throw {
-              code: 403,
-              error: {
-                errCode: "notAuthorized",
-                message: "User not authorized",
-              },
-            };
-          }
-        }
-      );
+  if (requestQuery.storeId != undefined) {
+    if (!mongoose.isValidObjectId(requestQuery.storeId)) {
+      throw new BackendError("invalidArgument");
     }
-    const query: FilterQuery<OrderDocument> = {};
-    if (requestQuery.storeId != undefined) {
-      query["store.id"] = requestQuery.storeId;
-    } else {
-      await Store.find({ "authorizations.userId": req.user._id }, "_id").then(
-        (storeIds) => {
-          query["store.id"] = {
-            $in: storeIds.map((elem) => elem._id),
-          };
-        }
-      );
-    }
-    if (requestQuery.fromDate != undefined) {
-      if (!query["date"]) {
-        query["date"] = {};
-      }
-      query["date"]["$gte"] = new Date(requestQuery.fromDate);
-    }
-    if (requestQuery.toDate != undefined) {
-      if (!query["date"]) {
-        query["date"] = {};
-      }
-      query["date"]["$lte"] = new Date(requestQuery.toDate);
-    }
-    const options = paginateOptions(
-      query,
-      OrderProjection,
-      { date: -1 },
-      req.query.limit,
-      req.query.pagingNext,
-      req.query.paginatePrevious
+    const storeRole = await getUserStoreRole(
+      req.user._id,
+      requestQuery.storeId
     );
-    Order.paginate(options, (err) => {
-      throw err;
-    }).then((result) => {
-      res.json(paginateResponse(result));
-    });
-  } catch (err) {
-    if (err.code && err.error) {
-      res.status(err.code).json(err.error);
-    } else {
-      res.status(500).json(err);
+    if (storeRole == undefined && !req.user.isAdmin) {
+      throw new BackendError("notAuthorized");
     }
   }
-};
-export const getOrderById = (req: UserRequest, res: Response) => {
-  if (!mongoose.isValidObjectId(req.params.orderId)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid ID supplied",
-    });
-    return;
+  const query: FilterQuery<OrderDocument> = {};
+  if (requestQuery.storeId != undefined) {
+    query["store.id"] = requestQuery.storeId;
+  } else {
+    const stores = await Store.find(
+      { "authorizations.userId": req.user._id },
+      "_id"
+    );
+    query["store.id"] = {
+      $in: stores.map((elem) => elem._id),
+    };
   }
-  Order.findById(req.params.orderId, OrderProjection)
-    .then((order) => {
-      if (order == null) {
-        throw {
-          code: 404,
-          error: {
-            errCode: "itemNotFound",
-            message: "Order not found",
-          },
-        };
-      } else {
-        getUserStoreRole(req.user._id, order.store.id).then((storeRole) => {
-          if (storeRole == undefined && !req.user.isAdmin) {
-            throw {
-              code: 403,
-              error: {
-                errCode: "notAuthorized",
-                message: "User not authorized",
-              },
-            };
-          }
-          res.json(order);
-        });
-      }
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const updateOrder = (req: UserRequest, res: Response) => {
+  if (requestQuery.fromDate != undefined) {
+    if (!query["date"]) {
+      query["date"] = {};
+    }
+    query["date"]["$gte"] = new Date(requestQuery.fromDate);
+  }
+  if (requestQuery.toDate != undefined) {
+    if (!query["date"]) {
+      query["date"] = {};
+    }
+    query["date"]["$lte"] = new Date(requestQuery.toDate);
+  }
+  const options = paginateOptions(
+    query,
+    OrderProjection,
+    { date: -1 },
+    requestQuery.limit,
+    req.query.pagingNext,
+    req.query.paginatePrevious
+  );
+  const result = await Order.paginate(options);
+  return paginateResponse(result);
+});
+export const getOrderById = callableUserFunction(async (req) => {
+  if (!mongoose.isValidObjectId(req.params.orderId)) {
+    throw new BackendError("invalidArgument", "Invalid id supplied");
+  }
+  const item = await Order.findById(req.params.orderId, OrderProjection);
+  if (item == null) {
+    throw new BackendError("itemNotFound");
+  }
+  const userStoreRole = await getUserStoreRole(req.user._id, item.store.id);
+  if (userStoreRole == null && !req.user.isAdmin) {
+    throw new BackendError("notAuthorized");
+  }
+  return item;
+});
+export const updateOrder = callableUserFunction(async (req) => {
   if (
     !validateRequest(CreateUpdateOrderInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.orderId)
   ) {
-    res
-      .status(400)
-      .json({ errCode: "invalidArgument", message: "Invalid Input" });
-    return;
+    throw new BackendError("invalidArgument");
   }
-  Order.findById(req.params.orderId, OrderProjection)
-    .then((order) => {
-      if (order == null) {
-        throw {
-          code: 404,
-          error: {
-            errCode: "itemNotFound",
-            message: "Order not found",
-          },
-        };
-      } else {
-        getUserStoreRole(req.user._id, order.store.id).then((storeRole) => {
-          if (
-            !(
-              storeRole == StoreAccessLevel.Salesman &&
-              order.createdBy == req.user._id.toString()
-            ) &&
-            storeRole != StoreAccessLevel.Manager &&
-            !req.user.isAdmin
-          ) {
-            throw {
-              code: 403,
-              error: {
-                errCode: "notAuthorized",
-                message: "User not authorized",
-              },
-            };
-          }
-          enrichOrder(req.body, order.createdBy).then((newOrder) => {
-            Order.findOneAndReplace({ _id: req.params.orderId }, newOrder).then(
-              (order) => {
-                if (order == null) {
-                  throw {
-                    code: 404,
-                    error: {
-                      errCode: "itemNotFound",
-                      message: "Order not found",
-                    },
-                  };
-                } else {
-                  Log.create({
-                    username: req.user.username,
-                    action: "Update",
-                    object: {
-                      id: order._id,
-                      type: "Order",
-                    },
-                  }).then(() => {
-                    io.emit("orderChanged", {
-                      id: order._id,
-                      action: "update",
-                    });
-                    res.json("Order Updated");
-                  });
-                }
-              }
-            );
-          });
-        });
-      }
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const deleteOrder = (req: UserRequest, res: Response) => {
+  const order = await Order.findById(req.params.orderId);
+  if (order == null) {
+    throw new BackendError("itemNotFound");
+  }
+  const storeRole = await getUserStoreRole(req.user._id, order.store.id);
+  if (
+    !(
+      storeRole == StoreAccessLevel.Salesman &&
+      order.createdBy == req.user._id.toString()
+    ) &&
+    storeRole != StoreAccessLevel.Manager &&
+    !req.user.isAdmin
+  ) {
+    throw new BackendError("notAuthorized");
+  }
+  const enrichedOrder = await enrichOrder(req.body, order.createdBy);
+  const updatedOrder = await Order.findOneAndReplace(
+    { _id: req.params.orderId },
+    enrichedOrder
+  );
+  if (updatedOrder == null) {
+    throw new BackendError("itemNotFound");
+  }
+  await Log.create({
+    username: req.user.username,
+    action: "Update",
+    object: {
+      id: order._id,
+      type: "Order",
+    },
+  });
+  io.emit("orderChanged", {
+    id: order._id,
+    action: "update",
+  });
+});
+export const deleteOrder = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.orderId)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid ID supplied",
-    });
-    return;
+    throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  Order.findById(req.params.orderId, OrderProjection)
-    .then((order) => {
-      if (order == null) {
-        throw {
-          code: 404,
-          error: {
-            errCode: "itemNotFound",
-            message: "Order not found",
-          },
-        };
-      } else {
-        getUserStoreRole(req.user._id, order.store.id).then((storeRole) => {
-          if (
-            !(
-              storeRole == StoreAccessLevel.Salesman &&
-              order.createdBy == req.user._id.toString()
-            ) &&
-            storeRole != StoreAccessLevel.Manager &&
-            !req.user.isAdmin
-          ) {
-            throw {
-              code: 403,
-              error: {
-                errCode: "notAuthorized",
-                message: "User not authorized",
-              },
-            };
-          }
-          Order.findByIdAndDelete(req.params.orderId).then((_) => {
-            Log.create({
-              username: req.user.username,
-              action: "Delete",
-              object: {
-                id: order._id,
-                type: "Order",
-              },
-            }).then(() => {
-              io.emit("orderChanged", { id: order._id, action: "delete" });
-              res.json({ message: "Order deleted" });
-            });
-          });
-        });
-      }
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
+  const order = await Order.findById(req.params.orderId);
+  if (order == null) {
+    throw {
+      code: 404,
+      error: {
+        errCode: "itemNotFound",
+        message: "Order not found",
+      },
+    };
+  }
+  const storeRole = await getUserStoreRole(req.user._id, order.store.id);
+  if (
+    !(
+      storeRole == StoreAccessLevel.Salesman &&
+      order.createdBy == req.user._id.toString()
+    ) &&
+    storeRole != StoreAccessLevel.Manager &&
+    !req.user.isAdmin
+  ) {
+    throw new BackendError("notAuthorized");
+  }
+  await Order.findByIdAndDelete(req.params.orderId);
+  await Log.create({
+    username: req.user.username,
+    action: "Delete",
+    object: {
+      id: order._id,
+      type: "Order",
+    },
+  });
+  io.emit("orderChanged", { id: order._id, action: "delete" });
+});

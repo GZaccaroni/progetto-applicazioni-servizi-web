@@ -1,4 +1,3 @@
-import { Response } from "express";
 import { validateRequest } from "@common/validation";
 import Store, { StoreDocument, StoreProjection } from "@/model/db/Store";
 import Log from "@/model/db/Log";
@@ -9,62 +8,53 @@ import User from "@/model/db/User";
 import Order from "@/model/db/Order";
 import { CreateUpdateStoreInputSchema } from "@common/validation/json_schema/CreateUpdateStoreInput";
 import { GetStoresInputSchema } from "@common/validation/json_schema/GetStoresInput";
-import { UserRequest } from "@/utils";
+import { callableUserFunction } from "@/utils";
 import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
+import { BackendError } from "@/model/common/BackendError";
+import { StoreAccessLevel } from "@common/model/common/StoreAccessLevel";
 
-const checkStoreConsistence = async (
+async function checkStoreConsistence(
   input: CreateUpdateStoreInput,
   storeId?: string
-) => {
-  const invalidAuthorizationError = {
-    code: 400,
-    error: {
-      errCode: "invalidArgument",
-      message: "Invalid store authorization",
-    },
-  };
-  const userSet = new Set(
-    input.authorizations.map((authorization) => authorization.userId)
+): Promise<void> {
+  const invalidAuthorizationError = new BackendError(
+    "invalidArgument",
+    "Invalid store authorization"
   );
-  if (userSet.size != input.authorizations.length) {
+  const usersIds = [
+    ...new Set(
+      input.authorizations.map((authorization) => authorization.userId)
+    ),
+  ];
+  if (usersIds.length != input.authorizations.length) {
     throw invalidAuthorizationError;
   }
-  const promises = new Array<Promise<unknown>>();
-  userSet.forEach((userId) => {
+  const store = await Store.findOne({ name: input.name });
+  if (store && !(storeId && store._id?.toString() == storeId)) {
+    throw new BackendError("nameAlreadyInUse");
+  }
+  const usersExistsPromises = usersIds.map(async (userId) => {
     if (!mongoose.isValidObjectId(userId)) {
       throw invalidAuthorizationError;
     }
-    promises.push(
-      User.findById(userId).then((user) => {
-        if (!user) {
-          throw invalidAuthorizationError;
-        }
-      })
-    );
+    const user = await User.findById(userId);
+    return user == null;
   });
-  promises.push(
-    Store.findOne({ name: input.name }).then((store) => {
-      if (store && !(storeId && store._id.toString() == storeId)) {
-        throw {
-          code: 400,
-          error: { errCode: "nameAlreadyInUse", message: "Invalid Store name" },
-        };
-      }
-    })
+  const usersExists = (await Promise.all(usersExistsPromises)).every(
+    (el) => el
   );
-  await Promise.all(promises);
-};
+  if (!usersExists) {
+    throw invalidAuthorizationError;
+  }
+}
 
-export const getUserStoreRole = async (userId: ObjectId, storeId: string) => {
+export async function getUserStoreRole(
+  userId: ObjectId,
+  storeId: string
+): Promise<StoreAccessLevel | undefined> {
   const store = await Store.findById(storeId, {});
   if (!store) {
-    throw {
-      code: 400,
-      error: {
-        errCode: "itemNotFound",
-        message: "Invalid Input: Store not found",
-      },
-    };
+    throw new BackendError("invalidArgument", "Store not found");
   }
   const userAuthorization = store.authorizations.find(
     (x) => x.userId == userId.toString()
@@ -74,54 +64,30 @@ export const getUserStoreRole = async (userId: ObjectId, storeId: string) => {
   } else {
     return undefined;
   }
-};
+}
 
-export const addStore = (req: UserRequest, res: Response) => {
+export const addStore = callableUserFunction(async (req) => {
   if (!req.user.isAdmin) {
-    res.status(403).json({
-      errCode: "notAuthorized",
-      message: "User not authorized",
-    });
-    return;
+    throw new BackendError("notAuthorized");
   }
   if (!validateRequest(CreateUpdateStoreInputSchema, req.body)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
-  checkStoreConsistence(req.body)
-    .then(() => {
-      Store.create(req.body).then((store) => {
-        Log.create({
-          username: req.user.username,
-          action: "Create",
-          object: {
-            id: store._id,
-            type: "Store",
-          },
-        }).then(() => {
-          io.emit("storeChanged", { id: store._id, action: "create" });
-          res.json("Add Store");
-        });
-      });
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const getStores = (req: UserRequest, res: Response) => {
+  await checkStoreConsistence(req.body);
+  const store = await Store.create(req.body);
+  await Log.create({
+    username: req.user.username,
+    action: "Create",
+    object: {
+      id: store._id,
+      type: "Store",
+    },
+  });
+  io.emit("storeChanged", { id: store._id, action: "create" });
+});
+export const getStores = callableUserFunction(async (req) => {
   if (!validateRequest(GetStoresInputSchema, req.query)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<StoreDocument> = {};
   if (req.query.authorized) {
@@ -138,131 +104,75 @@ export const getStores = (req: UserRequest, res: Response) => {
     req.query.pagingNext,
     req.query.paginatePrevious
   );
-  Store.find();
-  Store.paginate(options, (err) => res.status(500).json(err)).then((result) => {
-    res.json(paginateResponse(result));
-  });
-};
+  const result = await Store.paginate(options);
+  return paginateResponse(result);
+});
 
-export const getStoreById = (req: UserRequest, res: Response) => {
+export const getStoreById = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.storeId)) {
-    res
-      .status(400)
-      .json({ errCode: "invalidArgument", message: "Invalid ID supplied" });
-    return;
+    throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  Store.findById(req.params.storeId, StoreProjection).then(
-    (store) => {
-      if (store == null) {
-        res.status(404).json({ message: "Store not found" });
-      } else {
-        res.json(store);
-      }
-    },
-    (err) => res.status(500).json(err)
-  );
-};
-export const updateStore = (req: UserRequest, res: Response) => {
+  const item = await Store.findById(req.params.storeId, StoreProjection);
+  if (item == null) {
+    throw new BackendError("itemNotFound");
+  }
+  return item;
+});
+export const updateStore = callableUserFunction(async (req) => {
   if (!req.user.isAdmin) {
-    res
-      .status(403)
-      .json({ errCode: "notAuthorized", message: "User not authorized" });
+    throw new BackendError("notAuthorized");
   }
   if (
     !validateRequest(CreateUpdateStoreInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.storeId)
   ) {
-    res
-      .status(400)
-      .json({ errCode: "invalidArgument", message: "Invalid Input" });
-    return;
+    throw new BackendError("invalidArgument");
   }
-  checkStoreConsistence(req.body, req.params.storeId)
-    .then(() => {
-      Store.findByIdAndUpdate(req.params.storeId, req.body, { new: true }).then(
-        (store) => {
-          if (store == null) {
-            throw {
-              code: 404,
-              error: {
-                errCode: "itemNotFound",
-                message: "Store not found",
-              },
-            };
-          } else {
-            Log.create({
-              username: req.user.username,
-              action: "Update",
-              object: {
-                id: store._id,
-                type: "Store",
-              },
-            }).then(() => {
-              io.emit("storeChanged", { id: store._id, action: "update" });
-              res.json({ message: "Store Updated" });
-            });
-          }
-        }
-      );
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
+  await checkStoreConsistence(req.body, req.params.storeId);
 
-export const deleteStore = (req: UserRequest, res: Response) => {
-  if (!mongoose.isValidObjectId(req.params.storeId)) {
-    res
-      .status(400)
-      .send({ errCode: "invalidArgument", message: "Invalid ID supplied" });
-    return;
+  const updatedStore = await Store.findByIdAndUpdate(
+    req.params.storeId,
+    req.body,
+    {
+      new: true,
+    }
+  );
+  if (updatedStore == null) {
+    throw new BackendError("itemNotFound");
   }
-  Order.findOne({ "store.id": req.params.storeId })
-    .then((order) => {
-      if (order) {
-        throw {
-          code: 403,
-          error: {
-            errCode: "cannotDelete",
-            message: "Can't delete: the store has associated orders",
-          },
-        };
-      }
-    })
-    .then(() => {
-      Store.findByIdAndDelete(req.params.storeId).then((store) => {
-        if (store == null) {
-          throw {
-            code: 404,
-            error: {
-              errCode: "itemNotFound",
-              message: "Store not found",
-            },
-          };
-        } else {
-          Log.create({
-            username: req.user.username,
-            action: "Delete",
-            object: {
-              id: store._id,
-              type: "Store",
-            },
-          }).then(() => {
-            io.emit("storeChanged", { id: store._id, action: "delete" });
-            res.json({ message: "Store deleted" });
-          });
-        }
-      });
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
+  await Log.create({
+    username: req.user.username,
+    action: "Update",
+    object: {
+      id: updatedStore._id,
+      type: "Store",
+    },
+  });
+  io.emit("storeChanged", { id: req.params.storeId, action: "update" });
+});
+
+export const deleteStore = callableUserFunction(async (req) => {
+  if (!mongoose.isValidObjectId(req.params.storeId)) {
+    throw new BackendError("invalidArgument", "Invalid id supplied");
+  }
+  const order = await Order.findOne({ "store.id": req.params.storeId });
+  if (order) {
+    throw new BackendError(
+      "nonDeletable",
+      "Can't delete: the store has associated orders"
+    );
+  }
+  const deletedStore = await Store.findByIdAndDelete(req.params.storeId);
+  if (deletedStore == null) {
+    throw new BackendError("itemNotFound");
+  }
+  await Log.create({
+    username: req.user.username,
+    action: "Delete",
+    object: {
+      id: deletedStore._id,
+      type: "Store",
+    },
+  });
+  io.emit("storeChanged", { id: deletedStore._id, action: "delete" });
+});

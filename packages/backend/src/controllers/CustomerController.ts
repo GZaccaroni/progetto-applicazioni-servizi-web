@@ -1,4 +1,3 @@
-import { Response } from "express";
 import { validateRequest } from "@common/validation";
 import Customer, {
   CustomerDocument,
@@ -11,8 +10,9 @@ import { io } from "@/app";
 import Order from "@/model/db/Order";
 import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";
 import { GetCustomersInputSchema } from "@common/validation/json_schema/GetCustomersInput";
-import { UserRequest } from "@/utils";
+import { callableUserFunction } from "@/utils";
 import { CreateUpdateCustomerInput } from "@common/model/network/CreateUpdateCustomerInput";
+import { BackendError } from "@/model/common/BackendError";
 
 const checkCustomerConsistence = async (
   input: CreateUpdateCustomerInput,
@@ -20,55 +20,29 @@ const checkCustomerConsistence = async (
 ) => {
   const customer = await Customer.findOne({ name: input.name });
   if (customer && !(customerId && customer._id.toString() == customerId)) {
-    throw {
-      code: 400,
-      error: {
-        errCode: "nameAlreadyInUse",
-        message: "Invalid Customer name",
-      },
-    };
+    throw new BackendError("nameAlreadyInUse");
   }
 };
 
-export const addCustomer = (req: UserRequest, res: Response) => {
+export const addCustomer = callableUserFunction(async (req) => {
   if (!validateRequest(CreateUpdateCustomerInputSchema, req.body)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
-  checkCustomerConsistence(req.body)
-    .then(() => {
-      Customer.create(req.body).then((customer) => {
-        Log.create({
-          username: req.user.username,
-          action: "Create",
-          object: {
-            id: customer._id,
-            type: "Customer",
-          },
-        }).then(() => {
-          io.emit("customerChanged", { id: customer._id, action: "create" });
-          res.json("Add Customer");
-        });
-      });
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const getCustomers = (req: UserRequest, res: Response) => {
+  await checkCustomerConsistence(req.body);
+  const newCustomer = await Customer.create(req.body);
+  await Log.create({
+    username: req.user.username,
+    action: "Create",
+    object: {
+      id: newCustomer._id,
+      type: "Customer",
+    },
+  });
+  io.emit("customerChanged", { id: newCustomer._id, action: "create" });
+});
+export const getCustomers = callableUserFunction(async (req) => {
   if (!validateRequest(GetCustomersInputSchema, req.query)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<CustomerDocument> = {};
   if (req.query.searchName) {
@@ -82,134 +56,75 @@ export const getCustomers = (req: UserRequest, res: Response) => {
     req.query.pagingNext,
     req.query.paginatePrevious
   );
-  Customer.paginate(options, (err) => res.status(500).json(err)).then(
-    (result) => {
-      res.json(paginateResponse(result));
-    }
-  );
-};
+  const result = await Customer.paginate(options);
+  return paginateResponse(result);
+});
 
-export const getCustomerById = (req: UserRequest, res: Response) => {
+export const getCustomerById = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.customerId)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid ID supplied",
-    });
-    return;
+    throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  Customer.findById(req.params.customerId, CustomerProjection).then(
-    (customer) => {
-      if (customer == null) {
-        res.status(404).json({
-          errCode: "itemNotFound",
-          message: "Product not found",
-        });
-      } else {
-        res.json(customer);
-      }
-    },
-    (err) => res.status(500).json(err)
+  const item = await Customer.findById(
+    req.params.customerId,
+    CustomerProjection
   );
-};
+  if (item == null) {
+    throw new BackendError("itemNotFound");
+  }
+  return item;
+});
 
-export const updateCustomer = (req: UserRequest, res: Response) => {
+export const updateCustomer = callableUserFunction(async (req) => {
   if (
     !validateRequest(CreateUpdateCustomerInputSchema, req.body) ||
     !mongoose.isValidObjectId(req.params.customerId)
   ) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
-  checkCustomerConsistence(req.body, req.params.customerId)
-    .then(() => {
-      Customer.findByIdAndUpdate(req.params.customerId, req.body, {
-        new: true,
-      }).then((customer) => {
-        if (customer == null) {
-          throw {
-            code: 404,
-            error: {
-              errCode: "itemNotFound",
-              message: "Customer not found",
-            },
-          };
-        } else {
-          Log.create({
-            username: req.user.username,
-            action: "Update",
-            object: {
-              id: customer._id,
-              type: "Customer",
-            },
-          }).then(() => {
-            io.emit("customerChanged", { id: customer._id, action: "update" });
-            res.json({ message: "Customer updated" });
-          });
-        }
-      });
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const deleteCustomer = (req: UserRequest, res: Response) => {
+  await checkCustomerConsistence(req.body, req.params.customerId);
+  const updatedCustomer = await Customer.findByIdAndUpdate(
+    req.params.customerId,
+    req.body,
+    {
+      new: true,
+    }
+  );
+  if (updatedCustomer == null) {
+    throw new BackendError("itemNotFound");
+  }
+  await Log.create({
+    username: req.user.username,
+    action: "Update",
+    object: {
+      id: updatedCustomer._id,
+      type: "Customer",
+    },
+  });
+  io.emit("customerChanged", { id: updatedCustomer._id, action: "update" });
+});
+export const deleteCustomer = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.customerId)) {
-    res.status(400).send({
-      errCode: "invalidArgument",
-      message: "Invalid ID supplied",
-    });
-    return;
+    throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  Order.findOne({ "customer.id": req.params.customerId })
-    .then((order) => {
-      if (order) {
-        throw {
-          code: 403,
-          error: {
-            errCode: "cannotDelete",
-            message:
-              "Can't delete customer: the customer has associated orders",
-          },
-        };
-      }
-    })
-    .then(() => {
-      Customer.findByIdAndDelete(req.params.customerId).then((customer) => {
-        if (customer == null) {
-          throw {
-            code: 404,
-            error: {
-              errCode: "itemNotFound",
-              message: "Customer not found",
-            },
-          };
-        } else {
-          Log.create({
-            username: req.user.username,
-            action: "Delete",
-            object: {
-              id: customer._id,
-              type: "Customer",
-            },
-          }).then(() => {
-            io.emit("customerChanged", { id: customer._id, action: "delete" });
-            res.json({ message: "Customer deleted" });
-          });
-        }
-      });
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
+  const associatedOrder = await Order.findOne({
+    "customer.id": req.params.customerId,
+  });
+  if (associatedOrder) {
+    throw new BackendError("nonDeletable");
+  }
+  const deletedCustomer = await Customer.findByIdAndDelete(
+    req.params.customerId
+  );
+  if (deletedCustomer == null) {
+    throw new BackendError("itemNotFound");
+  }
+  await Log.create({
+    username: req.user.username,
+    action: "Delete",
+    object: {
+      id: deletedCustomer._id,
+      type: "Customer",
+    },
+  });
+  io.emit("customerChanged", { id: deletedCustomer._id, action: "delete" });
+});

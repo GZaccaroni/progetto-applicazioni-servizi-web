@@ -1,49 +1,31 @@
-import { Response } from "express";
 import mongoose, { FilterQuery } from "mongoose";
 import Order, { OrderDocument } from "@/model/db/Order";
 import { validateRequest } from "@common/validation";
 import { GetAnalyticsInputSchema } from "@common/validation/json_schema/GetAnalyticsInput";
-import { UserRequest } from "@/utils";
+import { callableUserFunction } from "@/utils";
 import { ChartDataType } from "@/model/common/ChartDataType";
+import { BackendError } from "@/model/common/BackendError";
 
-export const getAnalytics = (req: UserRequest, res: Response) => {
+export const getAnalytics = callableUserFunction(async (req) => {
   if (!validateRequest(GetAnalyticsInputSchema, req.query)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<OrderDocument> = {};
   if (req.query.storeId) {
-    if (mongoose.isValidObjectId(req.query.storeId)) {
-      query["store.id"] = req.query.storeId;
-    } else {
-      res.status(400).json({
-        errCode: "invalidArgument",
-        message: "Invalid storeId supplied",
-      });
-      return;
+    if (!mongoose.isValidObjectId(req.query.storeId)) {
+      throw new BackendError("invalidArgument", "Invalid store id");
     }
+    query["store.id"] = req.query.storeId;
   } else {
     if (!req.user.isAdmin) {
-      res.status(403).json({
-        errCode: "notAuthorized",
-        message: "User not authorized",
-      });
-      return;
+      throw new BackendError("notAuthorized");
     }
   }
   if (req.query.customerId) {
-    if (mongoose.isValidObjectId(req.query.customerId)) {
-      query["customer.id"] = req.query.customerId;
-    } else {
-      res.status(400).json({
-        errCode: "invalidArgument",
-        message: "Invalid customerId supplied",
-      });
-      return;
+    if (!mongoose.isValidObjectId(req.query.customerId)) {
+      throw new BackendError("invalidArgument", "Invalid customer id");
     }
+    query["customer.id"] = req.query.customerId;
   }
   if (req.query.fromDate) {
     if (!query["date"]) {
@@ -86,7 +68,7 @@ export const getAnalytics = (req: UserRequest, res: Response) => {
   } else {
     projection["value"] = "$entries.quantity";
   }
-  Order.aggregate([
+  return Order.aggregate([
     { $unwind: "$entries" },
     { $match: query },
     { $project: projection },
@@ -176,15 +158,5 @@ export const getAnalytics = (req: UserRequest, res: Response) => {
     {
       $unset: ["_id", "product", "variant"],
     },
-  ])
-    .then((analytics) => {
-      res.json(analytics);
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
+  ]);
+});

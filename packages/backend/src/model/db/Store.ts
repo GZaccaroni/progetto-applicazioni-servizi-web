@@ -1,5 +1,5 @@
 import mongoose, { ProjectionType } from "mongoose";
-import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
+import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 import { StoreAccessLevel } from "../common/StoreAccessLevel";
 
 export type StoreDocument = {

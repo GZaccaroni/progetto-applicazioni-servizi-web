@@ -1,5 +1,5 @@
 import mongoose, { ProjectionType } from "mongoose";
-import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
+import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 
 export type CustomerDocument = {
   name: string;

@@ -1,5 +1,5 @@
 import mongoose, { ProjectionType, Schema } from "mongoose";
-import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
+import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 import { ProductGrade } from "../common/ProductGrade";
 import { CustomerDocument } from "@/model/db/Customer";

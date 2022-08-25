@@ -11,6 +11,7 @@ import { Server } from "socket.io";
 import * as http from "http";
 import { queryParser } from "express-query-parser";
 import passport from "passport";
+import { BackendError } from "@/model/common/BackendError";
 
 const app = express();
 const port = 3000;
@@ -47,6 +48,16 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use("/", routes);
+app.use((err: unknown, req, res, next) => {
+  if (err instanceof BackendError) {
+    res.status(err.httpStatusCode()).json({
+      error: {
+        code: err.errorCode,
+        message: err.errorMessage,
+      },
+    });
+  }
+});
 
 server.listen(port, () => {
   return console.log(`Express is listening at http://localhost:${port}`);

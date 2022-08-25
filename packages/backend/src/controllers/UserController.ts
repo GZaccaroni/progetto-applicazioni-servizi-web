@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, request, Request, Response } from "express";
 import { validateRequest } from "@common/validation";
 import passport from "passport";
 import UserDb, { UserDocument, UserProjection } from "@/model/db/User";
@@ -10,71 +10,48 @@ import { CreateUserInputSchema } from "@common/validation/json_schema/CreateUser
 import { GetUsersInputSchema } from "@common/validation/json_schema/GetUsersInput";
 import { UpdateUserInputSchema } from "@common/validation/json_schema/UpdateUserInput";
 import { UserLoginInputSchema } from "@common/validation/json_schema/UserLoginInput";
-import { UserRequest } from "@/utils";
+import { callableUserFunction, UserRequest } from "@/utils";
 import { FilterQuery } from "mongoose";
+import { BackendError } from "@/model/common/BackendError";
 
-export const createUser = (req: UserRequest, res: Response) => {
+export const createUser = callableUserFunction(async (req) => {
   if (!validateRequest(CreateUserInputSchema, req.body)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument", "Invalid input");
   }
   if (!req.user?.isAdmin) {
-    res.status(403).json({
-      errCode: "notAuthorized",
-      message: "User not authorized",
-    });
-    return;
+    throw new BackendError("notAuthorized", "User not authorized");
   }
-  UserDb.findOne({ username: req.body.username })
-    .then((user) => {
-      if (user) {
-        throw {
-          code: 400,
-          error: {
-            errCode: "nameAlreadyInUse",
-            message: "Invalid Username",
-          },
-        };
-      }
-    })
-    .then(() => {
-      UserDb.register(req.body, req.body.password).then(
-        (user) => {
-          Log.create({
-            username: req.user.username,
-            action: "Create",
-            object: {
-              id: user._id,
-              type: "User",
-            },
-          }).then(() => {
-            io.emit("userChanged", { id: user._id, action: "create" });
-            res.json({ message: "User added" });
-          });
-        },
-        () => {
-          throw {
-            code: 400,
-            error: {
-              errCode: "invalidArgument",
-              message: "Registration error",
-            },
-          };
-        }
-      );
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const getUsers = (req: UserRequest, res: Response) => {
+  let existingUser: UserDocument | null;
+  try {
+    existingUser = await UserDb.findOne({ username: req.body.username });
+  } catch (e) {
+    throw new BackendError("serverError", "Persistence error");
+  }
+  if (existingUser) {
+    throw new BackendError("nameAlreadyInUse");
+  }
+  let registeredUser: UserDocument;
+  try {
+    registeredUser = await UserDb.register(req.body as any, req.body.password);
+  } catch (e) {
+    throw new BackendError("serverError", "Registration error");
+  }
+  await Log.create({
+    username: req.user.username,
+    action: "Create",
+    object: {
+      id: registeredUser._id,
+      type: "User",
+    },
+  });
+  io.emit("userChanged", { id: registeredUser._id, action: "create" });
+  return {};
+});
+export const getUsers = (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user.isAdmin) {
     res
       .status(403)
@@ -100,14 +77,18 @@ export const getUsers = (req: UserRequest, res: Response) => {
     req.query.pagingNext,
     req.query.pagingPrevious
   );
-  UserDb.paginate(options, (err) => res.status(500).json(err)).then(
-    (result) => {
+  UserDb.paginate(options)
+    .then((result) => {
       res.json(paginateResponse(result));
-    }
-  );
+    })
+    .catch((err) => res.status(500).json(err));
 };
 
-export const getUserByName = (req: UserRequest, res: Response) => {
+export const getUserByName = (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.params.username) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -144,7 +125,11 @@ export const getUserByName = (req: UserRequest, res: Response) => {
       }
     });
 };
-export const updateUser = (req: UserRequest, res: Response) => {
+export const updateUser = (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction
+) => {
   if (
     !validateRequest(UpdateUserInputSchema, req.body) ||
     !req.params.username
@@ -201,7 +186,11 @@ export const updateUser = (req: UserRequest, res: Response) => {
       }
     });
 };
-export const deleteUser = (req: UserRequest, res: Response) => {
+export const deleteUser = (
+  req: UserRequest,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.params.username) {
     res.status(400).json({
       errCode: "invalidArgument",
@@ -219,13 +208,8 @@ export const deleteUser = (req: UserRequest, res: Response) => {
   UserDb.findOne({ username: req.params.username })
     .then((user) => {
       if (user == null) {
-        throw {
-          code: 400,
-          error: {
-            errCode: "itemNotFound",
-            message: "User not found",
-          },
-        };
+        next(new BackendError("itemNotFound", "User not found"));
+        return;
       }
       Store.updateMany(
         { "authorizations.userId": user._id },
@@ -257,29 +241,23 @@ export const deleteUser = (req: UserRequest, res: Response) => {
             },
           }).then(() => {
             io.emit("userChanged", { id: user._id, action: "delete" });
-            res.json({ message: "User deleted" });
+            res.json();
           });
         });
       });
     })
     .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
+      next(new BackendError("serverError", err.error));
+      return;
     });
 };
-export const userLogin = (req: Request, res: Response) => {
+export const userLogin = (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
-    res.json({ message: "User already authenticated" });
+    res.json();
     return;
   }
   if (!validateRequest(UserLoginInputSchema, req.body)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
+    next(new BackendError("invalidArgument"));
     return;
   }
   passport.authenticate("local", function (err, user) {
@@ -296,17 +274,16 @@ export const userLogin = (req: Request, res: Response) => {
         if (err) {
           res.status(500).json(err);
         } else {
-          res.json({ message: "Logged In" });
+          res.json();
         }
       });
     } else {
-      throw {
-        code: 400,
-        error: {
-          errCode: "invalidArgument",
-          message: "Invalid username/password supplied",
-        },
-      };
+      next(
+        new BackendError(
+          "invalidArgument",
+          "Invalid username/password supplied"
+        )
+      );
     }
   })(req, res);
 };
@@ -315,7 +292,7 @@ export const userLogout = (req: Request, res: Response) => {
     if (err) {
       res.status(500).json(err);
     } else {
-      res.json({ message: "logout" });
+      res.json();
     }
   });
 };

@@ -5,7 +5,7 @@ import mongoose, {
   ProjectionType,
 } from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
-import { mongoosePagination, Pagination } from "mongoose-paginate-ts";
+import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 
 export type UserDocument = {
   _id: ObjectId;
