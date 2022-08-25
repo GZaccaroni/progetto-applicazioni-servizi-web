@@ -70,7 +70,13 @@ const selectedDate = computed({
     if (props["value"] instanceof Date) {
       return toDateString(props["value"]);
     } else {
-      return props["value"]?.split("T")[0];
+      const splittedDateTime = props["value"]?.split("T");
+      const date = splittedDateTime?.[0];
+      const time = splittedDateTime?.[1];
+      if (time != undefined) {
+        emit("input", date);
+      }
+      return date;
     }
   },
   set: (value) => {
