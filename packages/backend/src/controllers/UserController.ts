@@ -1,4 +1,4 @@
-import { NextFunction, request, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { validateRequest } from "@common/validation";
 import passport from "passport";
 import UserDb, { UserDocument, UserProjection } from "@/model/db/User";
@@ -10,7 +10,7 @@ import { CreateUserInputSchema } from "@common/validation/json_schema/CreateUser
 import { GetUsersInputSchema } from "@common/validation/json_schema/GetUsersInput";
 import { UpdateUserInputSchema } from "@common/validation/json_schema/UpdateUserInput";
 import { UserLoginInputSchema } from "@common/validation/json_schema/UserLoginInput";
-import { callableUserFunction, UserRequest } from "@/utils";
+import { callableUserFunction } from "@/utils";
 import { FilterQuery } from "mongoose";
 import { BackendError } from "@/model/common/BackendError";
 
@@ -47,23 +47,12 @@ export const createUser = callableUserFunction(async (req) => {
   io.emit("userChanged", { id: registeredUser._id, action: "create" });
   return {};
 });
-export const getUsers = (
-  req: UserRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const getUsers = callableUserFunction(async (req) => {
   if (!req.user.isAdmin) {
-    res
-      .status(403)
-      .json({ errCode: "notAuthorized", message: "User not authorized" });
-    return;
+    throw new BackendError("notAuthorized");
   }
   if (!validateRequest(GetUsersInputSchema, req.query)) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Input",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<UserDocument> = {};
   if (req.query.searchName) {
@@ -77,180 +66,98 @@ export const getUsers = (
     req.query.pagingNext,
     req.query.pagingPrevious
   );
-  UserDb.paginate(options)
-    .then((result) => {
-      res.json(paginateResponse(result));
-    })
-    .catch((err) => res.status(500).json(err));
-};
+  const result = await UserDb.paginate(options);
+  return paginateResponse(result);
+});
 
-export const getUserByName = (
-  req: UserRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const getUserByName = callableUserFunction(async (req) => {
   if (!req.params.username) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Username supplied",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
   if (!req.user.isAdmin && req.params.username != req.user.username) {
-    res.status(403).json({
-      errCode: "notAuthorized",
-      message: "User not authorized",
-    });
-    return;
+    throw new BackendError("notAuthorized");
   }
-  UserDb.findOne({ username: req.params.username }, UserProjection)
-    .then((user) => {
-      if (!user) {
-        throw {
-          code: 404,
-          error: {
-            errCode: "itemNotFound",
-            message: "User not found",
-          },
-        };
-      } else {
-        res.json(user);
-      }
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const updateUser = (
-  req: UserRequest,
-  res: Response,
-  next: NextFunction
-) => {
+  const user = await UserDb.findOne(
+    { username: req.params.username },
+    UserProjection
+  );
+  if (!user) {
+    throw new BackendError("itemNotFound");
+  }
+  return user;
+});
+export const updateUser = callableUserFunction(async (req) => {
   if (
     !validateRequest(UpdateUserInputSchema, req.body) ||
     !req.params.username
   ) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid input",
-    });
-    return;
-  }
-  if (!req.params.username) {
-    res.status(400).json({
-      errCode: "notAuthorized",
-      message: "Invalid Username supplied",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
   if (req.user.username != req.params.username && !req.user.isAdmin) {
-    res.status(403).json({
-      errCode: "notAuthorized",
-      message: "User not authorized",
-    });
-    return;
+    throw new BackendError("notAuthorized");
   }
-  UserDb.findOne({ username: req.params.username })
-    .then((user) => {
-      if (!user) {
-        throw {
-          code: 404,
-          error: {
-            errCode: "itemNotFound",
-            message: "User not found",
-          },
-        };
-      } else {
-        user.setPassword(req.body.password).then((user) => {
-          user.save();
-          Log.create({
-            username: req.user.username,
-            action: "Update",
-            object: {
-              id: user._id,
-              type: "User",
-            },
-          }).then(() => res.json({ message: "User password updated" }));
-        });
-      }
-    })
-    .catch((err) => {
-      if (err.code && err.error) {
-        res.status(err.code).json(err.error);
-      } else {
-        res.status(500).json(err);
-      }
-    });
-};
-export const deleteUser = (
-  req: UserRequest,
-  res: Response,
-  next: NextFunction
-) => {
+  const user = await UserDb.findOne({ username: req.params.username });
+  if (!user) {
+    throw new BackendError("itemNotFound");
+  }
+  if (req.body.password != undefined) {
+    await user.setPassword(req.body.password);
+  }
+  if (req.body.isAdmin != undefined) {
+    user.isAdmin = req.body.isAdmin;
+  }
+  await user.save();
+  await Log.create({
+    username: req.user.username,
+    action: "Update",
+    object: {
+      id: user._id,
+      type: "User",
+    },
+  });
+});
+export const deleteUser = callableUserFunction(async (req) => {
   if (!req.params.username) {
-    res.status(400).json({
-      errCode: "invalidArgument",
-      message: "Invalid Username supplied",
-    });
-    return;
+    throw new BackendError("invalidArgument");
   }
   if (req.user.username != req.params.username && !req.user.isAdmin) {
-    res.status(403).json({
-      errCode: "notAuthorized",
-      message: "User not authorized",
-    });
-    return;
+    throw new BackendError("notAuthorized");
   }
-  UserDb.findOne({ username: req.params.username })
-    .then((user) => {
-      if (user == null) {
-        next(new BackendError("itemNotFound", "User not found"));
-        return;
+  const user = await UserDb.findOne({ username: req.params.username });
+  if (user == null) {
+    throw new BackendError("itemNotFound", "User not found");
+  }
+  await Store.updateMany(
+    { "authorizations.userId": user._id },
+    { $pullAll: { authorizations: user._id } }
+  );
+  const deleteResult = await UserDb.deleteOne({ _id: user._id });
+  if (deleteResult.deletedCount < 1) {
+    throw {
+      code: 400,
+      error: {
+        errCode: "itemNotFound",
+        message: "User not found",
+      },
+    };
+  }
+  if (req.user.username == user.username) {
+    req.logout(function (err) {
+      if (err) {
+        throw err;
       }
-      Store.updateMany(
-        { "authorizations.userId": user._id },
-        { $pullAll: { authorizations: user._id } }
-      ).then(() => {
-        UserDb.deleteOne({ _id: user._id }).then((result) => {
-          if (result.deletedCount < 1) {
-            throw {
-              code: 400,
-              error: {
-                errCode: "itemNotFound",
-                message: "User not found",
-              },
-            };
-          }
-          if (req.user.username == user.username) {
-            req.logout(function (err) {
-              if (err) {
-                throw err;
-              }
-            });
-          }
-          Log.create({
-            username: user.username,
-            action: "Delete",
-            object: {
-              id: user._id,
-              type: "User",
-            },
-          }).then(() => {
-            io.emit("userChanged", { id: user._id, action: "delete" });
-            res.json();
-          });
-        });
-      });
-    })
-    .catch((err) => {
-      next(new BackendError("serverError", err.error));
-      return;
     });
-};
+  }
+  await Log.create({
+    username: user.username,
+    action: "Delete",
+    object: {
+      id: user._id,
+      type: "User",
+    },
+  });
+  io.emit("userChanged", { id: user._id, action: "delete" });
+});
 export const userLogin = (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
     res.json();
