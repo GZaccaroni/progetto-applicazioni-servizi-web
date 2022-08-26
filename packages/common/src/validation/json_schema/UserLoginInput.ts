@@ -2,6 +2,7 @@ import { JSONSchemaType } from "ajv";
 import {UserLoginInput} from "../../model/network/UserLoginInput";
 
 export const UserLoginInputSchema: JSONSchemaType<UserLoginInput> = {
+  additionalProperties: false,
   required: ["username", "password"],
   type: "object",
   properties: {
@@ -14,6 +15,7 @@ export const UserLoginInputSchema: JSONSchemaType<UserLoginInput> = {
     },
     password: {
       type: "string",
+      format: "password",
     },
   },
 };

@@ -6,6 +6,7 @@ export const CreateOrderInputEntrySchema: JSONSchemaType<CreateOrderInputEntry> 
   {
     required: ["pricePerUnit", "productId", "quantity"],
     type: "object",
+    additionalProperties: false,
     properties: {
       productId: {
         type: "string",

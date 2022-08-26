@@ -4,6 +4,7 @@ import {StoreAccessLevel} from "../../model/common/StoreAccessLevel";
 
 export const StoreAuthorizationSchema: JSONSchemaType<NetworkStoreAuthorization> =
   {
+    additionalProperties: false,
     required: ["accessLevel", "userId"],
     type: "object",
     properties: {

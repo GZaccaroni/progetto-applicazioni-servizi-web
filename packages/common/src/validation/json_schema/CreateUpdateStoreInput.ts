@@ -5,6 +5,7 @@ import { StoreAuthorizationSchema } from "./StoreAuthorization";
 export const CreateUpdateStoreInputSchema: JSONSchemaType<CreateUpdateStoreInput> =
   {
     required: ["authorizations", "name"],
+    additionalProperties: false,
     type: "object",
     properties: {
       name: {

@@ -2,6 +2,7 @@ import { JSONSchemaType } from "ajv";
 import { NetworkProductKind } from "../../model/network/NetworkProduct";
 
 export const ProductKindSchema: JSONSchemaType<NetworkProductKind> = {
+  additionalProperties: false,
   required: ["id", "name"],
   type: "object",
   properties: {

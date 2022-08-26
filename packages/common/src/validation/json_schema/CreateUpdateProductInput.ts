@@ -7,6 +7,7 @@ export const CreateUpdateProductInputSchema: JSONSchemaType<CreateUpdateProductI
   {
     required: ["kinds", "name", "unitOfMeasure"],
     type: "object",
+    additionalProperties: false,
     properties: {
       name: {
         minLength: 1,

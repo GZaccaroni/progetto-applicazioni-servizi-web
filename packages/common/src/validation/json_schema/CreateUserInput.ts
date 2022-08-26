@@ -3,6 +3,7 @@ import { CreateUserInput } from "../../model/network/CreateUserInput";
 
 export const CreateUserInputSchema: JSONSchemaType<CreateUserInput> = {
   required: ["isAdmin", "password", "username"],
+  additionalProperties: false,
   type: "object",
   properties: {
     username: {

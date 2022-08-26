@@ -5,6 +5,7 @@ export const CreateUpdateCustomerInputSchema: JSONSchemaType<CreateUpdateCustome
   {
     required: ["name"],
     type: "object",
+    additionalProperties: false,
     properties: {
       name: {
         minLength: 3,

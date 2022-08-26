@@ -6,6 +6,7 @@ export const CreateUpdateOrderInputSchema: JSONSchemaType<CreateUpdateOrderInput
   {
     required: ["date", "entries", "storeId"],
     type: "object",
+    additionalProperties: false,
     properties: {
       customerId: {
         type: "string",
