@@ -60,7 +60,6 @@ const confirmDialogStore = useConfirmDialogStore();
 watch(
   () => confirmDialogStore.data,
   (newValue) => {
-    console.log("Confirm dialog data changed, hey!");
     dialogVisible.value = newValue != undefined;
   }
 );

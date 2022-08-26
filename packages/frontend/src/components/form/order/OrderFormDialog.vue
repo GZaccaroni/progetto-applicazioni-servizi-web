@@ -139,6 +139,7 @@ import { AsyncSelectItem } from "@/components/common/AsyncSelectTypes";
 import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderInput";
 import { validateRequest } from "@common/validation";
 import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/CreateUpdateOrderInput";
+import { toISODateString } from "@/helpers/dateUtils";
 
 export type OrderFormDialogModel = GenericFormDialogModel<{
   orderToUpdate?: string;
@@ -310,5 +311,6 @@ function mapToFormValue(
 }
 const defaultValues: RecursivePartial<CreateUpdateOrderInput> = {
   entries: [],
+  date: toISODateString(new Date()),
 };
 </script>

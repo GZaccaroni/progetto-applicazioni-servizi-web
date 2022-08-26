@@ -18,6 +18,7 @@
       :label="$t('model.customer.address')"
     ></v-text-field>
     <v-text-field
+      type="tel"
       v-model="formData.phoneNumber"
       :label="$t('model.customer.phoneNumber')"
     ></v-text-field>

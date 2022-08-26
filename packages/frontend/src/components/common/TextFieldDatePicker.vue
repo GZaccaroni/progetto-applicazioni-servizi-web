@@ -28,6 +28,7 @@
 </template>
 <script setup lang="ts">
 import { computed, PropType, ref } from "vue";
+import { toISODateString } from "@/helpers/dateUtils";
 
 const props = defineProps({
   value: {
@@ -62,13 +63,10 @@ const props = defineProps({
 const emit = defineEmits(["input"]);
 
 const menuVisible = ref(false);
-function toDateString(date?: Date): string | undefined {
-  return date?.toISOString()?.substring(0, 10);
-}
 const selectedDate = computed({
   get: () => {
     if (props["value"] instanceof Date) {
-      return toDateString(props["value"]);
+      return toISODateString(props["value"]);
     } else {
       const splittedDateTime = props["value"]?.split("T");
       const date = splittedDateTime?.[0];
