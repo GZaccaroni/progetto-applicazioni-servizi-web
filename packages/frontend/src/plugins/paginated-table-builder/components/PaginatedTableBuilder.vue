@@ -55,8 +55,8 @@ import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { useCancellablesListener } from "@/components/common/UnsubscribeMixin";
 import { ObservePaginatedResultFunction } from "@/repositories/common/ObserveUtils";
 import { ItemAction } from "@/plugins/table-builder/components/ActionsTable.vue";
-import { PaginatedFindInput } from "@/repositories/common/PaginatedResult";
 import { DataTableHeader } from "vuetify";
+import { PaginateParams } from "@common/model/network/PaginateParams";
 
 const props = defineProps({
   observeItemsFn: {
@@ -66,7 +66,7 @@ const props = defineProps({
     required: true,
   },
   observeFnInput: {
-    type: Object as PropType<PaginatedFindInput>,
+    type: Object as PropType<PaginateParams>,
     required: true,
   },
   columns: {
@@ -157,8 +157,8 @@ function loadItems(direction?: "previous" | "next") {
       limit: limit,
     },
     (result) => {
-      previousPageCursor.value = result.previous;
-      nextPageCursor.value = result.next;
+      previousPageCursor.value = result.cursors.previous;
+      nextPageCursor.value = result.cursors.next;
       // Add actions if needed
       const itemActions: Partial<Record<ItemAction, boolean>> = {};
       for (const action of props.actions) {
