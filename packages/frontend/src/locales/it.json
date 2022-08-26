@@ -224,11 +224,14 @@
   },
   "error": {
     "formGeneric": "Compila correttamente tutti i campi",
-    "invalidUsernameOrPassword": "Nome utente/ Password non validi.",
-    "requestFailed": "La richiesta è fallita.",
+    "invalidArgument": "Compila correttamente i campi",
     "itemNotFound": "Elemento non trovato.",
-    "userNotLoggedIn": "Devi effettuare l'accesso per continuare",
-    "unauthorized": "Non hai permessi sufficienti per eseguire questa azione.",
+    "notLoggedIn": "Devi effettuare l'accesso per continuare",
+    "notAuthorized": "Non hai permessi sufficienti per eseguire questa azione.",
+    "nonDeletable": "Non è possibile eliminare questo elemento perché ve ne sono altri che lo usano.",
+    "nameAlreadyInUse": "Questo nome è già in uso",
+    "serverError": "Stiamo avendo problemi ai server, riprova più tardi.",
+    "persistenceError": "Collegamento al database fallito, riprova più tardi.",
     "unknown": "Errore sconosciuto"
   }
 }

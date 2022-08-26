@@ -3,35 +3,27 @@ import { AxiosError } from "axios";
 import router from "@/router";
 import i18n from "@/i18n";
 import { useUserStore } from "@/store/user";
+import { BackendErrorCode } from "@common/model/common/BackendErrorCode";
 
-export async function repositoryErrorHandler(reason: unknown, isLogin = false) {
+export async function repositoryErrorHandler(reason: unknown) {
   let errorMessage: string;
   if (reason instanceof AxiosError) {
-    switch (reason.response?.status) {
-      case 400:
-        if (isLogin) {
-          errorMessage = i18n.t("error.invalidUsernameOrPassword").toString();
-        } else {
-          errorMessage = i18n.t("error.requestFailed").toString();
-        }
-        break;
-      case 404:
-        errorMessage = i18n.t("error.itemNotFound").toString();
-        break;
-      case 401:
-        try {
-          await useUserStore().logout();
-          await router.push("/");
-        } catch {
-          // Ignore errors
-        }
-        errorMessage = i18n.t("error.userNotLoggedIn").toString();
-        break;
-      case 403:
-        errorMessage = i18n.t("error.unauthorized").toString();
-        break;
-      default:
-        errorMessage = reason.message;
+    const errorCode: BackendErrorCode | undefined =
+      reason.response?.data.error?.code;
+    if (errorCode != undefined) {
+      errorMessage = i18n.t("error." + errorCode).toString();
+      switch (errorCode) {
+        case "notLoggedIn":
+          try {
+            await useUserStore().logout();
+            await router.push("/");
+          } catch {
+            // Ignore errors
+          }
+          break;
+      }
+    } else {
+      errorMessage = i18n.t("error.unknown").toString();
     }
   } else if (typeof reason == "string") {
     errorMessage = reason;

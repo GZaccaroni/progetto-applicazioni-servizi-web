@@ -1,3 +1,5 @@
+import { BackendErrorCode } from "@common/model/common/BackendErrorCode";
+
 export class BackendError {
   errorCode: BackendErrorCode;
   errorMessage?: string;
@@ -9,6 +11,8 @@ export class BackendError {
 
   httpStatusCode(): number {
     switch (this.errorCode) {
+      case "notLoggedIn":
+        return 401;
       case "itemNotFound":
         return 404;
       case "invalidArgument":
@@ -23,12 +27,3 @@ export class BackendError {
     }
   }
 }
-
-export type BackendErrorCode =
-  | "itemNotFound"
-  | "invalidArgument"
-  | "notAuthorized"
-  | "nameAlreadyInUse"
-  | "serverError"
-  | "persistenceError"
-  | "nonDeletable";

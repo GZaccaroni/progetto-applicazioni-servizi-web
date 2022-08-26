@@ -10,7 +10,7 @@ export const isUserLoggedIn = (
   next: NextFunction
 ) => {
   if (!req.isAuthenticated()) {
-    res.status(401).send("User not authenticated");
+    next(new BackendError("notLoggedIn"));
     return;
   }
   next();

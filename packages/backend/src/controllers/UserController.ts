@@ -18,7 +18,7 @@ export const createUser = callableUserFunction(async (req) => {
     throw new BackendError("invalidArgument", "Invalid input");
   }
   if (!req.user?.isAdmin) {
-    throw new BackendError("notAuthorized", "User not authorized");
+    throw new BackendError("notAuthorized");
   }
   let existingUser: UserDocument | null;
   try {
