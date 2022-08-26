@@ -22,7 +22,7 @@ export const createUser = callableUserFunction(async (req) => {
   }
   let existingUser: UserDocument | null;
   try {
-    existingUser = await UserDb.findOne({ username: req.body.username });
+    existingUser = await UserDb.findOne({ username: req.body.username }).lean();
   } catch (e) {
     throw new BackendError("serverError", "Persistence error");
   }
@@ -63,6 +63,7 @@ export const getUsers = callableUserFunction(async (req) => {
     sortAscending: true,
     projection: UserProjection,
     limit: req.query.limit,
+    lean: true,
     cursors: {
       next: req.query.pagingNext,
       previous: req.query.pagingPrevious,
@@ -80,7 +81,7 @@ export const getUserByName = callableUserFunction(async (req) => {
   const user = await UserDb.findOne(
     { username: req.params.username },
     UserProjection
-  );
+  ).lean();
   if (!user) {
     throw new BackendError("itemNotFound");
   }
@@ -126,7 +127,7 @@ export const deleteUser = callableUserFunction(async (req) => {
   if (req.user.username != req.params.username && !req.user.isAdmin) {
     throw new BackendError("notAuthorized");
   }
-  const user = await UserDb.findOne({ username: req.params.username });
+  const user = await UserDb.findOne({ username: req.params.username }).lean();
   if (user == null) {
     throw new BackendError("itemNotFound", "User not found");
   }

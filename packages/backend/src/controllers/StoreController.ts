@@ -28,7 +28,7 @@ async function checkStoreConsistence(
   if (usersIds.length != input.authorizations.length) {
     throw invalidAuthorizationError;
   }
-  const store = await Store.findOne({ name: input.name });
+  const store = await Store.findOne({ name: input.name }).lean();
   if (store && !(storeId && store._id?.toString() == storeId)) {
     throw new BackendError("nameAlreadyInUse");
   }
@@ -99,7 +99,9 @@ export const getStores = callableUserFunction(async (req) => {
     query,
     paginatedField: "_id",
     sortAscending: true,
+    projection: StoreProjection,
     limit: req.query.limit,
+    lean: true,
     cursors: {
       next: req.query.pagingNext,
       previous: req.query.pagingPrevious,
@@ -154,7 +156,7 @@ export const deleteStore = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.storeId)) {
     throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  const order = await Order.findOne({ "store.id": req.params.storeId });
+  const order = await Order.findOne({ "store.id": req.params.storeId }).lean();
   if (order) {
     throw new BackendError(
       "nonDeletable",

@@ -24,7 +24,7 @@ const checkProductConsistence = async (
     throw new BackendError("invalidArgument");
   }
 
-  const product = await Product.findOne({ name: input.name });
+  const product = await Product.findOne({ name: input.name }).lean();
   if (product && !(productId && product._id.toString() == productId)) {
     throw new BackendError("nameAlreadyInUse");
   }
@@ -76,7 +76,9 @@ export const getProducts = callableUserFunction(async (req) => {
     query,
     paginatedField: "_id",
     sortAscending: true,
+    projection: ProductProjection,
     limit: req.query.limit,
+    lean: true,
     cursors: {
       next: req.query.pagingNext,
       previous: req.query.pagingPrevious,
@@ -113,7 +115,9 @@ export const updateProduct = callableUserFunction(async (req) => {
   const deletedKindId = product.kinds
     .filter((k) => enrichedProduct.kinds.find((x) => x.id == k.id) == null)
     .map((k) => k.id);
-  const order = await Order.findOne({ "entries.variantId": deletedKindId });
+  const order = await Order.findOne({
+    "entries.variantId": deletedKindId,
+  }).lean();
   if (order) {
     throw new BackendError(
       "nonDeletable",
@@ -153,7 +157,7 @@ export const deleteProduct = callableUserFunction(async (req) => {
 
   const order = await Order.findOne({
     "entries.productId": req.params.productId,
-  });
+  }).lean();
   if (order) {
     throw new BackendError(
       "nonDeletable",

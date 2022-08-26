@@ -17,7 +17,7 @@ const checkCustomerConsistence = async (
   input: CreateUpdateCustomerInput,
   customerId?: string
 ) => {
-  const customer = await Customer.findOne({ name: input.name });
+  const customer = await Customer.findOne({ name: input.name }).lean();
   if (customer && !(customerId && customer._id.toString() == customerId)) {
     throw new BackendError("nameAlreadyInUse");
   }
@@ -53,6 +53,7 @@ export const getCustomers = callableUserFunction(async (req) => {
     sortAscending: true,
     limit: req.query.limit,
     projection: CustomerProjection,
+    lean: true,
     cursors: {
       next: req.query.pagingNext,
       previous: req.query.pagingPrevious,
@@ -108,7 +109,7 @@ export const deleteCustomer = callableUserFunction(async (req) => {
   }
   const associatedOrder = await Order.findOne({
     "customer.id": req.params.customerId,
-  });
+  }).lean();
   if (associatedOrder) {
     throw new BackendError("nonDeletable");
   }

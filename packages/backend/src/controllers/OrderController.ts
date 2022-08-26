@@ -128,7 +128,7 @@ export const getOrders = callableUserFunction(async (req) => {
     const stores = await Store.find(
       { "authorizations.userId": req.user._id },
       "_id"
-    );
+    ).lean();
     query["store.id"] = {
       $in: stores.map((elem) => elem._id),
     };
@@ -151,6 +151,7 @@ export const getOrders = callableUserFunction(async (req) => {
     sortAscending: true,
     projection: OrderProjection,
     limit: requestQuery.limit,
+    lean: true,
     cursors: {
       next: requestQuery.pagingNext,
       previous: requestQuery.pagingPrevious,
@@ -197,7 +198,7 @@ export const updateOrder = callableUserFunction(async (req) => {
   const updatedOrder = await Order.findOneAndReplace(
     { _id: req.params.orderId },
     enrichedOrder
-  );
+  ).lean();
   if (updatedOrder == null) {
     throw new BackendError("itemNotFound");
   }
