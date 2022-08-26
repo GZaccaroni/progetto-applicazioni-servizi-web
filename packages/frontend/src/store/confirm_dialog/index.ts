@@ -8,9 +8,7 @@ export const useConfirmDialogStore = defineStore("confirm_dialog", {
   state: () => ({ data: undefined } as ConfirmDialogState),
   actions: {
     show(dialog: ConfirmDialogInfo): Promise<boolean> {
-      console.log("Show called!!", dialog);
       this.data = dialog;
-      console.log("Updated!!", this.data);
       return new Promise((resolve) => {
         this.dialogResolve = resolve;
       });
