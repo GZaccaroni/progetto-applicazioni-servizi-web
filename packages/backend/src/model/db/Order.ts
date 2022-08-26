@@ -1,11 +1,11 @@
-import mongoose, { ObjectId, ProjectionType, Schema } from "mongoose";
+import mongoose, { ProjectionType, Schema, Types } from "mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 import { ProductGrade } from "../common/ProductGrade";
 import { CustomerDocument } from "@/model/db/Customer";
 
 export type OrderDocument = {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   customer?: CustomerDocument & NetworkIdentifiable;
   store: {
     id: string;

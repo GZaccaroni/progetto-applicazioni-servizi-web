@@ -1,14 +1,14 @@
 import mongoose, {
-  ObjectId,
   PassportLocalDocument,
   PassportLocalModel,
   ProjectionType,
+  Types,
 } from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 
 export type UserDocument = {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   username: string;
   isAdmin: boolean;
 } & Omit<PassportLocalDocument, "_id">;

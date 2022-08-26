@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { UserDocument } from "./model/db/User";
 import { RequestHandler } from "express-serve-static-core";
 import { BackendError } from "@/model/common/BackendError";
-import { Error as MongooseError, ObjectId } from "mongoose";
+import { Error as MongooseError, Types } from "mongoose";
 
 export const isUserLoggedIn = (
   req: Request,
@@ -38,5 +38,5 @@ export interface UserRequest extends Request {
 }
 
 export type DbIdentifiable = {
-  _id: ObjectId;
+  _id: Types.ObjectId;
 };

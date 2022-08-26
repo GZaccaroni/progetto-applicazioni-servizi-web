@@ -1,8 +1,8 @@
-import mongoose, { ObjectId, ProjectionType } from "mongoose";
+import mongoose, { ProjectionType, Types } from "mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 
 export type CustomerDocument = {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   name: string;
   phoneNumber?: string;
   address?: string;

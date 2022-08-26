@@ -1,9 +1,9 @@
-import mongoose, { ObjectId, ProjectionType } from "mongoose";
+import mongoose, { ProjectionType, Types } from "mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 import { StoreAccessLevel } from "../common/StoreAccessLevel";
 
 export type StoreDocument = {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   name: string;
   authorizations: Array<StoreDocumentAuthorization>;
 };

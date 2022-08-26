@@ -1,6 +1,7 @@
-import mongoose, { ObjectId, Schema } from "mongoose";
+import mongoose, { ObjectId, Schema, Types } from "mongoose";
 
 export type LogDocument = {
+  _id: Types.ObjectId;
   username: string;
   action: "create" | "update" | "delete";
   object: {

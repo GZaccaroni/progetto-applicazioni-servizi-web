@@ -1,9 +1,9 @@
-import mongoose, { ObjectId, ProjectionType } from "mongoose";
+import mongoose, { Types, ProjectionType } from "mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 import { QuantityUnitOfMeasure } from "../common/QuantityUnitOfMeasure";
 
 export type ProductDocument = {
-  _id: ObjectId;
+  _id: Types.ObjectId;
   name: string;
   pricePerUnit?: number;
   kinds: ProductDocumentKind[];
