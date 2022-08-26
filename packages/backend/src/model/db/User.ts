@@ -15,9 +15,6 @@ export type UserDocument = {
 } & Omit<PassportLocalDocument, "_id">;
 
 const UserSchema = new mongoose.Schema<UserDocument>({
-  _id: {
-    type: Schema.Types.ObjectId,
-  },
   username: {
     type: String,
     unique: true,

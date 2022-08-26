@@ -27,9 +27,6 @@ export type OrderDocumentEntry = {
   price: number;
 };
 const OrderSchema = new mongoose.Schema<OrderDocument>({
-  _id: {
-    type: Schema.Types.ObjectId,
-  },
   customer: {
     id: String,
     name: String,

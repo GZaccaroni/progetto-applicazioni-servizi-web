@@ -10,9 +10,6 @@ export type CustomerDocument = {
 };
 
 const CustomerSchema = new mongoose.Schema<CustomerDocument>({
-  _id: {
-    type: Schema.Types.ObjectId,
-  },
   name: {
     type: String,
     unique: true,

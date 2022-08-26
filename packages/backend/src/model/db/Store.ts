@@ -13,9 +13,6 @@ export interface StoreDocumentAuthorization {
 }
 
 const StoreSchema = new mongoose.Schema<StoreDocument>({
-  _id: {
-    type: Schema.Types.ObjectId,
-  },
   name: {
     type: String,
     unique: true,

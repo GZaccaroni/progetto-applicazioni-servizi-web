@@ -17,9 +17,6 @@ export type ProductDocumentKind = {
 };
 
 const ProductSchema = new mongoose.Schema<ProductDocument>({
-  _id: {
-    type: Schema.Types.ObjectId,
-  },
   name: {
     type: String,
     unique: true,
