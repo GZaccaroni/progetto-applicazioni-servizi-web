@@ -17,6 +17,7 @@ export const CreateUpdateCustomerInputSchema: JSONSchemaType<CreateUpdateCustome
         maxLength: 30,
         nullable: true,
         transform: ["trim"],
+        regexp: "/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$/"
       },
       address: {
         type: "string",
