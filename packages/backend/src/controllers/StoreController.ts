@@ -32,6 +32,9 @@ async function checkStoreConsistence(
   if (store && !(storeId && store._id?.toString() == storeId)) {
     throw new BackendError("nameAlreadyInUse");
   }
+  const usersIds = input.authorizations.map(
+    (authorization) => authorization.userId
+  );
   const usersExistsPromises = usersIds.map(async (userId) => {
     if (!mongoose.isValidObjectId(userId)) {
       throw invalidAuthorizationError;
@@ -76,10 +79,10 @@ export const addStore = callableUserFunction(async (req) => {
   const store = await Store.create(req.body);
   await Log.create({
     username: req.user.username,
-    action: "Create",
+    action: "create",
     object: {
       id: store._id,
-      type: "Store",
+      type: "store",
     },
   });
   io.emit("storeChanged", { id: store._id, action: "create" });
@@ -143,10 +146,10 @@ export const updateStore = callableUserFunction(async (req) => {
   }
   await Log.create({
     username: req.user.username,
-    action: "Update",
+    action: "update",
     object: {
       id: updatedStore._id,
-      type: "Store",
+      type: "store",
     },
   });
   io.emit("storeChanged", { id: req.params.storeId, action: "update" });
@@ -169,10 +172,10 @@ export const deleteStore = callableUserFunction(async (req) => {
   }
   await Log.create({
     username: req.user.username,
-    action: "Delete",
+    action: "delete",
     object: {
       id: deletedStore._id,
-      type: "Store",
+      type: "store",
     },
   });
   io.emit("storeChanged", { id: deletedStore._id, action: "delete" });

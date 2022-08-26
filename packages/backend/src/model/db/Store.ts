@@ -1,4 +1,4 @@
-import mongoose, { ObjectId, ProjectionType, Schema } from "mongoose";
+import mongoose, { ObjectId, ProjectionType } from "mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 import { StoreAccessLevel } from "../common/StoreAccessLevel";
 

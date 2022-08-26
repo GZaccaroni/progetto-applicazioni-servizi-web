@@ -52,10 +52,10 @@ export const addProduct = callableUserFunction(async (req) => {
   const newProduct = await Product.create(enrichedProduct);
   await Log.create({
     username: req.user.username,
-    action: "Create",
+    action: "create",
     object: {
       id: newProduct._id,
-      type: "Product",
+      type: "product",
     },
   });
   io.emit("productChanged", { id: newProduct._id, action: "create" });
@@ -136,10 +136,10 @@ export const updateProduct = callableUserFunction(async (req) => {
   }
   await Log.create({
     username: req.user.username,
-    action: "Update",
+    action: "update",
     object: {
       id: product._id,
-      type: "Product",
+      type: "product",
     },
   });
   io.emit("productChanged", {
@@ -170,10 +170,10 @@ export const deleteProduct = callableUserFunction(async (req) => {
   }
   await Log.create({
     username: req.user.username,
-    action: "Delete",
+    action: "delete",
     object: {
       id: product._id,
-      type: "Product",
+      type: "product",
     },
   });
   io.emit("productChanged", { id: product._id, action: "delete" });

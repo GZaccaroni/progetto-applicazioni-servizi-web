@@ -96,10 +96,10 @@ export const addOrder = callableUserFunction(async (req) => {
   const newOrder = await Order.create(enrichedOrder);
   await Log.create({
     username: req.user.username,
-    action: "Create",
+    action: "create",
     object: {
       id: newOrder._id,
-      type: "Order",
+      type: "order",
     },
   });
   io.emit("orderChanged", { id: newOrder._id, action: "create" });
@@ -204,10 +204,10 @@ export const updateOrder = callableUserFunction(async (req) => {
   }
   await Log.create({
     username: req.user.username,
-    action: "Update",
+    action: "update",
     object: {
       id: order._id,
-      type: "Order",
+      type: "order",
     },
   });
   io.emit("orderChanged", {
@@ -243,10 +243,10 @@ export const deleteOrder = callableUserFunction(async (req) => {
   await Order.findByIdAndDelete(req.params.orderId);
   await Log.create({
     username: req.user.username,
-    action: "Delete",
+    action: "delete",
     object: {
       id: order._id,
-      type: "Order",
+      type: "order",
     },
   });
   io.emit("orderChanged", { id: order._id, action: "delete" });

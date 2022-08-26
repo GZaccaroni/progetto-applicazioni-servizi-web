@@ -3,7 +3,6 @@ import mongoose, {
   PassportLocalDocument,
   PassportLocalModel,
   ProjectionType,
-  Schema,
 } from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";

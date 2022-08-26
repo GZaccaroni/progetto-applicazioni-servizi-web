@@ -37,10 +37,10 @@ export const createUser = callableUserFunction(async (req) => {
   }
   await Log.create({
     username: req.user.username,
-    action: "Create",
+    action: "create",
     object: {
       id: registeredUser._id,
-      type: "User",
+      type: "user",
     },
   });
   io.emit("userChanged", { id: registeredUser._id, action: "create" });
@@ -113,10 +113,10 @@ export const updateUser = callableUserFunction(async (req) => {
   await user.save();
   await Log.create({
     username: req.user.username,
-    action: "Update",
+    action: "update",
     object: {
       id: user._id,
-      type: "User",
+      type: "user",
     },
   });
 });
@@ -137,13 +137,7 @@ export const deleteUser = callableUserFunction(async (req) => {
   );
   const deleteResult = await UserDb.deleteOne({ _id: user._id });
   if (deleteResult.deletedCount < 1) {
-    throw {
-      code: 400,
-      error: {
-        errCode: "itemNotFound",
-        message: "User not found",
-      },
-    };
+    throw new BackendError("itemNotFound", "User not found");
   }
   if (req.user.username == user.username) {
     req.logout(function (err) {
@@ -154,10 +148,10 @@ export const deleteUser = callableUserFunction(async (req) => {
   }
   await Log.create({
     username: user.username,
-    action: "Delete",
+    action: "delete",
     object: {
       id: user._id,
-      type: "User",
+      type: "user",
     },
   });
   io.emit("userChanged", { id: user._id, action: "delete" });

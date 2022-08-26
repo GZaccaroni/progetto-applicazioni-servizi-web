@@ -31,10 +31,10 @@ export const addCustomer = callableUserFunction(async (req) => {
   const newCustomer = await Customer.create(req.body);
   await Log.create({
     username: req.user.username,
-    action: "Create",
+    action: "create",
     object: {
       id: newCustomer._id,
-      type: "Customer",
+      type: "customer",
     },
   });
   io.emit("customerChanged", { id: newCustomer._id, action: "create" });
@@ -95,10 +95,10 @@ export const updateCustomer = callableUserFunction(async (req) => {
   }
   await Log.create({
     username: req.user.username,
-    action: "Update",
+    action: "update",
     object: {
       id: updatedCustomer._id,
-      type: "Customer",
+      type: "customer",
     },
   });
   io.emit("customerChanged", { id: updatedCustomer._id, action: "update" });
@@ -121,10 +121,10 @@ export const deleteCustomer = callableUserFunction(async (req) => {
   }
   await Log.create({
     username: req.user.username,
-    action: "Delete",
+    action: "delete",
     object: {
       id: deletedCustomer._id,
-      type: "Customer",
+      type: "customer",
     },
   });
   io.emit("customerChanged", { id: deletedCustomer._id, action: "delete" });

@@ -1,21 +1,29 @@
-import mongoose from "mongoose";
+import mongoose, { ObjectId, Schema } from "mongoose";
 
-const Log = new mongoose.Schema(
+export type LogDocument = {
+  username: string;
+  action: "create" | "update" | "delete";
+  object: {
+    id: ObjectId;
+    type: "user" | "product" | "customer" | "order" | "store";
+  };
+};
+const LogSchema = new mongoose.Schema<LogDocument>(
   {
     username: String,
     action: {
       type: String,
-      enum: ["Create", "Update", "Delete"],
+      enum: ["create", "update", "delete"],
     },
     object: {
-      id: String,
+      id: Schema.Types.ObjectId,
       type: {
         type: String,
-        enum: ["User", "Product", "Customer", "Order", "Store"],
+        enum: ["user", "product", "customer", "order", "store"],
       },
     },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("log", Log);
+export default mongoose.model<LogDocument>("log", LogSchema, "logs");
