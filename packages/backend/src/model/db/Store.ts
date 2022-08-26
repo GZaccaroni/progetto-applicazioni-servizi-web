@@ -1,8 +1,9 @@
-import mongoose, { ProjectionType } from "mongoose";
+import mongoose, { ObjectId, ProjectionType, Schema } from "mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 import { StoreAccessLevel } from "../common/StoreAccessLevel";
 
 export type StoreDocument = {
+  _id: ObjectId;
   name: string;
   authorizations: Array<StoreDocumentAuthorization>;
 };
@@ -12,6 +13,9 @@ export interface StoreDocumentAuthorization {
 }
 
 const StoreSchema = new mongoose.Schema<StoreDocument>({
+  _id: {
+    type: Schema.Types.ObjectId,
+  },
   name: {
     type: String,
     unique: true,

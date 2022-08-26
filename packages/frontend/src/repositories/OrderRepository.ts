@@ -1,16 +1,14 @@
 import Client from "@/repositories/common/AxiosClient";
-import {
-  PaginatedFindInput,
-  PaginatedResult,
-} from "@/repositories/common/PaginatedResult";
+import { PaginatedResult } from "@common/model/common/PaginatedResult";
 import { NetworkOrder } from "@common/model/network/NetworkOrder";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderInput";
+import { PaginateParams } from "@common/model/network/PaginateParams";
 
 const resource = "/order";
 
-export interface FindOrdersInput extends PaginatedFindInput {
+export interface FindOrdersInput extends PaginateParams {
   storeId?: string;
   fromDate?: Date;
   toDate?: Date;

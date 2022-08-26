@@ -1,10 +1,11 @@
-import mongoose, { ProjectionType, Schema } from "mongoose";
+import mongoose, { ObjectId, ProjectionType, Schema } from "mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 import { ProductGrade } from "../common/ProductGrade";
 import { CustomerDocument } from "@/model/db/Customer";
 
 export type OrderDocument = {
+  _id: ObjectId;
   customer?: CustomerDocument & NetworkIdentifiable;
   store: {
     id: string;
@@ -26,6 +27,9 @@ export type OrderDocumentEntry = {
   price: number;
 };
 const OrderSchema = new mongoose.Schema<OrderDocument>({
+  _id: {
+    type: Schema.Types.ObjectId,
+  },
   customer: {
     id: String,
     name: String,

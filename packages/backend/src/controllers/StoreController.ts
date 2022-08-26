@@ -1,7 +1,6 @@
 import { validateRequest } from "@common/validation";
 import Store, { StoreDocument, StoreProjection } from "@/model/db/Store";
 import Log from "@/model/db/Log";
-import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import mongoose, { FilterQuery, ObjectId } from "mongoose";
 import { io } from "@/app";
 import User from "@/model/db/User";
@@ -96,16 +95,16 @@ export const getStores = callableUserFunction(async (req) => {
   if (req.query.searchName) {
     query["name"] = { $regex: req.query.searchName, $options: "i" };
   }
-  const options = paginateOptions(
+  return await Store.paginate({
     query,
-    StoreProjection,
-    {},
-    req.query.limit,
-    req.query.pagingNext,
-    req.query.paginatePrevious
-  );
-  const result = await Store.paginate(options);
-  return paginateResponse(result);
+    paginatedField: "_id",
+    sortAscending: true,
+    limit: req.query.limit,
+    cursors: {
+      next: req.query.pagingNext,
+      previous: req.query.pagingPrevious,
+    },
+  });
 });
 
 export const getStoreById = callableUserFunction(async (req) => {

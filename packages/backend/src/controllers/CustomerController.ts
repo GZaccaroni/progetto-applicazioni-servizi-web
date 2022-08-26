@@ -4,7 +4,6 @@ import Customer, {
   CustomerProjection,
 } from "@/model/db/Customer";
 import Log from "@/model/db/Log";
-import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import Order from "@/model/db/Order";
@@ -48,16 +47,17 @@ export const getCustomers = callableUserFunction(async (req) => {
   if (req.query.searchName) {
     query["name"] = { $regex: req.query.searchName, $options: "i" };
   }
-  const options = paginateOptions(
+  return await Customer.paginate({
     query,
-    CustomerProjection,
-    {},
-    req.query.limit,
-    req.query.pagingNext,
-    req.query.paginatePrevious
-  );
-  const result = await Customer.paginate(options);
-  return paginateResponse(result);
+    paginatedField: "_id",
+    sortAscending: true,
+    limit: req.query.limit,
+    projection: CustomerProjection,
+    cursors: {
+      next: req.query.pagingNext,
+      previous: req.query.pagingPrevious,
+    },
+  });
 });
 
 export const getCustomerById = callableUserFunction(async (req) => {

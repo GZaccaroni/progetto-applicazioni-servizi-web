@@ -4,12 +4,11 @@ import Product, {
   ProductProjection,
 } from "../model/db/Product";
 import Log from "../model/db/Log";
-import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import Order from "../model/db/Order";
 import { GetProductsInputSchema } from "@common/validation/json_schema/GetProductsInput";
-import { callableUserFunction } from "@/utils";
+import { callableUserFunction, DbIdentifiable } from "@/utils";
 import { CreateUpdateProductInputSchema } from "@common/validation/json_schema/CreateUpdateProductInput";
 import { CreateUpdateProductInput } from "@common/model/network/CreateUpdateProductInput";
 import { BackendError } from "@/model/common/BackendError";
@@ -31,7 +30,9 @@ const checkProductConsistence = async (
   }
 };
 
-function enrichProduct(product: CreateUpdateProductInput): ProductDocument {
+function enrichProduct(
+  product: CreateUpdateProductInput
+): Omit<ProductDocument, keyof DbIdentifiable> {
   const kinds: ProductDocument["kinds"] = product.kinds.map((kind) =>
     Object.assign({ fullName: `${product.name} ${kind.name}` }, kind)
   );
@@ -71,16 +72,16 @@ export const getProducts = callableUserFunction(async (req) => {
       { "kinds.fullName": { $regex: req.query.searchName, $options: "i" } },
     ];
   }
-  const options = paginateOptions(
+  return await Product.paginate({
     query,
-    ProductProjection,
-    {},
-    req.query.limit,
-    req.query.pagingNext,
-    req.query.paginatePrevious
-  );
-  const result = await Product.paginate(options);
-  return paginateResponse(result);
+    paginatedField: "_id",
+    sortAscending: true,
+    limit: req.query.limit,
+    cursors: {
+      next: req.query.pagingNext,
+      previous: req.query.pagingPrevious,
+    },
+  });
 });
 
 export const getProductById = callableUserFunction(async (req) => {

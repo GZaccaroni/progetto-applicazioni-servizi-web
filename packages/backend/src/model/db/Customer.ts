@@ -1,7 +1,8 @@
-import mongoose, { ProjectionType } from "mongoose";
+import mongoose, { ObjectId, ProjectionType, Schema } from "mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 
 export type CustomerDocument = {
+  _id: ObjectId;
   name: string;
   phoneNumber?: string;
   address?: string;
@@ -9,6 +10,9 @@ export type CustomerDocument = {
 };
 
 const CustomerSchema = new mongoose.Schema<CustomerDocument>({
+  _id: {
+    type: Schema.Types.ObjectId,
+  },
   name: {
     type: String,
     unique: true,

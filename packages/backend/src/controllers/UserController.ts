@@ -3,7 +3,6 @@ import { validateRequest } from "@common/validation";
 import passport from "passport";
 import UserDb, { UserDocument, UserProjection } from "@/model/db/User";
 import Log from "@/model/db/Log";
-import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import { io } from "@/app";
 import Store from "@/model/db/Store";
 import { CreateUserInputSchema } from "@common/validation/json_schema/CreateUserInput";
@@ -58,16 +57,17 @@ export const getUsers = callableUserFunction(async (req) => {
   if (req.query.searchName) {
     query["username"] = { $regex: req.query.searchName, $options: "i" };
   }
-  const options = paginateOptions(
+  return await UserDb.paginate({
     query,
-    UserProjection,
-    {},
-    req.query.limit,
-    req.query.pagingNext,
-    req.query.pagingPrevious
-  );
-  const result = await UserDb.paginate(options);
-  return paginateResponse(result);
+    paginatedField: "_id",
+    sortAscending: true,
+    projection: UserProjection,
+    limit: req.query.limit,
+    cursors: {
+      next: req.query.pagingNext,
+      previous: req.query.pagingPrevious,
+    },
+  });
 });
 
 export const getUserByName = callableUserFunction(async (req) => {
@@ -93,7 +93,10 @@ export const updateUser = callableUserFunction(async (req) => {
   ) {
     throw new BackendError("invalidArgument");
   }
-  if (req.user.username != req.params.username && !req.user.isAdmin) {
+  if (
+    (req.user.username != req.params.username && !req.user.isAdmin) ||
+    (!req.user.isAdmin && req.body.isAdmin != undefined)
+  ) {
     throw new BackendError("notAuthorized");
   }
   const user = await UserDb.findOne({ username: req.params.username });

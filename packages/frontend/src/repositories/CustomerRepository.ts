@@ -1,12 +1,10 @@
 import Client from "@/repositories/common/AxiosClient";
-import {
-  PaginatedFindInput,
-  PaginatedResult,
-} from "@/repositories/common/PaginatedResult";
+import { PaginatedResult } from "@common/model/common/PaginatedResult";
 import { NetworkCustomer } from "@common/model/network/NetworkCustomer";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 import { CreateUpdateCustomerInput } from "@common/model/network/CreateUpdateCustomerInput";
+import { PaginateParams } from "@common/model/network/PaginateParams";
 
 const resource = "/customer";
 
@@ -23,7 +21,7 @@ export function observeCustomers(
     onError
   );
 }
-export interface FindCustomersInput extends PaginatedFindInput {
+export interface FindCustomersInput extends PaginateParams {
   searchName?: string;
   limit: number;
 }

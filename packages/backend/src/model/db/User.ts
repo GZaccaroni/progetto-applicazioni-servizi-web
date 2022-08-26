@@ -3,6 +3,7 @@ import mongoose, {
   PassportLocalDocument,
   PassportLocalModel,
   ProjectionType,
+  Schema,
 } from "mongoose";
 import passportLocalMongoose from "passport-local-mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
@@ -14,6 +15,9 @@ export type UserDocument = {
 } & Omit<PassportLocalDocument, "_id">;
 
 const UserSchema = new mongoose.Schema<UserDocument>({
+  _id: {
+    type: Schema.Types.ObjectId,
+  },
   username: {
     type: String,
     unique: true,

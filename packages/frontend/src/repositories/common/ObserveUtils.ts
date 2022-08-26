@@ -1,16 +1,14 @@
 import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
-import {
-  PaginatedFindInput,
-  PaginatedResult,
-} from "@/repositories/common/PaginatedResult";
+import { PaginatedResult } from "@common/model/common/PaginatedResult";
 import socketIoClient, {
   ServerEventData,
   ServerToClientEvents,
 } from "@/repositories/common/SocketIoClient";
 import { Cancellable } from "@/repositories/common/Cancellable";
+import { PaginateParams } from "@common/model/network/PaginateParams";
 
 export type ObservePaginatedResultFunction<
-  Input extends PaginatedFindInput,
+  Input extends PaginateParams,
   Item extends NetworkIdentifiable
 > = (
   input: Input,

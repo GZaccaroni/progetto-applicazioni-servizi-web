@@ -1,8 +1,9 @@
-import mongoose, { ProjectionType } from "mongoose";
+import mongoose, { ObjectId, ProjectionType, Schema } from "mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
 import { QuantityUnitOfMeasure } from "../common/QuantityUnitOfMeasure";
 
 export type ProductDocument = {
+  _id: ObjectId;
   name: string;
   pricePerUnit?: number;
   kinds: ProductDocumentKind[];
@@ -16,6 +17,9 @@ export type ProductDocumentKind = {
 };
 
 const ProductSchema = new mongoose.Schema<ProductDocument>({
+  _id: {
+    type: Schema.Types.ObjectId,
+  },
   name: {
     type: String,
     unique: true,

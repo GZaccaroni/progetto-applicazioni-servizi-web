@@ -1,16 +1,14 @@
 import Client from "@/repositories/common/AxiosClient";
-import {
-  PaginatedFindInput,
-  PaginatedResult,
-} from "@/repositories/common/PaginatedResult";
+import { PaginatedResult } from "@common/model/common/PaginatedResult";
 import { NetworkStore } from "@common/model/network/NetworkStore";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
+import { PaginateParams } from "@common/model/network/PaginateParams";
 
 const resource = "/store";
 
-export interface FindStoresInput extends PaginatedFindInput {
+export interface FindStoresInput extends PaginateParams {
   authorized?: boolean;
   searchName?: string;
   limit: number;

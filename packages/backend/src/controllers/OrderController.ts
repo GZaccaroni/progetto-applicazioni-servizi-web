@@ -5,7 +5,6 @@ import Order, {
   OrderProjection,
 } from "@/model/db/Order";
 import Log from "@/model/db/Log";
-import { paginateOptions, paginateResponse } from "@/paginationUtils";
 import Store from "@/model/db/Store";
 import Product from "@/model/db/Product";
 import Customer, { CustomerProjection } from "@/model/db/Customer";
@@ -14,7 +13,7 @@ import { io } from "@/app";
 import { getUserStoreRole } from "./StoreController";
 import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/CreateUpdateOrderInput";
 import { GetOrdersInputSchema } from "@common/validation/json_schema/GetOrdersInput";
-import { callableUserFunction } from "@/utils";
+import { callableUserFunction, DbIdentifiable } from "@/utils";
 import { StoreAccessLevel } from "@/model/common/StoreAccessLevel";
 import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderInput";
 import { BackendError } from "@/model/common/BackendError";
@@ -22,7 +21,7 @@ import { BackendError } from "@/model/common/BackendError";
 const enrichOrder = async (
   order: CreateUpdateOrderInput,
   creatorId: string
-): Promise<OrderDocument> => {
+): Promise<Omit<OrderDocument, keyof DbIdentifiable>> => {
   //get Store data
   const store: OrderDocument["store"] | null = await Store.findById(
     order.storeId,
@@ -146,16 +145,17 @@ export const getOrders = callableUserFunction(async (req) => {
     }
     query["date"]["$lte"] = new Date(requestQuery.toDate);
   }
-  const options = paginateOptions(
+  return await Order.paginate({
     query,
-    OrderProjection,
-    { date: -1 },
-    requestQuery.limit,
-    req.query.pagingNext,
-    req.query.paginatePrevious
-  );
-  const result = await Order.paginate(options);
-  return paginateResponse(result);
+    paginatedField: "date",
+    sortAscending: true,
+    projection: OrderProjection,
+    limit: requestQuery.limit,
+    cursors: {
+      next: requestQuery.pagingNext,
+      previous: requestQuery.pagingPrevious,
+    },
+  });
 });
 export const getOrderById = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.orderId)) {
