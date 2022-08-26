@@ -4,7 +4,7 @@ import Product, {
   ProductProjection,
 } from "../model/db/Product";
 import Log from "../model/db/Log";
-import mongoose, { FilterQuery } from "mongoose";
+import mongoose, { FilterQuery, Types } from "mongoose";
 import { io } from "@/app";
 import Order from "../model/db/Order";
 import { GetProductsInputSchema } from "@common/validation/json_schema/GetProductsInput";
@@ -83,7 +83,10 @@ export const getProductById = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.productId)) {
     throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  const item = await Product.findById(req.params.productId, ProductProjection);
+  const item = await Product.findById(
+    req.params.productId,
+    ProductProjection
+  ).lean();
   if (item == null) {
     throw new BackendError("itemNotFound");
   }
@@ -101,7 +104,7 @@ export const updateProduct = callableUserFunction(async (req) => {
   }
   const enrichedProduct = enrichProduct(req.body);
   await checkProductConsistence(enrichedProduct, req.params.productId);
-  const product = await Product.findById(req.params.productId);
+  const product = await Product.findById(req.params.productId).lean();
   if (product == null) {
     throw new BackendError("itemNotFound");
   }
@@ -117,14 +120,14 @@ export const updateProduct = callableUserFunction(async (req) => {
       "Can't delete product kind: the product kind has associated orders"
     );
   }
-  const updatedProduct = Product.findByIdAndUpdate(
-    req.params.productId,
+  const updatedProduct = await Product.updateOne(
+    { _id: product._id },
     enrichedProduct,
     {
       new: true,
     }
   );
-  if (updatedProduct == null) {
+  if (updatedProduct.matchedCount < 1) {
     throw new BackendError("itemNotFound");
   }
   await Log.create({
@@ -157,17 +160,18 @@ export const deleteProduct = callableUserFunction(async (req) => {
       "Can't delete product: the product has associated orders"
     );
   }
-  const product = await Product.findByIdAndDelete(req.params.productId);
-  if (product == null) {
+  const productId = new Types.ObjectId(req.params.productId);
+  const deletedProduct = await Product.deleteOne({ _id: productId });
+  if (deletedProduct.deletedCount < 1) {
     throw new BackendError("itemNotFound");
   }
   await Log.create({
     username: req.user.username,
     action: "delete",
     object: {
-      id: product._id,
+      id: productId,
       type: "product",
     },
   });
-  io.emit("productChanged", { id: product._id, action: "delete" });
+  io.emit("productChanged", { id: productId, action: "delete" });
 });

@@ -4,7 +4,7 @@ import Customer, {
   CustomerProjection,
 } from "@/model/db/Customer";
 import Log from "@/model/db/Log";
-import mongoose, { FilterQuery } from "mongoose";
+import mongoose, { FilterQuery, Types } from "mongoose";
 import { io } from "@/app";
 import Order from "@/model/db/Order";
 import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";
@@ -68,7 +68,7 @@ export const getCustomerById = callableUserFunction(async (req) => {
   const item = await Customer.findById(
     req.params.customerId,
     CustomerProjection
-  );
+  ).lean();
   if (item == null) {
     throw new BackendError("itemNotFound");
   }
@@ -83,25 +83,23 @@ export const updateCustomer = callableUserFunction(async (req) => {
     throw new BackendError("invalidArgument");
   }
   await checkCustomerConsistence(req.body, req.params.customerId);
-  const updatedCustomer = await Customer.findByIdAndUpdate(
-    req.params.customerId,
-    req.body,
-    {
-      new: true,
-    }
+  const customerId = new Types.ObjectId(req.params.customerId);
+  const updatedCustomer = await Customer.updateOne(
+    { _id: req.params.customerId },
+    req.body
   );
-  if (updatedCustomer == null) {
+  if (updatedCustomer.matchedCount < 1) {
     throw new BackendError("itemNotFound");
   }
   await Log.create({
     username: req.user.username,
     action: "update",
     object: {
-      id: updatedCustomer._id,
+      id: customerId,
       type: "customer",
     },
   });
-  io.emit("customerChanged", { id: updatedCustomer._id, action: "update" });
+  io.emit("customerChanged", { id: customerId, action: "update" });
 });
 export const deleteCustomer = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.customerId)) {
@@ -113,19 +111,20 @@ export const deleteCustomer = callableUserFunction(async (req) => {
   if (associatedOrder) {
     throw new BackendError("nonDeletable");
   }
-  const deletedCustomer = await Customer.findByIdAndDelete(
-    req.params.customerId
-  );
-  if (deletedCustomer == null) {
+  const customerId = new Types.ObjectId(req.params.customerId);
+  const deletedCustomer = await Customer.deleteOne({
+    _id: customerId,
+  });
+  if (deletedCustomer.deletedCount < 1) {
     throw new BackendError("itemNotFound");
   }
   await Log.create({
     username: req.user.username,
     action: "delete",
     object: {
-      id: deletedCustomer._id,
+      id: customerId,
       type: "customer",
     },
   });
-  io.emit("customerChanged", { id: deletedCustomer._id, action: "delete" });
+  io.emit("customerChanged", { id: customerId, action: "delete" });
 });

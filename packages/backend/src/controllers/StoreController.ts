@@ -1,7 +1,7 @@
 import { validateRequest } from "@common/validation";
 import Store, { StoreDocument, StoreProjection } from "@/model/db/Store";
 import Log from "@/model/db/Log";
-import mongoose, { FilterQuery, ObjectId } from "mongoose";
+import mongoose, { FilterQuery, Types } from "mongoose";
 import { io } from "@/app";
 import User from "@/model/db/User";
 import Order from "@/model/db/Order";
@@ -31,7 +31,7 @@ async function checkStoreConsistence(
     if (!mongoose.isValidObjectId(userId)) {
       throw invalidAuthorizationError;
     }
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).lean();
     return user == null;
   });
   const usersExists = (await Promise.all(usersExistsPromises)).every(
@@ -43,10 +43,10 @@ async function checkStoreConsistence(
 }
 
 export async function getUserStoreRole(
-  userId: ObjectId,
+  userId: Types.ObjectId,
   storeId: string
 ): Promise<StoreAccessLevel | undefined> {
-  const store = await Store.findById(storeId, {});
+  const store = await Store.findById(storeId, {}).lean();
   if (!store) {
     throw new BackendError("invalidArgument", "Store not found");
   }
@@ -108,7 +108,7 @@ export const getStoreById = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.storeId)) {
     throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  const item = await Store.findById(req.params.storeId, StoreProjection);
+  const item = await Store.findById(req.params.storeId, StoreProjection).lean();
   if (item == null) {
     throw new BackendError("itemNotFound");
   }
@@ -126,21 +126,18 @@ export const updateStore = callableUserFunction(async (req) => {
   }
   await checkStoreConsistence(req.body, req.params.storeId);
 
-  const updatedStore = await Store.findByIdAndUpdate(
-    req.params.storeId,
-    req.body,
-    {
-      new: true,
-    }
+  const updatedStore = await Store.updateOne(
+    { _id: req.params.storeId },
+    req.body
   );
-  if (updatedStore == null) {
+  if (updatedStore.matchedCount < 1) {
     throw new BackendError("itemNotFound");
   }
   await Log.create({
     username: req.user.username,
     action: "update",
     object: {
-      id: updatedStore._id,
+      id: new Types.ObjectId(req.params.storeId),
       type: "store",
     },
   });
@@ -158,17 +155,18 @@ export const deleteStore = callableUserFunction(async (req) => {
       "Can't delete: the store has associated orders"
     );
   }
-  const deletedStore = await Store.findByIdAndDelete(req.params.storeId);
-  if (deletedStore == null) {
+  const storeId = new Types.ObjectId(req.params.storeId);
+  const deletedStore = await Store.deleteOne({ _id: storeId });
+  if (deletedStore.deletedCount < 1) {
     throw new BackendError("itemNotFound");
   }
   await Log.create({
     username: req.user.username,
     action: "delete",
     object: {
-      id: deletedStore._id,
+      id: storeId,
       type: "store",
     },
   });
-  io.emit("storeChanged", { id: deletedStore._id, action: "delete" });
+  io.emit("storeChanged", { id: storeId, action: "delete" });
 });

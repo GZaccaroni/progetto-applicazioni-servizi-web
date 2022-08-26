@@ -8,7 +8,7 @@ import Log from "@/model/db/Log";
 import Store from "@/model/db/Store";
 import Product from "@/model/db/Product";
 import Customer, { CustomerProjection } from "@/model/db/Customer";
-import mongoose, { FilterQuery } from "mongoose";
+import mongoose, { FilterQuery, Types } from "mongoose";
 import { io } from "@/app";
 import { getUserStoreRole } from "./StoreController";
 import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/CreateUpdateOrderInput";
@@ -29,7 +29,7 @@ const enrichOrder = async (
       id: "$_id",
       name: 1,
     }
-  );
+  ).lean();
   if (store == null) {
     throw new BackendError("invalidArgument", "Store not found");
   }
@@ -38,14 +38,14 @@ const enrichOrder = async (
   const customer: OrderDocument["customer"] | null = await Customer.findById(
     order.customerId,
     CustomerProjection
-  );
+  ).lean();
   if (customer == null) {
     throw new BackendError("invalidArgument", "Customer not found");
   }
 
   //generate product name
   const entryPromises = order.entries.map(async (entry) => {
-    const product = await Product.findById(entry.productId);
+    const product = await Product.findById(entry.productId).lean();
     if (product == null) {
       throw new BackendError("invalidArgument", "Product not found");
     }
@@ -162,7 +162,7 @@ export const getOrderById = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.orderId)) {
     throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  const item = await Order.findById(req.params.orderId, OrderProjection);
+  const item = await Order.findById(req.params.orderId, OrderProjection).lean();
   if (item == null) {
     throw new BackendError("itemNotFound");
   }
@@ -179,7 +179,7 @@ export const updateOrder = callableUserFunction(async (req) => {
   ) {
     throw new BackendError("invalidArgument");
   }
-  const order = await Order.findById(req.params.orderId);
+  const order = await Order.findById(req.params.orderId).lean();
   if (order == null) {
     throw new BackendError("itemNotFound");
   }
@@ -195,11 +195,8 @@ export const updateOrder = callableUserFunction(async (req) => {
     throw new BackendError("notAuthorized");
   }
   const enrichedOrder = await enrichOrder(req.body, order.createdBy);
-  const updatedOrder = await Order.findOneAndReplace(
-    { _id: req.params.orderId },
-    enrichedOrder
-  ).lean();
-  if (updatedOrder == null) {
+  const updatedOrder = await Order.updateOne({ _id: order._id }, enrichedOrder);
+  if (updatedOrder.matchedCount < 1) {
     throw new BackendError("itemNotFound");
   }
   await Log.create({
@@ -219,7 +216,8 @@ export const deleteOrder = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.orderId)) {
     throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  const order = await Order.findById(req.params.orderId);
+  const orderId = new Types.ObjectId(req.params.orderId);
+  const order = await Order.findById(orderId).lean();
   if (order == null) {
     throw {
       code: 404,
@@ -240,7 +238,10 @@ export const deleteOrder = callableUserFunction(async (req) => {
   ) {
     throw new BackendError("notAuthorized");
   }
-  await Order.findByIdAndDelete(req.params.orderId);
+  const deletedOrder = await Order.deleteOne({ _id: orderId });
+  if (deletedOrder.deletedCount < 1) {
+    throw new BackendError("itemNotFound");
+  }
   await Log.create({
     username: req.user.username,
     action: "delete",
