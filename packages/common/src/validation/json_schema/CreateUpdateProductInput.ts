@@ -22,6 +22,7 @@ export const CreateUpdateProductInputSchema: JSONSchemaType<CreateUpdateProductI
       },
       kinds: {
         type: "array",
+        uniqueItemProperties: ["name"],
         items: ProductKindSchema,
       },
       unitOfMeasure: {

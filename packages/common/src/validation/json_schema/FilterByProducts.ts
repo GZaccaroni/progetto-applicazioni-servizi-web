@@ -8,6 +8,7 @@ export const FilterByProductsSchema: JSONSchemaType<FilterByProducts> = {
     products: {
       type: "array",
       nullable: true,
+      uniqueItems: true,
       items: {
         type: "object",
         required: ["productId"],

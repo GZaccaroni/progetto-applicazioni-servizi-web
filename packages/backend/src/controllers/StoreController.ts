@@ -20,14 +20,6 @@ async function checkStoreConsistence(
     "invalidArgument",
     "Invalid store authorization"
   );
-  const usersIds = [
-    ...new Set(
-      input.authorizations.map((authorization) => authorization.userId)
-    ),
-  ];
-  if (usersIds.length != input.authorizations.length) {
-    throw invalidAuthorizationError;
-  }
   const store = await Store.findOne({ name: input.name }).lean();
   if (store && !(storeId && store._id?.toString() == storeId)) {
     throw new BackendError("nameAlreadyInUse");

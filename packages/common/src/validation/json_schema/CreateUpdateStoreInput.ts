@@ -15,6 +15,7 @@ export const CreateUpdateStoreInputSchema: JSONSchemaType<CreateUpdateStoreInput
       },
       authorizations: {
         type: "array",
+        uniqueItemProperties: ["userId"],
         items: StoreAuthorizationSchema,
       },
     },

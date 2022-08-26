@@ -17,13 +17,6 @@ const checkProductConsistence = async (
   input: CreateUpdateProductInput,
   productId?: string
 ) => {
-  const productKindSet = new Set(
-    input.kinds.map((productKind) => productKind.name)
-  );
-  if (productKindSet.size != input.kinds.length) {
-    throw new BackendError("invalidArgument");
-  }
-
   const product = await Product.findOne({ name: input.name }).lean();
   if (product && !(productId && product._id.toString() == productId)) {
     throw new BackendError("nameAlreadyInUse");
