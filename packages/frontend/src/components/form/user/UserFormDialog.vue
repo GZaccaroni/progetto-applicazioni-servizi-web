@@ -61,6 +61,10 @@ import { NetworkUser } from "@common/model/network/NetworkUser";
 import i18n from "@/i18n";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import { useUserStore } from "@/store/user";
+import { validateRequest } from "@common/validation";
+import { CreateUserInputSchema } from "@common/validation/json_schema/CreateUserInput";
+import { UpdateUserInputSchema } from "@common/validation/json_schema/UpdateUserInput";
+import { CreateUserInput } from "@common/model/network/CreateUserInput";
 export type UserFormDialogModel = GenericFormDialogModel<{
   userToUpdate?: string;
 }>;
@@ -102,7 +106,16 @@ watch(
     isVisible.value = el.isVisible;
   }
 );
-
+watch(changePassword, (changePassword) => {
+  console.log("Changed change password val", changePassword);
+  if (changePassword) {
+    console.log("Pw set empty");
+    formData.value = Object.assign({ password: "" }, formData.value);
+  } else {
+    console.log("Pw set undefined");
+    formData.value = Object.assign({ password: undefined }, formData.value);
+  }
+});
 async function onBecameVisible(userToUpdate?: string) {
   const userStore = useUserStore();
   dialogLoading.value = true;
@@ -111,10 +124,11 @@ async function onBecameVisible(userToUpdate?: string) {
     if (item != undefined) {
       formData.value = mapToFormValue(item);
     }
+    isCurrentUser.value = userStore.userProfile?.username == userToUpdate;
   } else {
     formData.value = defaultValues;
+    isCurrentUser.value = false;
   }
-  isCurrentUser.value = userStore.userProfile?.username == userToUpdate;
   changePassword.value = create.value;
   dialogLoading.value = false;
 }
@@ -154,19 +168,32 @@ async function saveForm() {
 function closeForm() {
   emit("input", { isVisible: false });
 }
+
 function validateForm(
   form: RecursivePartial<UpdateUserInput>
-): form is UpdateUserInput {
-  const data = clone(removeBlanks(form));
-  if (changePassword.value && data.password == undefined) {
-    return false;
+): form is UpdateUserInput | CreateUserInput {
+  if (create.value) {
+    return validateCreateForm(form);
+  } else {
+    return validateUpdateForm(form);
   }
+}
+function validateCreateForm(
+  form: RecursivePartial<UpdateUserInput>
+): form is CreateUserInput {
   return (
-    data.username != undefined &&
-    (data.password == undefined || zxcvbn(data.password).score >= 3)
+    validateRequest(CreateUserInputSchema, form) &&
+    zxcvbn(form.password).score >= 3
   );
 }
-
+function validateUpdateForm(
+  form: RecursivePartial<UpdateUserInput>
+): form is UpdateUserInput {
+  return (
+    validateRequest(UpdateUserInputSchema, form) &&
+    (form.password == undefined || zxcvbn(form.password).score >= 3)
+  );
+}
 // Helpers
 
 function mapToFormValue(item: NetworkUser): RecursivePartial<UpdateUserInput> {
