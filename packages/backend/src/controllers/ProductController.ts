@@ -7,7 +7,7 @@ import Log from "../model/db/Log";
 import mongoose, { FilterQuery, Types } from "mongoose";
 import { io } from "@/app";
 import Order from "../model/db/Order";
-import { GetProductsInputSchema } from "@common/validation/json_schema/GetProductsInput";
+import { FindProductsInputSchema } from "@common/validation/json_schema/FindProductsInput";
 import { callableUserFunction, DbIdentifiable } from "@/utils";
 import { CreateUpdateProductInputSchema } from "@common/validation/json_schema/CreateUpdateProductInput";
 import { CreateUpdateProductInput } from "@common/model/network/CreateUpdateProductInput";
@@ -55,7 +55,7 @@ export const addProduct = callableUserFunction(async (req) => {
 });
 
 export const getProducts = callableUserFunction(async (req) => {
-  if (!validateRequest(GetProductsInputSchema, req.query)) {
+  if (!validateRequest(FindProductsInputSchema, req.query)) {
     throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<ProductDocument> = {};

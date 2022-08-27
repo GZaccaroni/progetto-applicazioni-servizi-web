@@ -4,7 +4,7 @@ import { NetworkCustomer } from "@common/model/network/NetworkCustomer";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 import { CreateUpdateCustomerInput } from "@common/model/network/CreateUpdateCustomerInput";
-import { PaginateParams } from "@common/model/network/PaginateParams";
+import { FindCustomersInput } from "@common/model/network/FindCustomersInput";
 
 const resource = "/customer";
 
@@ -20,10 +20,6 @@ export function observeCustomers(
     onNext,
     onError
   );
-}
-export interface FindCustomersInput extends PaginateParams {
-  searchName?: string;
-  limit: number;
 }
 export async function findCustomers(
   input: FindCustomersInput

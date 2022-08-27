@@ -8,7 +8,7 @@ import mongoose, { FilterQuery, Types } from "mongoose";
 import { io } from "@/app";
 import Order from "@/model/db/Order";
 import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";
-import { GetCustomersInputSchema } from "@common/validation/json_schema/GetCustomersInput";
+import { FindCustomersInputSchema } from "@common/validation/json_schema/FindCustomersInput";
 import { callableUserFunction } from "@/utils";
 import { CreateUpdateCustomerInput } from "@common/model/network/CreateUpdateCustomerInput";
 import { BackendError } from "@/model/common/BackendError";
@@ -40,7 +40,7 @@ export const addCustomer = callableUserFunction(async (req) => {
   io.emit("customerChanged", { id: newCustomer._id, action: "create" });
 });
 export const getCustomers = callableUserFunction(async (req) => {
-  if (!validateRequest(GetCustomersInputSchema, req.query)) {
+  if (!validateRequest(FindCustomersInputSchema, req.query)) {
     throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<CustomerDocument> = {};

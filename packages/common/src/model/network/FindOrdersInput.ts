@@ -2,7 +2,7 @@ import { PaginateParams } from "./PaginateParams";
 import { FilterByDate } from "./FilterByDate";
 import { FilterByStore } from "./FilterByStore";
 
-export interface GetOrdersInput
+export interface FindOrdersInput
   extends PaginateParams,
     FilterByDate,
     FilterByStore {}

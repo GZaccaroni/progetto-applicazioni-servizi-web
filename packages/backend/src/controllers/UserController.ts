@@ -6,7 +6,7 @@ import Log from "@/model/db/Log";
 import { io } from "@/app";
 import Store from "@/model/db/Store";
 import { CreateUserInputSchema } from "@common/validation/json_schema/CreateUserInput";
-import { GetUsersInputSchema } from "@common/validation/json_schema/GetUsersInput";
+import { FindUsersInputSchema } from "@common/validation/json_schema/FindUsersInput";
 import { UpdateUserInputSchema } from "@common/validation/json_schema/UpdateUserInput";
 import { UserLoginInputSchema } from "@common/validation/json_schema/UserLoginInput";
 import { callableUserFunction } from "@/utils";
@@ -50,7 +50,7 @@ export const getUsers = callableUserFunction(async (req) => {
   if (!req.user.isAdmin) {
     throw new BackendError("notAuthorized");
   }
-  if (!validateRequest(GetUsersInputSchema, req.query)) {
+  if (!validateRequest(FindUsersInputSchema, req.query)) {
     throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<UserDocument> = {};
@@ -135,7 +135,7 @@ export const deleteUser = callableUserFunction(async (req) => {
   }
   await Store.updateMany(
     { "authorizations.userId": user._id },
-    { $pullAll: { authorizations: user._id } }
+    { $pull: { authorizations: { id: user._id } } }
   );
   const deleteResult = await UserDb.deleteOne({ _id: user._id });
   if (deleteResult.deletedCount < 1) {

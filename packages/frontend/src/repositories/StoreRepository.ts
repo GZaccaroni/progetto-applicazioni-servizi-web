@@ -4,15 +4,10 @@ import { NetworkStore } from "@common/model/network/NetworkStore";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
-import { PaginateParams } from "@common/model/network/PaginateParams";
+import { FindStoresInput } from "@common/model/network/FindStoresInput";
 
 const resource = "/store";
 
-export interface FindStoresInput extends PaginateParams {
-  authorized?: boolean;
-  searchName?: string;
-  limit: number;
-}
 export function observeStores(
   input: FindStoresInput,
   onNext: (result: PaginatedResult<NetworkStore>) => void,

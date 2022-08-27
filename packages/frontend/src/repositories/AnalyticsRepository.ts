@@ -1,20 +1,11 @@
 import Client from "@/repositories/common/AxiosClient";
 import { NetworkChartData } from "@common/model/network/NetworkChartData";
-import { NetworkProductKindIdentifier } from "@common/model/network/NetworkProduct";
-import { ChartDataType } from "@common/model/common/ChartDataType";
+import { GetAnalyticsInput } from "@common/model/network/GetAnalyticsInput";
 
 const resource = "/analytics";
 
-export interface AnalyticsDataInput {
-  storeId?: string;
-  dataType: ChartDataType;
-  fromDate?: Date;
-  toDate?: Date;
-  items?: NetworkProductKindIdentifier[];
-  customerId?: string;
-}
 export async function getAnalyticsData(
-  input: AnalyticsDataInput
+  input: GetAnalyticsInput
 ): Promise<NetworkChartData> {
   const result = await Client.get<NetworkChartData>(`${resource}`, {
     params: input,

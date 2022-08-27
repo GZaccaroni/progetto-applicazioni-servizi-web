@@ -48,13 +48,7 @@ import FormDialog, {
   GenericFormDialogModel,
 } from "@/components/common/FormDialog.vue";
 import { showMessage } from "@/helpers/snackbar";
-import {
-  addUser,
-  AddUserInput,
-  findUser,
-  updateUser,
-  UpdateUserInput,
-} from "@/repositories/UserRepository";
+import { addUser, findUser, updateUser } from "@/repositories/UserRepository";
 import { removeBlanks } from "@/helpers/utils";
 import { RecursivePartial } from "@/helpers/types";
 import { NetworkUser } from "@common/model/network/NetworkUser";
@@ -65,6 +59,7 @@ import { validateRequest } from "@common/validation";
 import { CreateUserInputSchema } from "@common/validation/json_schema/CreateUserInput";
 import { UpdateUserInputSchema } from "@common/validation/json_schema/UpdateUserInput";
 import { CreateUserInput } from "@common/model/network/CreateUserInput";
+import { UpdateUserInput } from "@common/model/network/UpdateUserInput";
 export type UserFormDialogModel = GenericFormDialogModel<{
   userToUpdate?: string;
 }>;
@@ -146,9 +141,9 @@ async function saveForm() {
       return;
     }
     if (itemToUpdateId.value != undefined) {
-      await updateUser(itemToUpdateId.value, data);
+      await updateUser(itemToUpdateId.value, omit(data, "username"));
     } else {
-      await addUser(data as AddUserInput);
+      await addUser(data as CreateUserInput);
     }
     closeForm();
     const message = create.value

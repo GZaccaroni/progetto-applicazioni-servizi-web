@@ -4,14 +4,10 @@ import { NetworkProduct } from "@common/model/network/NetworkProduct";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 import { CreateUpdateProductInput } from "@common/model/network/CreateUpdateProductInput";
-import { PaginateParams } from "@common/model/network/PaginateParams";
+import { FindProductsInput } from "@common/model/network/FindProductsInput";
 
 const resource = "/product";
 
-export interface FindProductsInput extends PaginateParams {
-  searchName?: string;
-  limit: number;
-}
 export function observeProducts(
   input: FindProductsInput,
   onNext: (result: PaginatedResult<NetworkProduct>) => void,

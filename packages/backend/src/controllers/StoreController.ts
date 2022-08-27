@@ -6,7 +6,7 @@ import { io } from "@/app";
 import User from "@/model/db/User";
 import Order from "@/model/db/Order";
 import { CreateUpdateStoreInputSchema } from "@common/validation/json_schema/CreateUpdateStoreInput";
-import { GetStoresInputSchema } from "@common/validation/json_schema/GetStoresInput";
+import { FindStoresInputSchema } from "@common/validation/json_schema/FindStoresInput";
 import { callableUserFunction } from "@/utils";
 import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
 import { BackendError } from "@/model/common/BackendError";
@@ -80,7 +80,7 @@ export const addStore = callableUserFunction(async (req) => {
   io.emit("storeChanged", { id: store._id, action: "create" });
 });
 export const getStores = callableUserFunction(async (req) => {
-  if (!validateRequest(GetStoresInputSchema, req.query)) {
+  if (!validateRequest(FindStoresInputSchema, req.query)) {
     throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<StoreDocument> = {};

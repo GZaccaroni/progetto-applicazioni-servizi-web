@@ -4,16 +4,10 @@ import { NetworkOrder } from "@common/model/network/NetworkOrder";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
 import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderInput";
-import { PaginateParams } from "@common/model/network/PaginateParams";
+import { FindOrdersInput } from "@common/model/network/FindOrdersInput";
 
 const resource = "/order";
 
-export interface FindOrdersInput extends PaginateParams {
-  storeId?: string;
-  fromDate?: Date;
-  toDate?: Date;
-  limit: number;
-}
 export function observeOrders(
   input: FindOrdersInput,
   onNext: (result: PaginatedResult<NetworkOrder>) => void,

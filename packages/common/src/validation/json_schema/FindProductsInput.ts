@@ -1,9 +1,9 @@
 import { JSONSchemaType } from "ajv";
-import { GetProductsInput } from "../../model/network/GetProductsInput";
+import { FindProductsInput } from "../../model/network/FindProductsInput";
 import { PaginateParamsSchema } from "./PaginateParams";
 import { FilterByNameSchema } from "./FilterByName";
 
-export const GetProductsInputSchema: JSONSchemaType<GetProductsInput> = {
+export const FindProductsInputSchema: JSONSchemaType<FindProductsInput> = {
   type: "object",
   required: [],
   allOf: [PaginateParamsSchema, FilterByNameSchema],

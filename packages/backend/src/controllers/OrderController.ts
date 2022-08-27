@@ -12,7 +12,7 @@ import mongoose, { FilterQuery, Types } from "mongoose";
 import { io } from "@/app";
 import { getUserStoreRole } from "./StoreController";
 import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/CreateUpdateOrderInput";
-import { GetOrdersInputSchema } from "@common/validation/json_schema/GetOrdersInput";
+import { FindOrdersInputSchema } from "@common/validation/json_schema/FindOrdersInput";
 import { callableUserFunction, DbIdentifiable } from "@/utils";
 import { StoreAccessLevel } from "@/model/common/StoreAccessLevel";
 import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderInput";
@@ -106,7 +106,7 @@ export const addOrder = callableUserFunction(async (req) => {
 });
 export const getOrders = callableUserFunction(async (req) => {
   const requestQuery = req.query;
-  if (!validateRequest(GetOrdersInputSchema, requestQuery)) {
+  if (!validateRequest(FindOrdersInputSchema, requestQuery)) {
     throw new BackendError("invalidArgument");
   }
   if (requestQuery.storeId != undefined) {

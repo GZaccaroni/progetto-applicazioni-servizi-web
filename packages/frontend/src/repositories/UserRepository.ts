@@ -3,8 +3,9 @@ import { PaginatedResult } from "@common/model/common/PaginatedResult";
 import { NetworkUser } from "@common/model/network/NetworkUser";
 import { Cancellable } from "@/repositories/common/Cancellable";
 import { observePaginatedResult } from "@/repositories/common/ObserveUtils";
-import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 import { PaginateParams } from "@common/model/network/PaginateParams";
+import { UpdateUserInput } from "@common/model/network/UpdateUserInput";
+import { CreateUserInput } from "@common/model/network/CreateUserInput";
 const resource = "/user";
 
 export function observeUsers(
@@ -43,16 +44,10 @@ export async function findCurrentUser(): Promise<NetworkUser> {
   const result = await Client.get<NetworkUser>(`${resource}/me`);
   return result.data;
 }
-export type AddUserInput = Omit<NetworkUser, keyof NetworkIdentifiable> & {
-  password: string;
-};
-export async function addUser(data: AddUserInput): Promise<void> {
+export async function addUser(data: CreateUserInput): Promise<void> {
   const result = await Client.post<void>(`${resource}`, data);
   return result.data;
 }
-export type UpdateUserInput = Omit<AddUserInput, "password"> & {
-  password?: string;
-};
 export async function updateUser(
   username: string,
   item: UpdateUserInput

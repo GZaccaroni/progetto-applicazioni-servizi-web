@@ -1,4 +1,4 @@
 import { PaginateParams } from "./PaginateParams";
 import { FilterByName } from "./FilterByName";
 
-export interface GetUsersInput extends PaginateParams, FilterByName {}
+export interface FindUsersInput extends PaginateParams, FilterByName {}
