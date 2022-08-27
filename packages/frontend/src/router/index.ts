@@ -46,9 +46,7 @@ const routes: Array<RouteConfig> = [
     path: "/stores",
     name: "stores",
     component: () =>
-      import(
-        /* webpackChunkName: "customers" */ "../views/store/StoresView.vue"
-      ),
+      import(/* webpackChunkName: "stores" */ "../views/store/StoresView.vue"),
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
