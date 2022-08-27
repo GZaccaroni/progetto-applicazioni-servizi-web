@@ -102,13 +102,12 @@ watch(
   }
 );
 watch(changePassword, (changePassword) => {
-  console.log("Changed change password val", changePassword);
   if (changePassword) {
-    console.log("Pw set empty");
-    formData.value = Object.assign({ password: "" }, formData.value);
+    formData.value = Object.assign(clone(formData.value), { password: "" });
   } else {
-    console.log("Pw set undefined");
-    formData.value = Object.assign({ password: undefined }, formData.value);
+    formData.value = Object.assign(clone(formData.value), {
+      password: undefined,
+    });
   }
 });
 async function onBecameVisible(userToUpdate?: string) {
@@ -185,7 +184,7 @@ function validateUpdateForm(
   form: RecursivePartial<UpdateUserInput>
 ): form is UpdateUserInput {
   return (
-    validateRequest(UpdateUserInputSchema, form) &&
+    validateRequest(UpdateUserInputSchema, omit(form, "username")) &&
     (form.password == undefined || zxcvbn(form.password).score >= 3)
   );
 }

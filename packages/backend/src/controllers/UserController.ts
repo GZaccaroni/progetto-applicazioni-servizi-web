@@ -121,6 +121,7 @@ export const updateUser = callableUserFunction(async (req) => {
       type: "user",
     },
   });
+  io.emit("userChanged", { id: user._id, action: "update" });
 });
 export const deleteUser = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.userId)) {
