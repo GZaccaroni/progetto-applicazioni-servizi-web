@@ -10,7 +10,7 @@ import { GetUsersInputSchema } from "@common/validation/json_schema/GetUsersInpu
 import { UpdateUserInputSchema } from "@common/validation/json_schema/UpdateUserInput";
 import { UserLoginInputSchema } from "@common/validation/json_schema/UserLoginInput";
 import { callableUserFunction } from "@/utils";
-import { FilterQuery } from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { BackendError } from "@/model/common/BackendError";
 
 export const createUser = callableUserFunction(async (req) => {
@@ -70,16 +70,18 @@ export const getUsers = callableUserFunction(async (req) => {
     },
   });
 });
-
-export const getUserByName = callableUserFunction(async (req) => {
-  if (!req.params.username) {
-    throw new BackendError("invalidArgument");
+export const getCurrentUser = callableUserFunction(async (req) => {
+  return UserDb.findOne({ username: req.user.username }, UserProjection).lean();
+});
+export const getUserById = callableUserFunction(async (req) => {
+  if (!mongoose.isValidObjectId(req.params.userId)) {
+    throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  if (!req.user.isAdmin && req.params.username != req.user.username) {
+  if (!req.user.isAdmin) {
     throw new BackendError("notAuthorized");
   }
   const user = await UserDb.findOne(
-    { username: req.params.username },
+    { _id: req.params.userId },
     UserProjection
   ).lean();
   if (!user) {
@@ -90,17 +92,17 @@ export const getUserByName = callableUserFunction(async (req) => {
 export const updateUser = callableUserFunction(async (req) => {
   if (
     !validateRequest(UpdateUserInputSchema, req.body) ||
-    !req.params.username
+    !mongoose.isValidObjectId(req.params.userId)
   ) {
     throw new BackendError("invalidArgument");
   }
   if (
-    (req.user.username != req.params.username && !req.user.isAdmin) ||
+    (req.user.id != req.params.userId && !req.user.isAdmin) ||
     (!req.user.isAdmin && req.body.isAdmin != undefined)
   ) {
     throw new BackendError("notAuthorized");
   }
-  const user = await UserDb.findOne({ username: req.params.username });
+  const user = await UserDb.findOne({ _id: req.params.userId });
   if (!user) {
     throw new BackendError("itemNotFound");
   }
@@ -121,13 +123,13 @@ export const updateUser = callableUserFunction(async (req) => {
   });
 });
 export const deleteUser = callableUserFunction(async (req) => {
-  if (!req.params.username) {
+  if (!mongoose.isValidObjectId(req.params.userId)) {
     throw new BackendError("invalidArgument");
   }
-  if (req.user.username != req.params.username && !req.user.isAdmin) {
+  if (req.user.id != req.params.userId && !req.user.isAdmin) {
     throw new BackendError("notAuthorized");
   }
-  const user = await UserDb.findOne({ username: req.params.username }).lean();
+  const user = await UserDb.findOne({ _id: req.params.userId }).lean();
   if (user == null) {
     throw new BackendError("itemNotFound", "User not found");
   }

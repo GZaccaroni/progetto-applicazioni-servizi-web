@@ -2,7 +2,8 @@ import { Router } from "express";
 import {
   createUser,
   deleteUser,
-  getUserByName,
+  getCurrentUser,
+  getUserById,
   getUsers,
   updateUser,
   userLogin,
@@ -17,8 +18,9 @@ UserRoutes.route("/logout").post(userLogout);
 UserRoutes.use(isUserLoggedIn);
 UserRoutes.route("/").post(createUser);
 UserRoutes.route("/find").get(getUsers);
-UserRoutes.route("/:username")
-  .get(getUserByName)
+UserRoutes.route("/me").get(getCurrentUser);
+UserRoutes.route("/:userId")
+  .get(getUserById)
   .post(updateUser)
   .delete(deleteUser);
 

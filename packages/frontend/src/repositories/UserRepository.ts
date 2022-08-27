@@ -39,6 +39,10 @@ export async function findUser(id: string): Promise<NetworkUser> {
   const result = await Client.get<NetworkUser>(`${resource}/${id}`);
   return result.data;
 }
+export async function findCurrentUser(): Promise<NetworkUser> {
+  const result = await Client.get<NetworkUser>(`${resource}/me`);
+  return result.data;
+}
 export type AddUserInput = Omit<NetworkUser, keyof NetworkIdentifiable> & {
   password: string;
 };

@@ -47,7 +47,7 @@ function deleteItem(item: NetworkUser) {
       .toString(),
   }).then((confirmed) => {
     if (confirmed) {
-      deleteUser(item.username).catch(repositoryErrorHandler);
+      deleteUser(item.id).catch(repositoryErrorHandler);
     }
   });
 }
@@ -56,7 +56,7 @@ function onRowEvent(event: TableItemEvent<NetworkUser>) {
     case TableItemEventType.rowEditAction:
       dialogModel.value = {
         isVisible: true,
-        userToUpdate: event.item.username,
+        userToUpdate: event.item.id,
       };
       break;
     case TableItemEventType.rowDeleteAction:
