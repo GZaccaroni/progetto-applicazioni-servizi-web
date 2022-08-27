@@ -42,7 +42,7 @@ export function mongoosePagination<T extends DbIdentifiable>(
     const query = options?.query ?? {};
     const populate = options?.populate ?? undefined;
     const sort = generateSort(options);
-    const projection = options?.projection ?? {};
+    const projection = Object.assign({}, options?.projection);
     const lean = options?.lean ?? true;
     const limit = options.limit > 0 ? options.limit : 0;
     const cursorQuery = generateCursorQuery(options);
