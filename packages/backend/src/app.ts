@@ -1,7 +1,7 @@
 /* eslint:disable no-var-requires */
 import sourceMapSupport = require("source-map-support");
 sourceMapSupport.install();
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import session from "express-session";
 import User from "./model/db/User";
 import cors from "cors";
@@ -44,11 +44,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(User.createStrategy());
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use("/", routes);
-app.use((err: unknown, req, res, next) => {
+app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof BackendError) {
     res.status(err.httpStatusCode()).json({
       error: {

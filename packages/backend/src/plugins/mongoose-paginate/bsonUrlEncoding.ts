@@ -6,11 +6,11 @@ import base64url from "base64-url";
  * encode/decode as a URL-safe string.
  */
 
-const encode = function (obj) {
+const encode = function (obj: EJSON.SerializableTypes) {
   return base64url.encode(EJSON.stringify(obj));
 };
 
-const decode = function (str) {
+const decode = function (str: string) {
   return EJSON.parse(base64url.decode(str));
 };
 

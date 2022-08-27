@@ -1,4 +1,4 @@
-import mongoose, { FilterQuery } from "mongoose";
+import mongoose, { FilterQuery, ProjectionType } from "mongoose";
 import Order, { OrderDocument } from "@/model/db/Order";
 import { validateRequest } from "@common/validation";
 import { GetAnalyticsInputSchema } from "@common/validation/json_schema/GetAnalyticsInput";
@@ -43,7 +43,7 @@ export const getAnalytics = callableUserFunction(async (req) => {
   const productsConditions = new Array<FilterQuery<OrderDocument>>();
   if (req.query.products?.length) {
     req.query.products.forEach((p) => {
-      const productCondition = {
+      const productCondition: FilterQuery<OrderDocument> = {
         "entries.productId": p.productId,
       };
       if (p.variantId) {
@@ -55,7 +55,7 @@ export const getAnalytics = callableUserFunction(async (req) => {
     });
     query["$or"] = productsConditions.concat(productAndVariantConditions);
   }
-  const projection = {
+  const projection: ProjectionType<OrderDocument> = {
     date: 1,
     name: "$entries.name",
     entries: {

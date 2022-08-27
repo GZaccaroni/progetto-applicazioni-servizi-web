@@ -1,10 +1,10 @@
 // Adapted from https://github.com/IGLU-Agency/mongoose-paginate-ts
 import {
-  Schema,
-  Model,
   FilterQuery,
-  ProjectionType,
+  Model,
   PopulateOptions,
+  ProjectionType,
+  Schema,
 } from "mongoose";
 import objectPath from "object-path";
 import {
@@ -13,12 +13,12 @@ import {
 } from "@common/model/common/PaginatedResult";
 import { DbIdentifiable } from "@/utils";
 import bsonUrlEncoding from "./bsonUrlEncoding";
-import { omit } from "lodash";
+import { clone, omit } from "lodash";
 
-export interface PaginationOptions<T> {
+export interface PaginationOptions<T extends DbIdentifiable> {
   query?: FilterQuery<T>;
   populate?: PopulateOptions;
-  paginatedField: keyof T;
+  paginatedField: keyof T & string;
   sortAscending: boolean;
   projection?: ProjectionType<T> | undefined;
   lean?: boolean;
@@ -38,19 +38,21 @@ export function mongoosePagination<T extends DbIdentifiable>(
   schema.statics.paginate = async function paginate(
     options: PaginationOptions<T>
   ): Promise<PaginatedResult<T>> {
-    const removeIdInResponse = options.projection && !options.projection["_id"];
     const query = options?.query ?? {};
     const populate = options?.populate ?? undefined;
     const sort = generateSort(options);
-    const projection = Object.assign({}, options?.projection);
+    const projection = clone(options?.projection);
     const lean = options?.lean ?? true;
     const limit = options.limit > 0 ? options.limit : 0;
     const cursorQuery = generateCursorQuery(options);
     //MARK: QUERY
 
+    const removeIdInResponse =
+      projection && typeof projection == "object" && projection["_id"] == 0;
     if (removeIdInResponse) {
       projection["_id"] = 1;
     }
+
     let mQuery = this.find<T>({ $and: [cursorQuery, query] }, projection);
     if (lean) {
       mQuery = mQuery.lean();
@@ -103,7 +105,9 @@ function prepareResponse<T extends DbIdentifiable>(
   };
 }
 
-function generateCursorQuery<T>(options: PaginationOptions<T>): FilterQuery<T> {
+function generateCursorQuery<T extends DbIdentifiable>(
+  options: PaginationOptions<T>
+): FilterQuery<T> {
   if (!options.cursors) return {};
   const sortAsc =
     (!options.sortAscending && options.cursors.previous) ||
@@ -156,7 +160,7 @@ function generateCursorQuery<T>(options: PaginationOptions<T>): FilterQuery<T> {
     return {};
   }
 }
-function generateSort<T>(options: PaginationOptions<T>) {
+function generateSort<T extends DbIdentifiable>(options: PaginationOptions<T>) {
   const sortAsc =
     (!options.sortAscending && options.cursors?.previous) ||
     (options.sortAscending && !options.cursors?.previous);
