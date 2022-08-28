@@ -32,7 +32,7 @@ async function checkStoreConsistence(
       throw invalidAuthorizationError;
     }
     const user = await User.findById(userId).lean();
-    return user == null;
+    return user != null;
   });
   const usersExists = (await Promise.all(usersExistsPromises)).every(
     (el) => el
@@ -84,8 +84,12 @@ export const findStores = callableUserFunction(async (req) => {
     throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<StoreDocument> = {};
-  if (req.query.authorized) {
-    query["authorizations.userId"] = req.user.id;
+  if (!req.user.isAdmin) {
+    if (req.query.authorized) {
+      query["authorizations.userId"] = req.user.id;
+    } else {
+      throw new BackendError("notAuthorized");
+    }
   }
   if (req.query.searchName) {
     query["name"] = { $regex: req.query.searchName, $options: "i" };
