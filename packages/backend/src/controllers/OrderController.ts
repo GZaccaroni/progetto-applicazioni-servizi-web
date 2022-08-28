@@ -104,7 +104,7 @@ export const addOrder = callableUserFunction(async (req) => {
   });
   io.emit("orderChanged", { id: newOrder._id, action: "create" });
 });
-export const getOrders = callableUserFunction(async (req) => {
+export const findOrders = callableUserFunction(async (req) => {
   const requestQuery = req.query;
   if (!validateRequest(FindOrdersInputSchema, requestQuery)) {
     throw new BackendError("invalidArgument");

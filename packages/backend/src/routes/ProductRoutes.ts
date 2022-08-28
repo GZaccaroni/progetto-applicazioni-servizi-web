@@ -3,7 +3,7 @@ import {
   addProduct,
   deleteProduct,
   getProductById,
-  getProducts,
+  findProducts,
   updateProduct,
 } from "@/controllers/ProductController";
 
@@ -11,7 +11,7 @@ const ProductRoutes = Router();
 
 ProductRoutes.route("/").post(addProduct);
 
-ProductRoutes.route("/find").get(getProducts);
+ProductRoutes.route("/find").get(findProducts);
 
 ProductRoutes.route("/:productId")
   .get(getProductById)

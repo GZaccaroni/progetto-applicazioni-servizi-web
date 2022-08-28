@@ -39,7 +39,7 @@ export const addCustomer = callableUserFunction(async (req) => {
   });
   io.emit("customerChanged", { id: newCustomer._id, action: "create" });
 });
-export const getCustomers = callableUserFunction(async (req) => {
+export const findCustomers = callableUserFunction(async (req) => {
   if (!validateRequest(FindCustomersInputSchema, req.query)) {
     throw new BackendError("invalidArgument");
   }

@@ -3,7 +3,7 @@ import {
   addCustomer,
   deleteCustomer,
   getCustomerById,
-  getCustomers,
+  findCustomers,
   updateCustomer,
 } from "@/controllers/CustomerController";
 
@@ -11,7 +11,7 @@ const CustomerRoutes = Router();
 
 CustomerRoutes.route("/").post(addCustomer);
 
-CustomerRoutes.route("/find").get(getCustomers);
+CustomerRoutes.route("/find").get(findCustomers);
 
 CustomerRoutes.route("/:customerId")
   .get(getCustomerById)

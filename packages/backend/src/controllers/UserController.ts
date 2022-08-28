@@ -46,7 +46,7 @@ export const createUser = callableUserFunction(async (req) => {
   io.emit("userChanged", { id: registeredUser._id, action: "create" });
   return {};
 });
-export const getUsers = callableUserFunction(async (req) => {
+export const findUsers = callableUserFunction(async (req) => {
   if (!req.user.isAdmin) {
     throw new BackendError("notAuthorized");
   }

@@ -4,7 +4,7 @@ import {
   deleteUser,
   getCurrentUser,
   getUserById,
-  getUsers,
+  findUsers,
   updateUser,
   userLogin,
   userLogout,
@@ -17,7 +17,7 @@ UserRoutes.route("/login").post(userLogin);
 UserRoutes.route("/logout").post(userLogout);
 UserRoutes.use(isUserLoggedIn);
 UserRoutes.route("/").post(createUser);
-UserRoutes.route("/find").get(getUsers);
+UserRoutes.route("/find").get(findUsers);
 UserRoutes.route("/me").get(getCurrentUser);
 UserRoutes.route("/:userId")
   .get(getUserById)

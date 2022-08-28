@@ -3,7 +3,7 @@ import {
   addOrder,
   deleteOrder,
   getOrderById,
-  getOrders,
+  findOrders,
   updateOrder,
 } from "@/controllers/OrderController";
 
@@ -11,7 +11,7 @@ const OrderRoutes = Router();
 
 OrderRoutes.route("/").post(addOrder);
 
-OrderRoutes.route("/find").get(getOrders);
+OrderRoutes.route("/find").get(findOrders);
 
 OrderRoutes.route("/:orderId")
   .get(getOrderById)

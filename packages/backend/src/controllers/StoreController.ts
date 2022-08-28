@@ -79,7 +79,7 @@ export const addStore = callableUserFunction(async (req) => {
   });
   io.emit("storeChanged", { id: store._id, action: "create" });
 });
-export const getStores = callableUserFunction(async (req) => {
+export const findStores = callableUserFunction(async (req) => {
   if (!validateRequest(FindStoresInputSchema, req.query)) {
     throw new BackendError("invalidArgument");
   }

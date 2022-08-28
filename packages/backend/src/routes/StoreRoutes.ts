@@ -3,7 +3,7 @@ import {
   addStore,
   deleteStore,
   getStoreById,
-  getStores,
+  findStores,
   updateStore,
 } from "@/controllers/StoreController";
 
@@ -11,7 +11,7 @@ const StoreRoutes = Router();
 
 StoreRoutes.route("/").post(addStore);
 
-StoreRoutes.route("/find").get(getStores);
+StoreRoutes.route("/find").get(findStores);
 
 StoreRoutes.route("/:storeId")
   .get(getStoreById)

@@ -54,7 +54,7 @@ export const addProduct = callableUserFunction(async (req) => {
   io.emit("productChanged", { id: newProduct._id, action: "create" });
 });
 
-export const getProducts = callableUserFunction(async (req) => {
+export const findProducts = callableUserFunction(async (req) => {
   if (!validateRequest(FindProductsInputSchema, req.query)) {
     throw new BackendError("invalidArgument");
   }
