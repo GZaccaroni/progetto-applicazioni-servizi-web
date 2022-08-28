@@ -32,6 +32,7 @@
           <v-btn
             text
             :disabled="submitButtonLoading || !submitButtonEnabled"
+            type="submit"
             @click="submitForm"
             class="me-4 px-4"
           >
@@ -63,6 +64,7 @@
             >{{ $t("word.cancel") }}</v-btn
           >
           <v-btn
+            type="submit"
             color="primary"
             elevation="0"
             :disabled="submitButtonLoading || !submitButtonEnabled"
