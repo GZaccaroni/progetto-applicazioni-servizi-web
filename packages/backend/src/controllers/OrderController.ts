@@ -125,13 +125,16 @@ export const findOrders = callableUserFunction(async (req) => {
   if (requestQuery.storeId != undefined) {
     query["store.id"] = requestQuery.storeId;
   } else {
-    const stores = await Store.find(
-      { "authorizations.userId": req.user._id },
-      "_id"
-    ).lean();
-    query["store.id"] = {
-      $in: stores.map((elem) => elem._id),
-    };
+    if (!req.user.isAdmin) {
+      // Show only authorized store data
+      const stores = await Store.find(
+        { "authorizations.userId": req.user._id },
+        "_id"
+      ).lean();
+      query["store.id"] = {
+        $in: stores.map((elem) => elem._id),
+      };
+    }
   }
   if (requestQuery.fromDate != undefined) {
     if (!query["date"]) {
