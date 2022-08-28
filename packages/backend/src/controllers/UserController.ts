@@ -136,7 +136,7 @@ export const deleteUser = callableUserFunction(async (req) => {
   }
   await Store.updateMany(
     { "authorizations.userId": user._id },
-    { $pull: { authorizations: { id: user._id } } }
+    { $pull: { authorizations: { userId: user._id } } }
   );
   const deleteResult = await UserDb.deleteOne({ _id: user._id });
   if (deleteResult.deletedCount < 1) {
