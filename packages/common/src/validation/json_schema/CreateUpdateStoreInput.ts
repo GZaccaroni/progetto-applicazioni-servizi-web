@@ -9,8 +9,8 @@ export const CreateUpdateStoreInputSchema: JSONSchemaType<CreateUpdateStoreInput
     type: "object",
     properties: {
       name: {
-        maximum: 250,
         type: "string",
+        maxLength: 250,
         transform: ["trim"],
       },
       authorizations: {
