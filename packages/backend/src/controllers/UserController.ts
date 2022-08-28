@@ -60,7 +60,7 @@ export const findUsers = callableUserFunction(async (req) => {
   return await UserDb.paginate({
     query,
     paginatedField: "_id",
-    sortAscending: true,
+    sortAscending: false,
     projection: UserProjection,
     limit: req.query.limit,
     lean: true,

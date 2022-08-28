@@ -148,7 +148,7 @@ export const findOrders = callableUserFunction(async (req) => {
   return await Order.paginate({
     query,
     paginatedField: "date",
-    sortAscending: true,
+    sortAscending: false,
     projection: OrderProjection,
     limit: requestQuery.limit,
     lean: true,
@@ -216,7 +216,7 @@ export const deleteOrder = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.orderId)) {
     throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  const orderId = new Types.ObjectId(req.params.orderId);
+  const orderId = req.params.orderId;
   const order = await Order.findById(orderId).lean();
   if (order == null) {
     throw {

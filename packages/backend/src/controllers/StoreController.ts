@@ -93,7 +93,7 @@ export const findStores = callableUserFunction(async (req) => {
   return await Store.paginate({
     query,
     paginatedField: "_id",
-    sortAscending: true,
+    sortAscending: false,
     projection: StoreProjection,
     limit: req.query.limit,
     lean: true,
@@ -137,7 +137,7 @@ export const updateStore = callableUserFunction(async (req) => {
     username: req.user.username,
     action: "update",
     object: {
-      id: new Types.ObjectId(req.params.storeId),
+      id: req.params.storeId,
       type: "store",
     },
   });
@@ -155,7 +155,7 @@ export const deleteStore = callableUserFunction(async (req) => {
       "Can't delete: the store has associated orders"
     );
   }
-  const storeId = new Types.ObjectId(req.params.storeId);
+  const storeId = req.params.storeId;
   const deletedStore = await Store.deleteOne({ _id: storeId });
   if (deletedStore.deletedCount < 1) {
     throw new BackendError("itemNotFound");

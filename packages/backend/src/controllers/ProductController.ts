@@ -68,7 +68,7 @@ export const findProducts = callableUserFunction(async (req) => {
   return await Product.paginate({
     query,
     paginatedField: "_id",
-    sortAscending: true,
+    sortAscending: false,
     projection: ProductProjection,
     limit: req.query.limit,
     lean: true,
@@ -160,7 +160,7 @@ export const deleteProduct = callableUserFunction(async (req) => {
       "Can't delete product: the product has associated orders"
     );
   }
-  const productId = new Types.ObjectId(req.params.productId);
+  const productId = req.params.productId;
   const deletedProduct = await Product.deleteOne({ _id: productId });
   if (deletedProduct.deletedCount < 1) {
     throw new BackendError("itemNotFound");

@@ -50,7 +50,7 @@ export const findCustomers = callableUserFunction(async (req) => {
   return await Customer.paginate({
     query,
     paginatedField: "_id",
-    sortAscending: true,
+    sortAscending: false,
     limit: req.query.limit,
     projection: CustomerProjection,
     lean: true,
@@ -83,7 +83,7 @@ export const updateCustomer = callableUserFunction(async (req) => {
     throw new BackendError("invalidArgument");
   }
   await checkCustomerConsistence(req.body, req.params.customerId);
-  const customerId = new Types.ObjectId(req.params.customerId);
+  const customerId = req.params.customerId;
   const updatedCustomer = await Customer.updateOne(
     { _id: req.params.customerId },
     req.body
@@ -111,7 +111,7 @@ export const deleteCustomer = callableUserFunction(async (req) => {
   if (associatedOrder) {
     throw new BackendError("nonDeletable");
   }
-  const customerId = new Types.ObjectId(req.params.customerId);
+  const customerId = req.params.customerId;
   const deletedCustomer = await Customer.deleteOne({
     _id: customerId,
   });
