@@ -41,6 +41,7 @@ const OrderSchema = new mongoose.Schema<OrderDocument>({
   date: Schema.Types.Date,
   entries: [
     {
+      _id: false,
       productId: String,
       variantId: String,
       grade: {

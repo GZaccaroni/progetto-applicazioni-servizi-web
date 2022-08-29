@@ -24,6 +24,7 @@ const ProductSchema = new mongoose.Schema<ProductDocument>({
   pricePerUnit: Number,
   kinds: [
     {
+      _id: false,
       id: String,
       name: String,
       fullName: String,

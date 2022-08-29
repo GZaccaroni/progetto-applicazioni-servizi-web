@@ -19,6 +19,7 @@ const StoreSchema = new mongoose.Schema<StoreDocument>({
   },
   authorizations: [
     {
+      _id: false,
       userId: String,
       accessLevel: {
         type: String,
