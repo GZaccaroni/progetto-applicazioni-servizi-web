@@ -1,6 +1,7 @@
 <template>
   <v-container>
-    <user-login-dialog v-model="loginDialogVisible" />
+    <user-login-dialog v-if="!isLoggedIn" v-model="loginDialogVisible" />
+    <user-form-dialog v-if="isLoggedIn" v-model="userFormDialogModel" />
     <v-app-bar app color="white" elevate-on-scroll ref="menubar">
       <v-app-bar-nav-icon
         v-if="isLoggedIn"
@@ -30,8 +31,17 @@
             </v-avatar>
           </div>
         </template>
-        <v-list>
+        <v-list dense>
+          <v-list-item @click="editUser">
+            <v-list-item-icon>
+              <v-icon>mdi-account-edit</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>{{ $t("word.editUser") }}</v-list-item-title>
+          </v-list-item>
           <v-list-item @click="logout">
+            <v-list-item-icon>
+              <v-icon>mdi-logout</v-icon>
+            </v-list-item-icon>
             <v-list-item-title>{{ $t("word.logout") }}</v-list-item-title>
           </v-list-item>
         </v-list>
@@ -59,8 +69,11 @@ import { NetworkUser } from "@common/model/network/NetworkUser";
 import AppNavigationDrawer from "@/components/common/AppNavigationDrawer.vue";
 import router from "@/router";
 import { useUserStore } from "@/store/user";
+import UserFormDialog, {
+  UserFormDialogModel,
+} from "@/components/form/user/UserFormDialog.vue";
 
-defineProps({
+const props = defineProps({
   isLoggedIn: {
     type: Boolean,
     required: true,
@@ -70,10 +83,19 @@ defineProps({
   },
 });
 const loginDialogVisible = ref(false);
+const userFormDialogModel = ref<UserFormDialogModel>({ isVisible: false });
 const drawer = ref(false);
 
 function login() {
   loginDialogVisible.value = true;
+}
+async function editUser() {
+  if (props.userProfile != undefined) {
+    userFormDialogModel.value = {
+      isVisible: true,
+      userToUpdate: props.userProfile.id,
+    };
+  }
 }
 async function logout() {
   const userStore = useUserStore();
