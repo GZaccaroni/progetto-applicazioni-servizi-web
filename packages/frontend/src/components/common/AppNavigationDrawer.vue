@@ -18,21 +18,23 @@
         <v-subheader :key="group.title" v-if="group.title !== undefined">
           {{ $t(group.title) }}
         </v-subheader>
-        <v-list-item
-          v-for="item in group.items"
-          :key="item.title"
-          link
-          router
-          :to="item.route"
-        >
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
+        <v-list-item-group :key="group.title" color="primary">
+          <v-list-item
+            v-for="item in group.items"
+            :key="item.title"
+            link
+            router
+            :to="item.route"
+          >
+            <v-list-item-icon>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-icon>
 
-          <v-list-item-content>
-            <v-list-item-title>{{ $t(item.title) }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+            <v-list-item-content>
+              <v-list-item-title>{{ $t(item.title) }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
       </template>
     </v-list>
   </div>
