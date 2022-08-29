@@ -35,6 +35,7 @@
     "cancel": "Annulla",
     "close": "Chiudi",
     "login": "Accesso",
+    "editUser": "Modifica utente",
     "logout": "Disconnessione",
     "save": "Salva",
     "fromDate": "Da",
@@ -170,6 +171,7 @@
     },
     "form": {
       "user": {
+        "newPassword": "Nuova password",
         "changePassword": "Cambia password"
       },
       "userLogin": {

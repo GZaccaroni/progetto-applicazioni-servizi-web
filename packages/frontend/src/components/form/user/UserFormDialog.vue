@@ -18,6 +18,7 @@
       :autocomplete="isCurrentUser ? 'username' : 'off'"
     ></v-text-field>
     <v-checkbox
+      v-if="!isCurrentUser && isCurrentUserAdmin"
       v-model="formData.isAdmin"
       :label="$t('model.user.isAdmin')"
     ></v-checkbox>
@@ -31,7 +32,7 @@
       :type="showPassword ? 'text' : 'password'"
       v-if="changePassword"
       v-model="formData.password"
-      :label="$t('model.user.password')"
+      :label="$t('components.form.user.newPassword')"
       :rules="[passwordRules.min, passwordRules.strength]"
       :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
       @click:append="showPassword = !showPassword"
@@ -60,6 +61,7 @@ import { CreateUserInputSchema } from "@common/validation/json_schema/CreateUser
 import { UpdateUserInputSchema } from "@common/validation/json_schema/UpdateUserInput";
 import { CreateUserInput } from "@common/model/network/CreateUserInput";
 import { UpdateUserInput } from "@common/model/network/UpdateUserInput";
+
 export type UserFormDialogModel = GenericFormDialogModel<{
   userToUpdate?: string;
 }>;
@@ -78,6 +80,7 @@ const itemToUpdateId = ref<string>();
 const dialogLoading = ref(false);
 const isVisible = ref(false);
 const isCurrentUser = ref(false);
+const isCurrentUserAdmin = ref(false);
 const changePassword = ref(false);
 const showPassword = ref(false);
 const create = computed(() => itemToUpdateId.value == undefined);
@@ -118,7 +121,8 @@ async function onBecameVisible(userToUpdate?: string) {
     if (item != undefined) {
       formData.value = mapToFormValue(item);
     }
-    isCurrentUser.value = userStore.userProfile?.username == userToUpdate;
+    isCurrentUser.value = userStore.userProfile?.id == userToUpdate;
+    isCurrentUserAdmin.value = userStore.userProfile?.isAdmin ?? false;
   } else {
     formData.value = defaultValues;
     isCurrentUser.value = false;
@@ -140,7 +144,11 @@ async function saveForm() {
       return;
     }
     if (itemToUpdateId.value != undefined) {
-      await updateUser(itemToUpdateId.value, omit(data, "username"));
+      let updateData = omit(data, "username");
+      if (!isCurrentUserAdmin.value) {
+        updateData = omit(updateData, "isAdmin");
+      }
+      await updateUser(itemToUpdateId.value, updateData);
     } else {
       await addUser(data as CreateUserInput);
     }
