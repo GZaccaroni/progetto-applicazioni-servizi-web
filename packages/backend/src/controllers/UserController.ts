@@ -77,7 +77,7 @@ export const getUserById = callableUserFunction(async (req) => {
   if (!mongoose.isValidObjectId(req.params.userId)) {
     throw new BackendError("invalidArgument", "Invalid id supplied");
   }
-  if (!req.user.isAdmin && req.user.id != req.params.userId ) {
+  if (!req.user.isAdmin && req.user.id != req.params.userId) {
     throw new BackendError("notAuthorized");
   }
   const user = await UserDb.findOne(

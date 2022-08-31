@@ -4,7 +4,7 @@ import Product, {
   ProductProjection,
 } from "../model/db/Product";
 import Log from "../model/db/Log";
-import mongoose, { FilterQuery, Types } from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import Order from "../model/db/Order";
 import { FindProductsInputSchema } from "@common/validation/json_schema/FindProductsInput";
@@ -29,7 +29,7 @@ function enrichProduct(
   const kinds: ProductDocument["kinds"] = product.kinds.map((kind) =>
     Object.assign({ fullName: `${product.name} ${kind.name}` }, kind)
   );
-  return Object.assign({ kinds }, product);
+  return Object.assign(product, { kinds });
 }
 
 export const addProduct = callableUserFunction(async (req) => {

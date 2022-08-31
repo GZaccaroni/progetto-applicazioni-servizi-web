@@ -8,7 +8,7 @@ import Log from "@/model/db/Log";
 import Store from "@/model/db/Store";
 import Product from "@/model/db/Product";
 import Customer, { CustomerProjection } from "@/model/db/Customer";
-import mongoose, { FilterQuery, Types } from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import { getUserStoreRole } from "./StoreController";
 import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/CreateUpdateOrderInput";

@@ -4,7 +4,7 @@ import Customer, {
   CustomerProjection,
 } from "@/model/db/Customer";
 import Log from "@/model/db/Log";
-import mongoose, { FilterQuery, Types } from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import Order from "@/model/db/Order";
 import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";

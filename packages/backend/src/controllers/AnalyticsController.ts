@@ -1,4 +1,4 @@
-import mongoose, { FilterQuery, ProjectionType } from "mongoose";
+import mongoose, { FilterQuery, PipelineStage, ProjectionType } from "mongoose";
 import Order, { OrderDocument } from "@/model/db/Order";
 import { validateRequest } from "@common/validation";
 import { GetAnalyticsInputSchema } from "@common/validation/json_schema/GetAnalyticsInput";
@@ -7,53 +7,52 @@ import { ChartDataType } from "@/model/common/ChartDataType";
 import { BackendError } from "@/model/common/BackendError";
 
 export const getAnalytics = callableUserFunction(async (req) => {
-  if (!validateRequest(GetAnalyticsInputSchema, req.query)) {
+  if (!validateRequest(GetAnalyticsInputSchema, req.body)) {
     throw new BackendError("invalidArgument");
   }
   const query: FilterQuery<OrderDocument> = {};
-  if (req.query.storeId) {
-    if (!mongoose.isValidObjectId(req.query.storeId)) {
+  if (req.body.storeId) {
+    if (!mongoose.isValidObjectId(req.body.storeId)) {
       throw new BackendError("invalidArgument", "Invalid store id");
     }
-    query["store.id"] = req.query.storeId;
+    query["store.id"] = req.body.storeId;
   } else {
     if (!req.user.isAdmin) {
       throw new BackendError("notAuthorized");
     }
   }
-  if (req.query.customerId) {
-    if (!mongoose.isValidObjectId(req.query.customerId)) {
+  if (req.body.customerId) {
+    if (!mongoose.isValidObjectId(req.body.customerId)) {
       throw new BackendError("invalidArgument", "Invalid customer id");
     }
-    query["customer.id"] = req.query.customerId;
+    query["customer.id"] = req.body.customerId;
   }
-  if (req.query.fromDate) {
+  if (req.body.fromDate) {
     if (!query["date"]) {
       query["date"] = {};
     }
-    query["date"]["$gte"] = new Date(req.query.fromDate);
+    query["date"]["$gte"] = new Date(req.body.fromDate);
   }
-  if (req.query.toDate) {
+  if (req.body.toDate) {
     if (!query["date"]) {
       query["date"] = {};
     }
-    query["date"]["$lte"] = new Date(req.query.toDate);
+    query["date"]["$lte"] = new Date(req.body.toDate);
   }
-  const productAndVariantConditions = new Array<FilterQuery<OrderDocument>>();
   const productsConditions = new Array<FilterQuery<OrderDocument>>();
-  if (req.query.products?.length) {
-    req.query.products.forEach((p) => {
-      const productCondition: FilterQuery<OrderDocument> = {
+  if (req.body.products?.length) {
+    req.body.products.forEach((p) => {
+      const condition: FilterQuery<OrderDocument> = {
         "entries.productId": p.productId,
       };
       if (p.variantId) {
-        productCondition["entries.variantId"] = p.variantId;
-        productAndVariantConditions.push(productCondition);
+        condition["entries.variantId"] = p.variantId;
       } else {
-        productsConditions.push(productCondition);
+        condition["entries.variantId"] = null;
       }
+      productsConditions.push(condition);
     });
-    query["$or"] = productsConditions.concat(productAndVariantConditions);
+    query["$or"] = productsConditions;
   }
   const projection: ProjectionType<OrderDocument> = {
     date: 1,
@@ -63,69 +62,33 @@ export const getAnalytics = callableUserFunction(async (req) => {
       variantId: 1,
     },
   };
-  if (req.query.dataType == ChartDataType.Price) {
+  if (req.body.dataType == ChartDataType.Price) {
     projection["value"] = "$entries.price";
   } else {
     projection["value"] = "$entries.quantity";
   }
-  return Order.aggregate([
+  const pipeline: PipelineStage[] = [
     { $unwind: "$entries" },
     { $match: query },
     { $project: projection },
     {
-      $facet: {
-        CategorizedByVariant: [
-          {
-            $match: productAndVariantConditions?.length
-              ? { $or: productAndVariantConditions }
-              : { _id: null },
-          },
-          {
-            $group: {
-              _id: {
-                productId: { $toObjectId: "$entries.productId" },
-                variantId: "$entries.variantId",
-              },
-              value: { $sum: "$value" },
-              productData: {
-                $push: {
-                  date: "$date",
-                  value: "$value",
-                },
-              },
-            },
-          },
-        ],
-        CategorizedByProduct: [
-          {
-            $match: productsConditions?.length
-              ? { $or: productsConditions }
-              : { _id: null },
-          },
-          {
-            $group: {
-              _id: { productId: { $toObjectId: "$entries.productId" } },
-              value: { $sum: "$value" },
-              productData: {
-                $push: {
-                  date: "$date",
-                  value: "$value",
-                },
-              },
-            },
-          },
-        ],
-      },
+      $match: productsConditions?.length ? { $or: productsConditions } : {},
     },
     {
-      $project: {
-        items: {
-          $concatArrays: ["$CategorizedByVariant", "$CategorizedByProduct"],
+      $group: {
+        _id: {
+          productId: { $toObjectId: "$entries.productId" },
+          variantId: "$entries.variantId",
+        },
+        value: { $sum: "$value" },
+        productData: {
+          $push: {
+            date: "$date",
+            value: "$value",
+          },
         },
       },
     },
-    { $unwind: "$items" },
-    { $replaceRoot: { newRoot: "$items" } },
     {
       $lookup: {
         from: "products",
@@ -151,12 +114,21 @@ export const getAnalytics = callableUserFunction(async (req) => {
       },
     },
     {
+      $unwind: {
+        path: "$product",
+      },
+    },
+    {
       $addFields: {
-        name: { $ifNull: ["$variant.fullName", "$product.name"] },
+        productName: { $ifNull: ["$variant.fullName", "$product.name"] },
       },
     },
     {
       $unset: ["_id", "product", "variant"],
     },
-  ]);
+  ];
+  const resultData = await Order.aggregate(pipeline);
+  return {
+    data: resultData,
+  };
 });

@@ -3,6 +3,6 @@ import { getAnalytics } from "@/controllers/AnalyticsController";
 
 const AnalyticsRoutes = Router();
 
-AnalyticsRoutes.route("/").get(getAnalytics);
+AnalyticsRoutes.route("/").post(getAnalytics);
 
 export default AnalyticsRoutes;
