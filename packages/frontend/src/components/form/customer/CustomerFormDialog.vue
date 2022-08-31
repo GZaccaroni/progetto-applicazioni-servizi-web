@@ -110,7 +110,6 @@ async function saveForm() {
     } else {
       await addCustomer(data);
     }
-    closeForm();
     const message = create.value
       ? i18n.t("model.customer.added")
       : i18n.t("model.customer.edited");

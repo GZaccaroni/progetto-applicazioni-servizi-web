@@ -152,7 +152,6 @@ async function saveForm() {
     } else {
       await addUser(data as CreateUserInput);
     }
-    closeForm();
     const message = create.value
       ? i18n.t("model.user.added")
       : i18n.t("model.user.edited");

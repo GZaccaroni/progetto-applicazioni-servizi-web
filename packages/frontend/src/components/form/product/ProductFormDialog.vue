@@ -178,7 +178,6 @@ async function saveForm() {
     } else {
       await addProduct(data);
     }
-    closeForm();
     const message = create.value
       ? i18n.t("model.product.added")
       : i18n.t("model.product.edited");

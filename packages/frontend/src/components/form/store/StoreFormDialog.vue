@@ -146,7 +146,6 @@ async function saveForm() {
     } else {
       await addStore(data);
     }
-    closeForm();
     const message = create.value
       ? i18n.t("model.store.added")
       : i18n.t("model.store.edited");

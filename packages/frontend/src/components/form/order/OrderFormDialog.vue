@@ -263,7 +263,6 @@ async function saveForm() {
     } else {
       await addOrder(data);
     }
-    closeForm();
     const message = create.value
       ? i18n.t("model.order.added")
       : i18n.t("model.order.edited");

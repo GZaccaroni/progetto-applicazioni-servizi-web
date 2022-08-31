@@ -1,13 +1,13 @@
 /* eslint:disable no-var-requires */
 import sourceMapSupport = require("source-map-support");
 sourceMapSupport.install();
-import express, { NextFunction, Request, RequestHandler, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import session from "express-session";
 import User from "./model/db/User";
 import cors from "cors";
 import routes from "@/routes/Routes";
 import mongoose from "mongoose";
-import {Server, Socket} from "socket.io";
+import { Server } from "socket.io";
 import * as http from "http";
 import { queryParser } from "express-query-parser";
 import passport from "passport";

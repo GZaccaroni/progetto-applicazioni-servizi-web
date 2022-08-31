@@ -13,7 +13,7 @@ export function validateRequest<T>(
   if (ajv.validate(schema, data)) {
     return true;
   } else {
-    console.warn("Validation failed", ajv.errorsText(), data);
+    // console.warn("Validation failed", ajv.errorsText(), data);
     return false;
   }
 }
