@@ -14,6 +14,7 @@ export const FindStoresInputSchema: JSONSchemaType<FindStoresInput> = {
       properties: {
         authorized: {
           type: "boolean",
+          nullable: true,
         },
       },
     },
