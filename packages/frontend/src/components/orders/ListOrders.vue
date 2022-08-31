@@ -33,10 +33,11 @@ import { ref } from "vue";
 import { DataTableHeader } from "vuetify";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
-import { FindOrdersInput, observeOrders } from "@/repositories/OrderRepository";
+import { observeOrders } from "@/repositories/OrderRepository";
 import ListOrdersFilter from "@/components/orders/ListOrdersFilter.vue";
 import { NetworkOrder } from "@common/model/network/NetworkOrder";
 import ListOrderEntries from "@/components/orders/ListOrderEntries.vue";
+import { FindOrdersInput } from "@common/model/network/FindOrdersInput";
 
 const emit = defineEmits(["onRowEvent"]);
 

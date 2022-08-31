@@ -124,7 +124,7 @@ async function onBecameVisible(userToUpdate?: string) {
     isCurrentUser.value = userStore.userProfile?.id == userToUpdate;
     isCurrentUserAdmin.value = userStore.userProfile?.isAdmin ?? false;
   } else {
-    formData.value = defaultValues;
+    formData.value = clone(defaultValues);
     isCurrentUser.value = false;
   }
   changePassword.value = create.value;

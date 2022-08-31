@@ -88,7 +88,7 @@ async function onBecameVisible(itemToUpdate?: string) {
       formData.value = mapToFormValue(item);
     }
   } else {
-    formData.value = defaultValues;
+    formData.value = clone(defaultValues);
   }
   dialogLoading.value = false;
 }

@@ -20,12 +20,10 @@ import { ref } from "vue";
 import { DataTableHeader } from "vuetify";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
-import {
-  FindProductsInput,
-  observeProducts,
-} from "@/repositories/ProductRepository";
+import { observeProducts } from "@/repositories/ProductRepository";
 import { NetworkProduct } from "@common/model/network/NetworkProduct";
 import ListProductsFilter from "@/components/products/ListProductsFilter.vue";
+import { FindProductsInput } from "@common/model/network/FindProductsInput";
 
 const emit = defineEmits(["onRowEvent"]);
 

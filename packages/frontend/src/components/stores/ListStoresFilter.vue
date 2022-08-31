@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { reactive, watch } from "vue";
 import { removeBlanks } from "@/helpers/utils";
-import { FindStoresInput } from "@/repositories/StoreRepository";
+import { FindStoresInput } from "@common/model/network/FindStoresInput";
 
 const emit = defineEmits(["change"]);
 

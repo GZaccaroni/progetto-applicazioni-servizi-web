@@ -20,12 +20,10 @@ import { ref } from "vue";
 import { DataTableHeader } from "vuetify";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
-import {
-  FindCustomersInput,
-  observeCustomers,
-} from "@/repositories/CustomerRepository";
+import { observeCustomers } from "@/repositories/CustomerRepository";
 import ListCustomersFilter from "@/components/customers/ListCustomersFilter.vue";
 import { NetworkCustomer } from "@common/model/network/NetworkCustomer";
+import { FindCustomersInput } from "@common/model/network/FindCustomersInput";
 
 const emit = defineEmits(["onRowEvent"]);
 

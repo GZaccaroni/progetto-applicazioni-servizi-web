@@ -41,10 +41,10 @@
 <script setup lang="ts">
 import { reactive, watch } from "vue";
 import { removeBlanks } from "@/helpers/utils";
-import { FindOrdersInput } from "@/repositories/OrderRepository";
 import TextFieldDatePicker from "@/components/common/TextFieldDatePicker.vue";
 import AsyncSelect from "@/components/common/AsyncSelect.vue";
 import { getSelectStores } from "@/helpers/asyncSelectUtils";
+import { FindOrdersInput } from "@common/model/network/FindOrdersInput";
 
 const emit = defineEmits(["change"]);
 

@@ -21,8 +21,9 @@ import { DataTableHeader } from "vuetify";
 import { TableItemEvent } from "@/plugins/table-builder/TableItemEventType";
 import i18n from "@/i18n";
 import ListStoresFilter from "@/components/stores/ListStoresFilter.vue";
-import { FindStoresInput, observeStores } from "@/repositories/StoreRepository";
+import { observeStores } from "@/repositories/StoreRepository";
 import { NetworkStore } from "@common/model/network/NetworkStore";
+import { FindStoresInput } from "@common/model/network/FindStoresInput";
 
 const emit = defineEmits(["onRowEvent"]);
 
