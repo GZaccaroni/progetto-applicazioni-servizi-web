@@ -7,8 +7,6 @@ const resource = "/analytics";
 export async function getAnalyticsData(
   input: GetAnalyticsInput
 ): Promise<NetworkChartData> {
-  const result = await Client.get<NetworkChartData>(`${resource}`, {
-    params: input,
-  });
+  const result = await Client.post<NetworkChartData>(`${resource}`, input);
   return result.data;
 }
