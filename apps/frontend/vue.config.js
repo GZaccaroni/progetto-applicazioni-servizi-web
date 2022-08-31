@@ -6,7 +6,7 @@ module.exports = defineConfig({
   configureWebpack: {
     resolve: {
       alias: {
-        "@common": path.resolve(__dirname, "../common/dist"),
+        "@common": path.resolve(__dirname, "../../packages/common/dist"),
       },
     },
     module: {

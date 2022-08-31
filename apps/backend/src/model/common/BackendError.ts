@@ -1,4 +1,4 @@
-import { BackendErrorCode } from "@common/model/common/BackendErrorCode";
+import { BackendErrorCode } from "@colture-in-cloud/common/dist/model/common/BackendErrorCode";
 
 export class BackendError {
   errorCode: BackendErrorCode;

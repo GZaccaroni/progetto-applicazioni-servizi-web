@@ -1,16 +1,16 @@
-import { validateRequest } from "@common/validation";
+import { validateRequest } from "@colture-in-cloud/common/dist/validation";
 import Store, { StoreDocument, StoreProjection } from "@/model/db/Store";
 import Log from "@/model/db/Log";
 import mongoose, { FilterQuery, Types } from "mongoose";
 import { io } from "@/app";
 import User from "@/model/db/User";
 import Order from "@/model/db/Order";
-import { CreateUpdateStoreInputSchema } from "@common/validation/json_schema/CreateUpdateStoreInput";
-import { FindStoresInputSchema } from "@common/validation/json_schema/FindStoresInput";
+import { CreateUpdateStoreInputSchema } from "@colture-in-cloud/common/dist/validation/json_schema/CreateUpdateStoreInput";
+import { FindStoresInputSchema } from "@colture-in-cloud/common/dist/validation/json_schema/FindStoresInput";
 import { callableUserFunction } from "@/utils";
-import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
+import { CreateUpdateStoreInput } from "@colture-in-cloud/common/dist/model/network/CreateUpdateStoreInput";
 import { BackendError } from "@/model/common/BackendError";
-import { StoreAccessLevel } from "@common/model/common/StoreAccessLevel";
+import { StoreAccessLevel } from "@colture-in-cloud/common/dist/model/common/StoreAccessLevel";
 
 async function checkStoreConsistence(
   input: CreateUpdateStoreInput,

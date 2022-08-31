@@ -1,7 +1,7 @@
 import mongoose, { FilterQuery, PipelineStage, ProjectionType } from "mongoose";
 import Order, { OrderDocument } from "@/model/db/Order";
-import { validateRequest } from "@common/validation";
-import { GetAnalyticsInputSchema } from "@common/validation/json_schema/GetAnalyticsInput";
+import { validateRequest } from "@colture-in-cloud/common/dist/validation";
+import { GetAnalyticsInputSchema } from "@colture-in-cloud/common/dist/validation/json_schema/GetAnalyticsInput";
 import { callableUserFunction } from "@/utils";
 import { ChartDataType } from "@/model/common/ChartDataType";
 import { BackendError } from "@/model/common/BackendError";

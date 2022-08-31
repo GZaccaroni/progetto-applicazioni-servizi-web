@@ -9,6 +9,7 @@
     "lint": "npm run format:check"
   },
   "workspaces": [
+    "apps/*",
     "packages/*"
   ],
   "dependencies": {}

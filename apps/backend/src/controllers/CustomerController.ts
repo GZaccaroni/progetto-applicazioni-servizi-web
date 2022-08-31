@@ -1,4 +1,4 @@
-import { validateRequest } from "@common/validation";
+import { validateRequest } from "@colture-in-cloud/common/dist/validation";
 import Customer, {
   CustomerDocument,
   CustomerProjection,
@@ -7,10 +7,10 @@ import Log from "@/model/db/Log";
 import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import Order from "@/model/db/Order";
-import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";
-import { FindCustomersInputSchema } from "@common/validation/json_schema/FindCustomersInput";
+import { CreateUpdateCustomerInputSchema } from "@colture-in-cloud/common/dist/validation/json_schema/CreateUpdateCustomerInput";
+import { FindCustomersInputSchema } from "@colture-in-cloud/common/dist/validation/json_schema/FindCustomersInput";
 import { callableUserFunction } from "@/utils";
-import { CreateUpdateCustomerInput } from "@common/model/network/CreateUpdateCustomerInput";
+import { CreateUpdateCustomerInput } from "@colture-in-cloud/common/dist/model/network/CreateUpdateCustomerInput";
 import { BackendError } from "@/model/common/BackendError";
 
 const checkCustomerConsistence = async (

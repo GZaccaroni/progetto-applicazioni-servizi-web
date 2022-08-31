@@ -19,13 +19,13 @@
       "@/*": [
         "*"
       ],
-      "@common": ["../common/src"],
-      "@common/*": ["../../common/src/*"]
+      "@common": ["../../../packages/common/src"],
+      "@common/*": ["../../../packages/common/src/*"]
     }
   },
   "references": [
     {
-      "path": "../common"
+      "path": "../../packages/common"
     }
   ],
   "lib": ["esnext"],

@@ -32,9 +32,6 @@ import {
   compareAsc,
   differenceInDays,
   format,
-  getDay,
-  getMonth,
-  getYear,
   isSameDay,
   isSameMonth,
   isSameYear,
@@ -162,19 +159,14 @@ function groupByTimeUnit(
   timeUnit: TimeUnit
 ): ChartDataset<"line", ChartTimeDataPoint[]>[] {
   let groupByFormat: string;
-  let cleanDate: (date: Date) => Date;
   switch (timeUnit) {
     case "year":
-      cleanDate = (date) => new Date(getYear(date), 1, 1);
       groupByFormat = "yyyy";
       break;
     case "month":
-      cleanDate = (date) => new Date(getYear(date), getMonth(date), 1);
       groupByFormat = "MM-yyyy";
       break;
     case "day":
-      cleanDate = (date) =>
-        new Date(getYear(date), getMonth(date), getDay(date));
       groupByFormat = "dd-MM-yyyy";
       break;
     default:
