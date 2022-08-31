@@ -124,7 +124,7 @@ async function onBecameVisible(userToUpdate?: string) {
     isCurrentUser.value = userStore.userProfile?.id == userToUpdate;
     isCurrentUserAdmin.value = userStore.userProfile?.isAdmin ?? false;
   } else {
-    formData.value = clone(defaultValues);
+    formData.value = getDefaultFormValue();
     isCurrentUser.value = false;
   }
   changePassword.value = create.value;
@@ -200,7 +200,9 @@ function validateUpdateForm(
 function mapToFormValue(item: NetworkUser): RecursivePartial<UpdateUserInput> {
   return omit(item, "id");
 }
-const defaultValues: RecursivePartial<UpdateUserInput> = {
-  isAdmin: false,
-};
+function getDefaultFormValue(): RecursivePartial<UpdateUserInput> {
+  return {
+    isAdmin: false,
+  };
+}
 </script>

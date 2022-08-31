@@ -124,7 +124,7 @@ async function onBecameVisible(itemToUpdate?: string) {
       formData.value = mapToFormValue(item);
     }
   } else {
-    formData.value = clone(defaultValues);
+    formData.value = getDefaultFormValue();
   }
   dialogLoading.value = false;
 }
@@ -182,7 +182,9 @@ function mapToFormValue(
 ): RecursivePartial<CreateUpdateStoreInput> {
   return omit(item, "id");
 }
-const defaultValues: RecursivePartial<CreateUpdateStoreInput> = {
-  authorizations: [],
-};
+function getDefaultFormValue(): RecursivePartial<CreateUpdateStoreInput> {
+  return {
+    authorizations: [],
+  };
+}
 </script>

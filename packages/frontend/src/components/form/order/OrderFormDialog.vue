@@ -111,7 +111,7 @@
 <script setup lang="ts">
 import { computed, PropType, ref, watch } from "vue";
 import { repositoryErrorHandler } from "@/helpers/errorHandler";
-import { clone } from "lodash";
+import { clone, cloneDeep } from "lodash";
 import FormDialog, {
   GenericFormDialogModel,
 } from "@/components/common/FormDialog.vue";
@@ -193,7 +193,7 @@ async function onBecameVisible(itemToUpdate?: string) {
       formData.value = mapToFormValue(item);
     }
   } else {
-    formData.value = clone(defaultValues);
+    formData.value = getDefaultFormValue();
   }
   setProductKindsIdentifiers();
   dialogLoading.value = false;
@@ -308,8 +308,10 @@ function mapToFormValue(
     note: item.note,
   };
 }
-const defaultValues: RecursivePartial<CreateUpdateOrderInput> = {
-  entries: [],
-  date: toISODateString(new Date()),
-};
+function getDefaultFormValue(): RecursivePartial<CreateUpdateOrderInput> {
+  return {
+    entries: [],
+    date: toISODateString(new Date()),
+  };
+}
 </script>

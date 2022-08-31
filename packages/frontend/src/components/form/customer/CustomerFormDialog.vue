@@ -88,7 +88,7 @@ async function onBecameVisible(itemToUpdate?: string) {
       formData.value = mapToFormValue(item);
     }
   } else {
-    formData.value = clone(defaultValues);
+    formData.value = getDefaultFormValue();
   }
   dialogLoading.value = false;
 }
@@ -140,5 +140,7 @@ function mapToFormValue(
 ): RecursivePartial<CreateUpdateCustomerInput> {
   return omit(item, "id");
 }
-const defaultValues: RecursivePartial<NetworkCustomer> = {};
+function getDefaultFormValue(): RecursivePartial<CreateUpdateCustomerInput> {
+  return {};
+}
 </script>

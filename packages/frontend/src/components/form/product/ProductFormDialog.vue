@@ -149,7 +149,7 @@ async function onBecameVisible(itemToUpdate?: string) {
       formData.value = mapToFormValue(item);
     }
   } else {
-    formData.value = clone(defaultValues);
+    formData.value = getDefaultFormValue();
   }
   dialogLoading.value = false;
 }
@@ -208,7 +208,9 @@ function mapToFormValue(
 ): RecursivePartial<CreateUpdateProductInput> {
   return omit(item, "id");
 }
-const defaultValues: RecursivePartial<NetworkProduct> = {
-  kinds: [],
-};
+function getDefaultFormValue(): RecursivePartial<CreateUpdateProductInput> {
+  return {
+    kinds: [],
+  };
+}
 </script>
