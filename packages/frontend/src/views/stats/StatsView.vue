@@ -1,7 +1,9 @@
 <template>
   <v-container class="my-1" fluid>
     <header-view :title="$t('views.stats.title').toString()" />
-    <stats-chart />
+    <v-card>
+      <stats-chart />
+    </v-card>
   </v-container>
 </template>
 

@@ -202,7 +202,20 @@
       "title": "Ordini"
     },
     "stats": {
-      "title": "Statistiche"
+      "title": "Statistiche",
+      "totalSales": {
+        "quantity": "Quantità totale venduta nel periodo: {total}",
+        "price": "Entrate totali del periodo: {total}"
+      },
+      "trendChartTitle": "Andamento complessivo",
+      "chartByProductTitle": {
+        "quantity": "Quantità venduta per prodotto",
+        "price": "Entrate per prodotto"
+      },
+      "chartByPeriodTitle": {
+        "quantity": "Quantità venduta nel tempo",
+        "price": "Entrate nel tempo"
+      }
     },
     "stores": {
       "title": "Punti Vendita"
