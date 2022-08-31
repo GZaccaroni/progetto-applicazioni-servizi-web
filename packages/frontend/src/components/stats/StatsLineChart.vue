@@ -106,6 +106,11 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
       },
     },
   },
+  plugins: {
+    legend: {
+      display: !props.global,
+    },
+  },
 }));
 function getAtomicDataset(): ChartDataset<"line", ChartTimeDataPoint[]>[] {
   return props.data.data.map((el) => {
