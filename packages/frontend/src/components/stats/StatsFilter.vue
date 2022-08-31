@@ -35,6 +35,7 @@
                 :find-items-fn="getSelectProductKinds"
                 :multiple="true"
                 :clearable="true"
+                :return-object="true"
               />
             </v-col>
           </v-row>
@@ -72,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from "vue";
+import { ref, watch } from "vue";
 import { removeBlanks } from "@/helpers/utils";
 import TextFieldDatePicker from "@/components/common/TextFieldDatePicker.vue";
 import AsyncSelect from "@/components/common/AsyncSelect.vue";
@@ -81,39 +82,44 @@ import {
   getSelectCustomers,
   getSelectProductKinds,
   getSelectStores,
-  PRODUCT_KIND_IDENTIFIER_SEPARATOR,
+  SelectProductKind,
 } from "@/helpers/asyncSelectUtils";
-import { AnalyticsDataInput } from "@/repositories/AnalyticsRepository";
 import { ChartDataType } from "@common/model/common/ChartDataType";
+import { GetAnalyticsInput } from "@common/model/network/GetAnalyticsInput";
+import { AsyncSelectItem } from "@/components/common/AsyncSelectTypes";
 
 const emit = defineEmits(["change"]);
 
-const form = reactive<AnalyticsDataInput>({
-  dataType: ChartDataType.price,
+const form = ref<GetAnalyticsInput>({
+  dataType: ChartDataType.Quantity,
   fromDate: undefined,
   toDate: undefined,
+  products: undefined,
 });
 
-const productsKinds = computed<string[] | undefined>({
-  get: () => {
-    return form.items?.map((item) => {
-      return item.variantId == undefined
-        ? item.productId
-        : `${item.productId}${PRODUCT_KIND_IDENTIFIER_SEPARATOR}${item.variantId}`;
-    });
-  },
-  set: (newValue) => {
-    form.items = newValue?.map((el) => {
-      const kindComponents = el.split(PRODUCT_KIND_IDENTIFIER_SEPARATOR);
-      return {
-        productId: kindComponents[0],
-        variantId: kindComponents[1],
-      };
-    });
-  },
-});
+const productsKinds = ref<AsyncSelectItem<SelectProductKind>[]>([]);
 watch(
-  () => form,
+  productsKinds,
+  (newValue) => {
+    if (newValue.length == 0) {
+      form.value.products = undefined;
+    } else {
+      form.value.products = newValue.flatMap((selectItem) =>
+        selectItem.item != undefined
+          ? [
+              {
+                productId: selectItem.item.productId,
+                variantId: selectItem.item.variantId,
+              },
+            ]
+          : []
+      );
+    }
+  },
+  { deep: true }
+);
+watch(
+  form,
   (newValue) => {
     emit("change", removeBlanks(newValue));
   },

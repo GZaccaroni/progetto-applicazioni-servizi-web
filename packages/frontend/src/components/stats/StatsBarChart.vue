@@ -16,6 +16,7 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
+  ChartData,
 } from "chart.js";
 import { computed, PropType } from "vue";
 import { NetworkChartData } from "@common/model/network/NetworkChartData";
@@ -32,7 +33,7 @@ ChartJS.register(
 const props = defineProps({
   height: {
     type: Number,
-    default: 400,
+    default: 100,
   },
   data: {
     type: Object as PropType<NetworkChartData>,
@@ -40,9 +41,10 @@ const props = defineProps({
   },
 });
 const chartOptions = {
+  maintainAspectRatio: false,
   responsive: true,
 };
-const chartData = computed(() => {
+const chartData = computed<ChartData<"bar">>(() => {
   return {
     labels: [""],
     datasets: props.data.data.map((el) => {

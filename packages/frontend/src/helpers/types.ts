@@ -5,3 +5,8 @@ export type RecursivePartial<T> = {
     ? RecursivePartial<T[P]>
     : T[P];
 };
+
+export type ChartTimeDataPoint = {
+  x: Date;
+  y: number;
+};

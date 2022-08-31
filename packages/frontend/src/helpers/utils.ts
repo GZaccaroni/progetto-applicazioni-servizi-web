@@ -1,3 +1,5 @@
+import { compareAsc } from "date-fns";
+
 export function isBlank(str: string | undefined) {
   return !str || /^\s*$/.test(str);
 }
@@ -30,4 +32,16 @@ export function stringToColor(str: string) {
     colour += ("00" + value.toString(16)).substr(-2);
   }
   return colour;
+}
+export function getMinMax(array: Date[]): [Date, Date] | undefined {
+  if (array.length == 0) {
+    return undefined;
+  }
+  let minV = array[0];
+  let maxV = array[0];
+  for (const item of array) {
+    if (compareAsc(item, minV) == -1) minV = item;
+    if (compareAsc(item, maxV) == 1) maxV = item;
+  }
+  return [minV, maxV];
 }
