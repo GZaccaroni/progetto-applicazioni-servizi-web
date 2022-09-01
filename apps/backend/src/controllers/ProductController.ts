@@ -1,4 +1,4 @@
-import { validateRequest } from "@colture-in-cloud/common/dist/validation";
+import { validateRequest } from "@common/validation";
 import Product, {
   ProductDocument,
   ProductProjection,
@@ -7,10 +7,10 @@ import Log from "../model/db/Log";
 import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import Order from "../model/db/Order";
-import { FindProductsInputSchema } from "@colture-in-cloud/common/dist/validation/json_schema/FindProductsInput";
+import { FindProductsInputSchema } from "@common/validation/json_schema/FindProductsInput";
 import { callableUserFunction, DbIdentifiable } from "@/utils";
-import { CreateUpdateProductInputSchema } from "@colture-in-cloud/common/dist/validation/json_schema/CreateUpdateProductInput";
-import { CreateUpdateProductInput } from "@colture-in-cloud/common/dist/model/network/CreateUpdateProductInput";
+import { CreateUpdateProductInputSchema } from "@common/validation/json_schema/CreateUpdateProductInput";
+import { CreateUpdateProductInput } from "@common/model/network/CreateUpdateProductInput";
 import { BackendError } from "@/model/common/BackendError";
 
 const checkProductConsistence = async (

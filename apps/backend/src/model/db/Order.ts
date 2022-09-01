@@ -1,6 +1,6 @@
 import mongoose, { ProjectionType, Schema, Types } from "mongoose";
 import { mongoosePagination, Pagination } from "@/plugins/mongoose-paginate";
-import { NetworkIdentifiable } from "@colture-in-cloud/common/dist/model/network/NetworkIdentifiable";
+import { NetworkIdentifiable } from "@common/model/network/NetworkIdentifiable";
 import { ProductGrade } from "../common/ProductGrade";
 import { CustomerDocument } from "@/model/db/Customer";
 
