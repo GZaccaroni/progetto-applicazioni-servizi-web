@@ -1,10 +1,10 @@
 {
-  "name": "@colture-in-cloud/common",
+  "name": "package-common",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc --build"
+    "build": "npx tsc --build"
   },
   "types": "dist/index.d.ts",
   "keywords": [],
