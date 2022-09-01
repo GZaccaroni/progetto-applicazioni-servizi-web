@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <user-login-dialog v-if="!isLoggedIn" v-model="loginDialogVisible" />
+    <user-login-dialog v-model="loginDialogVisible" />
     <user-form-dialog v-if="isLoggedIn" v-model="userFormDialogModel" />
     <v-app-bar app color="white" elevate-on-scroll ref="menubar">
       <v-app-bar-nav-icon
