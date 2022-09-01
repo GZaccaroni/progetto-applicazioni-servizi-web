@@ -5,6 +5,7 @@ import { GetAnalyticsInputSchema } from "@common/validation/json_schema/GetAnaly
 import { callableUserFunction } from "@/utils";
 import { ChartDataType } from "@/model/common/ChartDataType";
 import { BackendError } from "@/model/common/BackendError";
+import Store from "@/model/db/Store";
 
 export const getAnalytics = callableUserFunction(async (req) => {
   if (!validateRequest(GetAnalyticsInputSchema, req.body)) {
@@ -16,10 +17,15 @@ export const getAnalytics = callableUserFunction(async (req) => {
       throw new BackendError("invalidArgument", "Invalid store id");
     }
     query["store.id"] = req.body.storeId;
-  } else {
-    if (!req.user.isAdmin) {
-      throw new BackendError("notAuthorized");
-    }
+  } else if (!req.user.isAdmin) {
+    // Show only authorized store data
+    const stores = await Store.find(
+      { "authorizations.userId": req.user._id },
+      "_id"
+    ).lean();
+    query["store.id"] = {
+      $in: stores.map((elem) => elem._id.toString()),
+    };
   }
   if (req.body.customerId) {
     if (!mongoose.isValidObjectId(req.body.customerId)) {

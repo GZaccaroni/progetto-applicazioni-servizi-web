@@ -71,7 +71,7 @@ const routes: Array<RouteConfig> = [
       import(/* webpackChunkName: "stats" */ "../views/stats/StatsView.vue"),
     meta: {
       requiresAuth: true,
-      requiresAdmin: true,
+      requiresAdmin: false,
     },
   },
   {
