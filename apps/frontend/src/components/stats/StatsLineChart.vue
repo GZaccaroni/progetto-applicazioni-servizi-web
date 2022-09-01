@@ -143,8 +143,9 @@ function inferTimeUnit(chartData: NetworkChartData): TimeUnit {
   const dates = chartData.data
     .flatMap((el) => el.productData)
     .map((el) => new Date(el.date));
-  if (dates.length == 0) return fallbackValue;
-  const [minDate, maxDate] = getMinMax(dates)!;
+  const minMaxDate = getMinMax(dates);
+  if (minMaxDate == undefined) return fallbackValue;
+  const [minDate, maxDate] = minMaxDate;
   const days = differenceInDays(new Date(minDate), new Date(maxDate));
   if (days > 365 * 1.5) {
     return "year";
@@ -211,8 +212,9 @@ function fillGapsWithZero(
   const dates = chartDatasets
     .flatMap((dataset) => dataset.data)
     .map((item) => item.x);
-  if (dates.length == 0) return chartDatasets;
-  const [minDate, maxDate] = getMinMax(dates)!;
+  const minMaxDate = getMinMax(dates);
+  if (minMaxDate == undefined) return chartDatasets;
+  const [minDate, maxDate] = minMaxDate;
   return chartDatasets.map((dataset) => {
     let currentIterationDate: Date | undefined = undefined;
     do {
