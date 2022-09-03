@@ -79,6 +79,6 @@ async function saveForm() {
   submitButtonLoading.value = false;
 }
 function validateForm(form: Partial<UserLoginInput>): form is UserLoginInput {
-  return validateRequest(UserLoginInputSchema, form);
+  return validateRequest(UserLoginInputSchema, removeBlanks(form));
 }
 </script>

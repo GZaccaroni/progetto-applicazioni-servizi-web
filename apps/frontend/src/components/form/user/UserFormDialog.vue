@@ -174,9 +174,9 @@ function validateForm(
   form: RecursivePartial<UpdateUserInput>
 ): form is UpdateUserInput | CreateUserInput {
   if (create.value) {
-    return validateCreateForm(form);
+    return validateCreateForm(removeBlanks(form));
   } else {
-    return validateUpdateForm(form);
+    return validateUpdateForm(removeBlanks(form));
   }
 }
 function validateCreateForm(

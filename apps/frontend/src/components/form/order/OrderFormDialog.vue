@@ -283,7 +283,7 @@ function closeForm() {
 function validateForm(
   form: RecursivePartial<CreateUpdateOrderInput>
 ): form is CreateUpdateOrderInput {
-  return validateRequest(CreateUpdateOrderInputSchema, form);
+  return validateRequest(CreateUpdateOrderInputSchema, removeBlanks(form));
 }
 
 // Helpers

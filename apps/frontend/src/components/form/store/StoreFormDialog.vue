@@ -166,7 +166,7 @@ function closeForm() {
 function validateForm(
   form: RecursivePartial<CreateUpdateStoreInput>
 ): form is CreateUpdateStoreInput {
-  return validateRequest(CreateUpdateStoreInputSchema, form);
+  return validateRequest(CreateUpdateStoreInputSchema, removeBlanks(form));
 }
 
 function addAuthorizedUser() {
