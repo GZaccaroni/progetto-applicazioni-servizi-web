@@ -8,7 +8,7 @@ import mongoose, { FilterQuery } from "mongoose";
 import { io } from "@/app";
 import Order from "../model/db/Order";
 import { FindProductsInputSchema } from "@common/validation/json_schema/FindProductsInput";
-import { callableUserFunction, DbIdentifiable } from "@/utils";
+import { callableUserFunction, DbIdentifiable } from "@/utils/utils";
 import { CreateUpdateProductInputSchema } from "@common/validation/json_schema/CreateUpdateProductInput";
 import { CreateUpdateProductInput } from "@common/model/network/CreateUpdateProductInput";
 import { BackendError } from "@/model/common/BackendError";

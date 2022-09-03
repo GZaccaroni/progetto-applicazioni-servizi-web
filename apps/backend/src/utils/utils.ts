@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { UserDocument } from "./model/db/User";
+import { UserDocument } from "../model/db/User";
 import { RequestHandler } from "express-serve-static-core";
 import { BackendError } from "@/model/common/BackendError";
 import { Error as MongooseError, Types } from "mongoose";

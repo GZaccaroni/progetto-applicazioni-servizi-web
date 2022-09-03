@@ -11,7 +11,7 @@ import {
   PaginatedResult,
   PaginatedResultCursors,
 } from "@common/model/common/PaginatedResult";
-import { DbIdentifiable } from "@/utils";
+import { DbIdentifiable } from "@/utils/utils";
 import bsonUrlEncoding from "./bsonUrlEncoding";
 import { clone, omit } from "lodash";
 

@@ -13,7 +13,7 @@ import { io } from "@/app";
 import { getUserStoreRole } from "./StoreController";
 import { CreateUpdateOrderInputSchema } from "@common/validation/json_schema/CreateUpdateOrderInput";
 import { FindOrdersInputSchema } from "@common/validation/json_schema/FindOrdersInput";
-import { callableUserFunction, DbIdentifiable } from "@/utils";
+import { callableUserFunction, DbIdentifiable } from "@/utils/utils";
 import { StoreAccessLevel } from "@/model/common/StoreAccessLevel";
 import { CreateUpdateOrderInput } from "@common/model/network/CreateUpdateOrderInput";
 import { BackendError } from "@/model/common/BackendError";

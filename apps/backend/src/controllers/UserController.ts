@@ -9,7 +9,7 @@ import { CreateUserInputSchema } from "@common/validation/json_schema/CreateUser
 import { FindUsersInputSchema } from "@common/validation/json_schema/FindUsersInput";
 import { UpdateUserInputSchema } from "@common/validation/json_schema/UpdateUserInput";
 import { UserLoginInputSchema } from "@common/validation/json_schema/UserLoginInput";
-import { callableUserFunction } from "@/utils";
+import { callableUserFunction } from "@/utils/utils";
 import mongoose, { FilterQuery } from "mongoose";
 import { BackendError } from "@/model/common/BackendError";
 

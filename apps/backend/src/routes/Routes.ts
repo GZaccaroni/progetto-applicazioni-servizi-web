@@ -5,7 +5,7 @@ import OrderRoutes from "./OrderRoutes";
 import CustomerRoutes from "./CustomerRoutes";
 import StoreRoutes from "./StoreRoutes";
 import UserRoutes from "./UserRoutes";
-import { isUserLoggedIn } from "@/utils";
+import { isUserLoggedIn } from "@/utils/utils";
 
 const router = Router();
 

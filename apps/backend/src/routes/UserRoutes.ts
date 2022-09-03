@@ -9,7 +9,7 @@ import {
   userLogin,
   userLogout,
 } from "@/controllers/UserController";
-import { isUserLoggedIn } from "@/utils";
+import { isUserLoggedIn } from "@/utils/utils";
 
 const UserRoutes = Router();
 

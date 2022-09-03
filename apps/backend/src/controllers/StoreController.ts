@@ -7,7 +7,7 @@ import User from "@/model/db/User";
 import Order from "@/model/db/Order";
 import { CreateUpdateStoreInputSchema } from "@common/validation/json_schema/CreateUpdateStoreInput";
 import { FindStoresInputSchema } from "@common/validation/json_schema/FindStoresInput";
-import { callableUserFunction } from "@/utils";
+import { callableUserFunction } from "@/utils/utils";
 import { CreateUpdateStoreInput } from "@common/model/network/CreateUpdateStoreInput";
 import { BackendError } from "@/model/common/BackendError";
 import { StoreAccessLevel } from "@common/model/common/StoreAccessLevel";

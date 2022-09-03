@@ -19,6 +19,7 @@ import {
   SESSION_SECRET,
   SESSIONS_COLLECTION,
 } from "@/config";
+import { installIfNeeded } from "@/utils/install";
 
 const MongoDBStore = connect_mongodb_session(session);
 
@@ -73,11 +74,17 @@ app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-server.listen(port, () => {
-  return console.log(`Express is listening at http://localhost:${port}`);
-});
-
-// connect to database
-mongoose.connect(MONGODB_CONNECTION_STRING).then(() => {
-  console.log("Db connected");
+async function startApp() {
+  try {
+    await mongoose.connect(MONGODB_CONNECTION_STRING);
+  } catch (e) {
+    console.error("Connection to persistence failed", e);
+  }
+  console.log("Connection to persistence succeeded");
+  await installIfNeeded();
+}
+startApp().then(() => {
+  server.listen(port, () =>
+    console.log(`Backend is listening at http://localhost:${port}`)
+  );
 });

@@ -9,7 +9,7 @@ import { io } from "@/app";
 import Order from "@/model/db/Order";
 import { CreateUpdateCustomerInputSchema } from "@common/validation/json_schema/CreateUpdateCustomerInput";
 import { FindCustomersInputSchema } from "@common/validation/json_schema/FindCustomersInput";
-import { callableUserFunction } from "@/utils";
+import { callableUserFunction } from "@/utils/utils";
 import { CreateUpdateCustomerInput } from "@common/model/network/CreateUpdateCustomerInput";
 import { BackendError } from "@/model/common/BackendError";
 
