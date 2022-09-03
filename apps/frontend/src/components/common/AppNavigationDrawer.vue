@@ -15,10 +15,13 @@
 
     <v-list dense nav>
       <template v-for="group in visibleMenuItems">
-        <v-subheader :key="group.title" v-if="group.title !== undefined">
+        <v-subheader
+          :key="group.title + '_header'"
+          v-if="group.title !== undefined"
+        >
           {{ $t(group.title) }}
         </v-subheader>
-        <v-list-item-group :key="group.title" color="primary">
+        <v-list-item-group :key="group.title + '_group'" color="primary">
           <v-list-item
             v-for="item in group.items"
             :key="item.title"
