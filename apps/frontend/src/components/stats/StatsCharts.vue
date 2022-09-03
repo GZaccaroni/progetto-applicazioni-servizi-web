@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%">
     <stats-filter @change="updateChartData" />
-    <v-container fluid class="pa-8">
+    <v-container v-if="!loading" fluid class="pa-8">
       <p v-if="totalValue !== undefined">
         {{
           $i18n.t(`views.stats.totalSales.${filterInput.dataType}`, {
@@ -36,6 +36,14 @@
         height="400"
       />
     </v-container>
+    <div class="text-center" v-if="loading">
+      <v-progress-circular
+        :size="60"
+        color="primary"
+        class="ma-16"
+        indeterminate
+      ></v-progress-circular>
+    </div>
   </div>
 </template>
 
@@ -51,6 +59,7 @@ import { repositoryErrorHandler } from "@/helpers/errorHandler";
 import { ChartDataType } from "@common/model/common/ChartDataType";
 import { GetAnalyticsInput } from "@common/model/network/GetAnalyticsInput";
 
+const loading = ref(false);
 const chartData = ref<NetworkChartData | undefined>(undefined);
 const filterInput = ref<GetAnalyticsInput>({
   dataType: ChartDataType.Quantity,
@@ -60,12 +69,14 @@ const totalValue = computed(() => {
   return sumBy(chartData.value.data, "value");
 });
 async function updateChartData(input: GetAnalyticsInput) {
+  loading.value = true;
   try {
     filterInput.value = input;
     chartData.value = await getAnalyticsData(input);
   } catch (e) {
     await repositoryErrorHandler(e);
   }
+  loading.value = false;
 }
 onMounted(() => {
   updateChartData(filterInput.value);
