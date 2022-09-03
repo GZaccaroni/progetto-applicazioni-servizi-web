@@ -5,8 +5,6 @@ WORKDIR /app
 
 # copy both 'package.json' and 'package-lock.json' (if available)
 COPY package*.json ./
-
-# copy both 'package.json' and 'package-lock.json' (if available)
 COPY apps/backend/package*.json ./apps/backend/
 COPY packages/common/package*.json ./packages/common/
 
@@ -19,7 +17,6 @@ COPY apps/backend apps/backend
 COPY packages/common packages/common
 
 WORKDIR /app/apps/backend
-# build app for production with minification
 
 EXPOSE 3000
 CMD ["npm", "run", "start"]
