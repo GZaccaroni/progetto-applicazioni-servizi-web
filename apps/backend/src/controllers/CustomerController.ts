@@ -84,7 +84,7 @@ export const updateCustomer = callableUserFunction(async (req) => {
   }
   await checkCustomerConsistence(req.body, req.params.customerId);
   const customerId = req.params.customerId;
-  const updatedCustomer = await Customer.updateOne(
+  const updatedCustomer = await Customer.replaceOne(
     { _id: req.params.customerId },
     req.body
   );

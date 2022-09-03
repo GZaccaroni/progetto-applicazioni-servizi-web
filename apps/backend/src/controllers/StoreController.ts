@@ -130,7 +130,7 @@ export const updateStore = callableUserFunction(async (req) => {
   }
   await checkStoreConsistence(req.body, req.params.storeId);
 
-  const updatedStore = await Store.updateOne(
+  const updatedStore = await Store.replaceOne(
     { _id: req.params.storeId },
     req.body
   );

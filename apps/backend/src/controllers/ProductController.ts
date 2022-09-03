@@ -120,12 +120,9 @@ export const updateProduct = callableUserFunction(async (req) => {
       "Can't delete product kind: the product kind has associated orders"
     );
   }
-  const updatedProduct = await Product.updateOne(
+  const updatedProduct = await Product.replaceOne(
     { _id: product._id },
-    enrichedProduct,
-    {
-      new: true,
-    }
+    enrichedProduct
   );
   if (updatedProduct.matchedCount < 1) {
     throw new BackendError("itemNotFound");

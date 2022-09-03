@@ -198,7 +198,10 @@ export const updateOrder = callableUserFunction(async (req) => {
     throw new BackendError("notAuthorized");
   }
   const enrichedOrder = await enrichOrder(req.body, order.createdBy);
-  const updatedOrder = await Order.updateOne({ _id: order._id }, enrichedOrder);
+  const updatedOrder = await Order.replaceOne(
+    { _id: order._id },
+    enrichedOrder
+  );
   if (updatedOrder.matchedCount < 1) {
     throw new BackendError("itemNotFound");
   }
