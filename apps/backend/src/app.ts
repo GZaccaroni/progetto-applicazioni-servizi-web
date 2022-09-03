@@ -12,10 +12,23 @@ import * as http from "http";
 import { queryParser } from "express-query-parser";
 import passport from "passport";
 import { BackendError } from "@/model/common/BackendError";
+import connect_mongodb_session from "connect-mongodb-session";
+import {
+  MONGODB_CONNECTION_STRING,
+  SESSION_MAX_AGE,
+  SESSION_SECRET,
+  SESSIONS_COLLECTION,
+} from "@/config";
+
+const MongoDBStore = connect_mongodb_session(session);
 
 const app = express();
 const port = 3000;
 const server = http.createServer(app);
+const store = new MongoDBStore({
+  uri: MONGODB_CONNECTION_STRING,
+  collection: SESSIONS_COLLECTION,
+});
 export const io = new Server(server, {
   cors: { credentials: true, origin: true },
 });
@@ -32,10 +45,11 @@ app.use(
   })
 );
 const sessionMiddleware = session({
-  secret: "r8q,+&1LM3)CD*zAGpx1xm{Pusadnstrc;#",
+  secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
+  cookie: { maxAge: SESSION_MAX_AGE }, // 1 hour,
+  store,
 });
 app.use(sessionMiddleware);
 
@@ -64,10 +78,6 @@ server.listen(port, () => {
 });
 
 // connect to database
-mongoose
-  .connect(
-    "mongodb+srv://admin:C0W6J0tA3jl8X4Cb@maincolturecloud.fujik.mongodb.net/main"
-  )
-  .then(() => {
-    console.log("Db connected");
-  });
+mongoose.connect(MONGODB_CONNECTION_STRING).then(() => {
+  console.log("Db connected");
+});
