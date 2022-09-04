@@ -1,8 +1,8 @@
 import { AppConfig } from "@/config/AppConfig";
 
 const config: AppConfig = {
-  httpEndpoint: "http://localhost:3000",
-  socketIoEndpoint: "http://localhost:3000/",
+  apiEndpoint: process.env.API_ENDPOINT || "http://localhost:3000",
+  socketIoEndpoint: process.env.SOCKETIO_ENDPOINT || "http://localhost:3000/",
 };
 
 export default config;

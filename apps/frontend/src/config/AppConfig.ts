@@ -2,7 +2,7 @@ import DevelopmentAppConfig from "@/config/DevelopmentAppConfig";
 import ProductionAppConfig from "@/config/ProductionAppConfig";
 
 export interface AppConfig {
-  httpEndpoint: string;
+  apiEndpoint: string;
   socketIoEndpoint: string;
 }
 

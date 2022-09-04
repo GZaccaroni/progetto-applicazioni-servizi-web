@@ -49,7 +49,7 @@ const sessionMiddleware = session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAge: SESSION_MAX_AGE }, // 1 hour,
+  cookie: { maxAge: SESSION_MAX_AGE },
   store,
 });
 app.use(sessionMiddleware);
