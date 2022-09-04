@@ -1,0 +1,43 @@
+services:
+  backend:
+    image: colture-backend
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    ports:
+      - "${BACKEND_PORT}:3000"
+    environment:
+      - "MONGODB_CONNECTION_STRING=mongodb://persistence/main"
+      - "SESSION_SECRET=r8q,+&1LM3)CD*zAGpx1xm{Pusadnstrc;#"
+    networks:
+      - coltureNetwork
+    depends_on:
+      - persistence
+
+  frontend:
+    image: colture-frontend
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    ports:
+      - "${FRONTEND_PORT}:8080"
+    environment:
+      - "API_ENDPOINT=http://localhost:3000/"
+      - "SOCKETIO_ENDPOINT=http://localhost:3000/"
+    networks:
+      - coltureNetwork
+
+  persistence:
+    image: mongo:6.0.1
+    ports:
+      - "27017:27017"
+    volumes:
+      - "mongoVolume:/data/db"
+    networks:
+      - coltureNetwork
+
+volumes:
+  mongoVolume:
+
+networks:
+  coltureNetwork:
