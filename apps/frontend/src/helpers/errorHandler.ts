@@ -9,7 +9,7 @@ export async function repositoryErrorHandler(reason: unknown) {
   let errorMessage: string;
   if (reason instanceof AxiosError) {
     const errorCode: BackendErrorCode | undefined =
-      reason.response?.data.error?.code;
+      reason.response?.data?.error?.code;
     if (errorCode != undefined) {
       errorMessage = i18n.t("error." + errorCode).toString();
       switch (errorCode) {
