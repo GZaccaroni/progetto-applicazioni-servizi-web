@@ -35,7 +35,7 @@ const enrichOrder = async (
   }
 
   //get Customer data
-  let customer: OrderDocument["customer"] | null = null;
+  let customer: OrderDocument["customer"] | undefined = undefined;
   if (order.customerId != null) {
     customer = await Customer.findById(
       order.customerId,
