@@ -35,12 +35,15 @@ const enrichOrder = async (
   }
 
   //get Customer data
-  const customer: OrderDocument["customer"] | null = await Customer.findById(
-    order.customerId,
-    CustomerProjection
-  ).lean();
-  if (customer == null) {
-    throw new BackendError("invalidArgument", "Customer not found");
+  let customer: OrderDocument["customer"] | null = null;
+  if (order.customerId != null) {
+    customer = await Customer.findById(
+      order.customerId,
+      CustomerProjection
+    ).lean();
+    if (customer == null) {
+      throw new BackendError("invalidArgument", "Customer not found");
+    }
   }
 
   //generate product name
